@@ -14,4 +14,6 @@ public interface IProductsFacade {
     @PostMapping()
     ResponseEntity<DtoProducts> addProduct(@RequestBody DtoProducts prudct);
     
+    @GetMapping
+    ResponseEntity<DtoProducts> retrieveAllProducts();
 }

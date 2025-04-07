@@ -39,4 +39,17 @@ public class ProductsFacadeImpl implements IProductsFacade {
 			return new ResponseEntity<>(null, e.getExceptHttpStatus());
 		}
     }
+
+	@Override
+	public ResponseEntity<DtoProducts> retrieveAllProducts() {
+		LOGGER.info("Retrieving all products");
+		try {
+			var products = service.getProducts();
+			var mapped = modelMapper.map(products, DtoProducts.class);
+			return new ResponseEntity<>(mapped, HttpStatus.OK);
+		} catch (BloSalesBusinessException e) {
+			LOGGER.error(e.getMessage());
+			return new ResponseEntity<>(null, e.getExceptHttpStatus());
+		}
+	}
 }

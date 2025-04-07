@@ -23,4 +23,10 @@ public class ProductsServiceImpl implements IProductsService {
     	LOGGER.info(String.format("products on service %s", String.valueOf(products)));
         return dao.addProducts(products);
     }
+
+	@Override
+	public DtoIntProducts getProducts() throws BloSalesBusinessException {
+		LOGGER.info("Get products");
+		return dao.getProducts();
+	}
 }

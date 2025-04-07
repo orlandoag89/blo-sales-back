@@ -6,5 +6,7 @@ import com.blo.sales.service.dto.DtoIntProducts;
 public interface IProductsDao {
 	
 	DtoIntProducts addProducts(DtoIntProducts products) throws BloSalesBusinessException;
+	
+	DtoIntProducts getProducts() throws BloSalesBusinessException;
 
 }

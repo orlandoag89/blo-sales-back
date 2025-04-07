@@ -46,4 +46,22 @@ public class ProductsDaoImpl implements IProductsDao {
 		return toOut;
 	}
 
+	@Override
+	public DtoIntProducts getProducts() throws BloSalesBusinessException {
+		var allProducts = repository.findAll();
+		LOGGER.info(String.format("Products found: %s", String.valueOf(allProducts)));
+		
+		DtoIntProducts toOut = new DtoIntProducts();
+		List<DtoIntProduct> productsList = new ArrayList<>();
+		
+		allProducts.forEach(p -> {
+			var product = modelMapper.map(p, DtoIntProduct.class);
+			LOGGER.info(String.format("product mapped: %s", String.valueOf(product)));
+			productsList.add(product);
+		});
+		
+		toOut.setProducts(productsList);
+		return toOut;
+	}
+
 }
