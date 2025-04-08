@@ -4,6 +4,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -21,4 +22,7 @@ public interface IProductsFacade {
     
     @GetMapping("/{productId}")
     ResponseEntity<DtoProduct> retrieveProduct(@PathVariable String productId);
+    
+    @PutMapping("/{productId}")
+    ResponseEntity<DtoProduct> updateProduct(@PathVariable String productId, @RequestBody DtoProduct product);
 }

@@ -36,4 +36,10 @@ public class ProductsServiceImpl implements IProductsService {
 		LOGGER.info(String.format("getting product by id: %s", productId));
 		return dao.getProduct(productId);
 	}
+
+	@Override
+	public DtoIntProduct updateProduct(String productId, DtoIntProduct data) throws BloSalesBusinessException {
+		LOGGER.info(String.format("Updating product by id: %s", String.valueOf(data)));
+		return dao.updateProduct(productId, data);
+	}
 }

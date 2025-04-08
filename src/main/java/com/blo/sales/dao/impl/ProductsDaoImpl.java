@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.blo.sales.dao.IProductsDao;
+import com.blo.sales.dao.docs.Product;
 import com.blo.sales.dao.docs.Products;
 import com.blo.sales.dao.repository.ProductsRepository;
 import com.blo.sales.exceptions.BloSalesBusinessException;
@@ -82,6 +83,25 @@ public class ProductsDaoImpl implements IProductsDao {
 		
 		var product = modelMapper.map(productFound.get(), DtoIntProduct.class);
 		return product;
+	}
+
+	@Override
+	public DtoIntProduct updateProduct(String productId, DtoIntProduct data) throws BloSalesBusinessException {
+		var productFound = getProduct(productId);
+		LOGGER.info(String.format("Updating data %s", productFound));
+		
+		productFound.setDesc(data.getDesc());
+		productFound.setName(data.getName());
+		productFound.setQuantity(data.getQuantity());
+		productFound.setTotal_price(data.getTotal_price());
+		
+		var product = modelMapper.map(productFound, Product.class);
+		
+		var saved = repository.save(product);
+		var out = modelMapper.map(saved, DtoIntProduct.class);
+		LOGGER.info(String.format("product updated: %s", String.valueOf(out)));
+		return out;
+		
 	}
 
 }

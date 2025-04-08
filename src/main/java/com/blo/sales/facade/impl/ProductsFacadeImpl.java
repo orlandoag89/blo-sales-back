@@ -14,6 +14,7 @@ import com.blo.sales.facade.IProductsFacade;
 import com.blo.sales.facade.dto.DtoProduct;
 import com.blo.sales.facade.dto.DtoProducts;
 import com.blo.sales.service.IProductsService;
+import com.blo.sales.service.dto.DtoIntProduct;
 import com.blo.sales.service.dto.DtoIntProducts;
 
 @RestController
@@ -61,6 +62,20 @@ public class ProductsFacadeImpl implements IProductsFacade {
 			var product = service.getProduct(productId);
 			var mappedProduct = modelMapper.map(product, DtoProduct.class);
 			return new ResponseEntity<DtoProduct>(mappedProduct, HttpStatus.OK);
+		} catch (BloSalesBusinessException e) {
+			LOGGER.error(e.getExceptionMessage());
+			return new ResponseEntity<>(null, e.getExceptHttpStatus());
+		}
+	}
+
+	@Override
+	public ResponseEntity<DtoProduct> updateProduct(String productId, DtoProduct product) {
+		LOGGER.info(String.format("Update info by id: %s, data %s", productId,  Encode.forJava(String.valueOf(product))));
+		try {
+			var productInner = modelMapper.map(product, DtoIntProduct.class);
+			var productUpdated = service.updateProduct(productId, productInner);
+			var productToOuter = modelMapper.map(productUpdated, DtoProduct.class);
+			return new ResponseEntity<>(productToOuter, HttpStatus.OK);
 		} catch (BloSalesBusinessException e) {
 			LOGGER.error(e.getExceptionMessage());
 			return new ResponseEntity<>(null, e.getExceptHttpStatus());
