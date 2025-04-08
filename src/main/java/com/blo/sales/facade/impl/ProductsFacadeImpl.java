@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.blo.sales.exceptions.BloSalesBusinessException;
 import com.blo.sales.facade.IProductsFacade;
+import com.blo.sales.facade.dto.DtoProduct;
 import com.blo.sales.facade.dto.DtoProducts;
 import com.blo.sales.service.IProductsService;
 import com.blo.sales.service.dto.DtoIntProducts;
@@ -48,7 +49,20 @@ public class ProductsFacadeImpl implements IProductsFacade {
 			var mapped = modelMapper.map(products, DtoProducts.class);
 			return new ResponseEntity<>(mapped, HttpStatus.OK);
 		} catch (BloSalesBusinessException e) {
-			LOGGER.error(e.getMessage());
+			LOGGER.error(e.getExceptionMessage());
+			return new ResponseEntity<>(null, e.getExceptHttpStatus());
+		}
+	}
+
+	@Override
+	public ResponseEntity<DtoProduct> retrieveProduct(String productId) {
+		LOGGER.info(String.format("Retrieving product %s", productId));
+		try {
+			var product = service.getProduct(productId);
+			var mappedProduct = modelMapper.map(product, DtoProduct.class);
+			return new ResponseEntity<DtoProduct>(mappedProduct, HttpStatus.OK);
+		} catch (BloSalesBusinessException e) {
+			LOGGER.error(e.getExceptionMessage());
 			return new ResponseEntity<>(null, e.getExceptHttpStatus());
 		}
 	}

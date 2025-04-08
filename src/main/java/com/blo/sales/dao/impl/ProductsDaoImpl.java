@@ -7,6 +7,8 @@ import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.blo.sales.dao.IProductsDao;
@@ -26,6 +28,12 @@ public class ProductsDaoImpl implements IProductsDao {
 	
 	@Autowired
 	private ModelMapper modelMapper;
+	
+	@Value("${exceptions.codes.not-found}")
+	private String notFoundCode;
+	
+	@Value("${exceptions.messages.not-found}")
+	private String notFoundMessage;
 
 	@Override
 	public DtoIntProducts addProducts(DtoIntProducts products) throws BloSalesBusinessException {
@@ -62,6 +70,18 @@ public class ProductsDaoImpl implements IProductsDao {
 		
 		toOut.setProducts(productsList);
 		return toOut;
+	}
+
+	@Override
+	public DtoIntProduct getProduct(String productId) throws BloSalesBusinessException {
+		var productFound = repository.findById(productId);
+		if (!productFound.isPresent()) {
+			LOGGER.error(String.format("id %s not found", productId));
+			throw new BloSalesBusinessException(notFoundMessage, notFoundCode, HttpStatus.NOT_FOUND);
+		}
+		
+		var product = modelMapper.map(productFound.get(), DtoIntProduct.class);
+		return product;
 	}
 
 }

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.blo.sales.dao.IProductsDao;
 import com.blo.sales.exceptions.BloSalesBusinessException;
 import com.blo.sales.service.IProductsService;
+import com.blo.sales.service.dto.DtoIntProduct;
 import com.blo.sales.service.dto.DtoIntProducts;
 
 @Service
@@ -28,5 +29,11 @@ public class ProductsServiceImpl implements IProductsService {
 	public DtoIntProducts getProducts() throws BloSalesBusinessException {
 		LOGGER.info("Get products");
 		return dao.getProducts();
+	}
+
+	@Override
+	public DtoIntProduct getProduct(String productId) throws BloSalesBusinessException {
+		LOGGER.info(String.format("getting product by id: %s", productId));
+		return dao.getProduct(productId);
 	}
 }

@@ -8,16 +8,18 @@ public class BloSalesBusinessException extends Exception {
 	
 	private String exceptionMessage;
 	
-	private HttpStatus exceptionHttpStatus; 
-
+	private HttpStatus exceptionHttpStatus;
+	
 	public BloSalesBusinessException(String error, String errorCode) {
 		super("[" + errorCode + "] " + error);
 		exceptionMessage = this.getMessage();
 		exceptionHttpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
 	}
-	
-	public void setExceptionHttpStatus(HttpStatus httpStatus) {
-		this.exceptionHttpStatus = httpStatus;
+
+	public BloSalesBusinessException(String error, String errorCode, HttpStatus httpStatus) {
+		super("[" + errorCode + "] " + error);
+		exceptionMessage = this.getMessage();
+		exceptionHttpStatus = httpStatus;
 	}
 	
 	public String getExceptionMessage() {
