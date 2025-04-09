@@ -2,6 +2,7 @@ package com.blo.sales.business.impl;
 
 import java.math.BigDecimal;
 
+import org.owasp.encoder.Encode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 import com.blo.sales.business.IDebtorsBusiness;
 import com.blo.sales.business.dto.DtoIntDebtor;
 import com.blo.sales.business.dto.DtoIntDebtors;
+import com.blo.sales.business.dto.DtoIntPartialPyment;
 import com.blo.sales.dao.IDebtorsDao;
 import com.blo.sales.exceptions.BloSalesBusinessException;
 
@@ -52,22 +54,23 @@ public class DebtorsService implements IDebtorsBusiness {
 	}
 
 	@Override
-	public DtoIntDebtor addPayment(BigDecimal partialPyment, String id) throws BloSalesBusinessException {
-		LOGGER.info(String.format("adding partial payment: %s to: %s", partialPyment, id));
-		var debtor = dao.getDebtorById(id);
-		var newAccount = debtor.getTotal().subtract(partialPyment);
-		LOGGER.info(String.format("new account min partial pyment %s", newAccount));
-		/** si la deuda es menor o igual a 0 entonces se debe eliminar el deudor */
-		if (newAccount.compareTo(BigDecimal.ZERO) == 0 || newAccount.compareTo(BigDecimal.ZERO) < 0) {
-			LOGGER.info("account is <= 0");
+	public DtoIntDebtor addPartialPyment(String id, DtoIntPartialPyment partialPyment)
+			throws BloSalesBusinessException {
+		LOGGER.info(String.format("Adding partial pyment %s to %s", Encode.forJava(String.valueOf(partialPyment)), id));
+		var debtorFound = getDebtorById(id);
+		var newAccount = debtorFound.getTotal().subtract(partialPyment.getPartial_pyment());
+		LOGGER.info(String.format("new account %s", newAccount));
+		
+		if (debtorFound.getTotal().compareTo(BigDecimal.ZERO) <= 0) {
+			LOGGER.info("this account was payed");
 			dao.deleteDebtorById(id);
-			return null;
+			return new DtoIntDebtor();
 		}
-		/** Actualiza la deuda y agrega el producto */
-		debtor.getPartial_pyments().add(partialPyment);
-		debtor.setTotal(partialPyment);
-		LOGGER.info(String.format("debtor updated: %s", String.valueOf(debtor)));
-		return dao.updateDebtor(id, debtor);
+		
+		LOGGER.info("Saving account");
+		debtorFound.setTotal(newAccount);
+		debtorFound.getPartial_pyments().add(partialPyment);
+		return dao.updateDebtor(id, debtorFound);
 	}
 
 }

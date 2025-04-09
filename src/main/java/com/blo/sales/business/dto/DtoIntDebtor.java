@@ -19,11 +19,11 @@ public @Data class DtoIntDebtor implements Serializable {
 	
 	private long open_date;
 	
-	private List<BigDecimal> partial_pyments;
+	private List<DtoIntPartialPyment> partial_pyments;
 	
 	private List<String> sales_id;
 	
-	public List<BigDecimal> getPartial_pyments() {
+	public List<DtoIntPartialPyment> getPartial_pyments() {
 		if (partial_pyments == null) {
 			return new ArrayList<>();
 		}

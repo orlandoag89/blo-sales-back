@@ -18,7 +18,7 @@ public @Data class DtoDebtor implements Serializable {
 
 	private long open_date;
 
-	private List<BigDecimal> partial_pyments;
+	private List<DtoPartialPyment> partial_pyments;
 
 	private List<String> sales_id;
 }

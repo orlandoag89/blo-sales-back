@@ -21,7 +21,7 @@ public @Data class Debtor implements Serializable {
 
 	private long open_date;
 
-	private List<BigDecimal> partial_pyments;
+	private List<PartialPyment> partial_pyments;
 
 	private List<String> sales_id;
 
