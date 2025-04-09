@@ -1,17 +1,14 @@
-package com.blo.sales.dao.docs;
+package com.blo.sales.facade.dto;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.List;
 
-import org.springframework.data.mongodb.core.mapping.Document;
-
 import lombok.Data;
 
-@Document(collation = "debtors")
-public @Data class Debtor implements Serializable {
+public @Data class DtoDebtor implements Serializable {
 
-	private static final long serialVersionUID = -4973741841840522936L;
+	private static final long serialVersionUID = 1611258371830409896L;
 
 	private String id;
 
@@ -24,5 +21,4 @@ public @Data class Debtor implements Serializable {
 	private List<BigDecimal> partial_pyments;
 
 	private List<String> sales_id;
-
 }

@@ -1,7 +1,6 @@
 package com.blo.sales.business.impl;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,7 +10,6 @@ import org.springframework.stereotype.Service;
 import com.blo.sales.business.IDebtorsBusiness;
 import com.blo.sales.business.dto.DtoIntDebtor;
 import com.blo.sales.business.dto.DtoIntDebtors;
-import com.blo.sales.business.dto.DtoIntProduct;
 import com.blo.sales.dao.IDebtorsDao;
 import com.blo.sales.exceptions.BloSalesBusinessException;
 
@@ -70,17 +68,6 @@ public class DebtorsService implements IDebtorsBusiness {
 		debtor.setTotal(partialPyment);
 		LOGGER.info(String.format("debtor updated: %s", String.valueOf(debtor)));
 		return dao.updateDebtor(id, debtor);
-	}
-
-	@Override
-	public DtoIntDebtor addProducts(String idDebtor, List<DtoIntProduct> products, BigDecimal payment)
-			throws BloSalesBusinessException {
-		var debtorFound = dao.getDebtorById(idDebtor);
-		debtorFound.getProducts().addAll(products);
-		debtorFound.getTotal().add(payment);
-		// agregar la venta hecha
-		LOGGER.info(String.format("debtor updated %s", String.valueOf(debtorFound)));
-		return dao.updateDebtor(idDebtor, debtorFound);
 	}
 
 }

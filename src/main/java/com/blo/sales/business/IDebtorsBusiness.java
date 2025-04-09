@@ -1,11 +1,9 @@
 package com.blo.sales.business;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 import com.blo.sales.business.dto.DtoIntDebtor;
 import com.blo.sales.business.dto.DtoIntDebtors;
-import com.blo.sales.business.dto.DtoIntProduct;
 import com.blo.sales.exceptions.BloSalesBusinessException;
 
 public interface IDebtorsBusiness {
@@ -21,7 +19,5 @@ public interface IDebtorsBusiness {
 	DtoIntDebtor updateDebtor(String id, DtoIntDebtor debtor) throws BloSalesBusinessException;
 	
 	DtoIntDebtor addPayment(BigDecimal partialPyment, String id) throws BloSalesBusinessException;
-	
-	DtoIntDebtor addProducts(String idDebtor, List<DtoIntProduct> products, BigDecimal payment) throws BloSalesBusinessException;
 	
 }
