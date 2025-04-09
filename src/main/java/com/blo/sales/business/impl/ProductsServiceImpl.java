@@ -1,18 +1,18 @@
-package com.blo.sales.service.impl;
+package com.blo.sales.business.impl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.blo.sales.business.IProductsBusiness;
+import com.blo.sales.business.dto.DtoIntProduct;
+import com.blo.sales.business.dto.DtoIntProducts;
 import com.blo.sales.dao.IProductsDao;
 import com.blo.sales.exceptions.BloSalesBusinessException;
-import com.blo.sales.service.IProductsService;
-import com.blo.sales.service.dto.DtoIntProduct;
-import com.blo.sales.service.dto.DtoIntProducts;
 
 @Service
-public class ProductsServiceImpl implements IProductsService {
+public class ProductsServiceImpl implements IProductsBusiness {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(ProductsServiceImpl.class);
 	

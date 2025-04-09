@@ -9,13 +9,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.blo.sales.business.IProductsBusiness;
+import com.blo.sales.business.dto.DtoIntProduct;
+import com.blo.sales.business.dto.DtoIntProducts;
 import com.blo.sales.exceptions.BloSalesBusinessException;
 import com.blo.sales.facade.IProductsFacade;
 import com.blo.sales.facade.dto.DtoProduct;
 import com.blo.sales.facade.dto.DtoProducts;
-import com.blo.sales.service.IProductsService;
-import com.blo.sales.service.dto.DtoIntProduct;
-import com.blo.sales.service.dto.DtoIntProducts;
 
 @RestController
 public class ProductsFacadeImpl implements IProductsFacade {
@@ -26,7 +26,7 @@ public class ProductsFacadeImpl implements IProductsFacade {
     private ModelMapper modelMapper;
     
     @Autowired
-    private IProductsService service;
+    private IProductsBusiness service;
 
     @Override
     public ResponseEntity<DtoProducts> addProduct(final DtoProducts products) {

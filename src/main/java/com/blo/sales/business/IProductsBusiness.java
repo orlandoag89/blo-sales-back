@@ -1,10 +1,10 @@
-package com.blo.sales.service;
+package com.blo.sales.business;
 
+import com.blo.sales.business.dto.DtoIntProduct;
+import com.blo.sales.business.dto.DtoIntProducts;
 import com.blo.sales.exceptions.BloSalesBusinessException;
-import com.blo.sales.service.dto.DtoIntProduct;
-import com.blo.sales.service.dto.DtoIntProducts;
 
-public interface IProductsService {
+public interface IProductsBusiness {
 
     DtoIntProducts addProducts(DtoIntProducts products) throws BloSalesBusinessException;
     

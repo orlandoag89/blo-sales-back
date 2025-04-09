@@ -11,13 +11,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import com.blo.sales.business.dto.DtoIntProduct;
+import com.blo.sales.business.dto.DtoIntProducts;
 import com.blo.sales.dao.IProductsDao;
 import com.blo.sales.dao.docs.Product;
 import com.blo.sales.dao.docs.Products;
 import com.blo.sales.dao.repository.ProductsRepository;
 import com.blo.sales.exceptions.BloSalesBusinessException;
-import com.blo.sales.service.dto.DtoIntProduct;
-import com.blo.sales.service.dto.DtoIntProducts;
 
 @Service
 public class ProductsDaoImpl implements IProductsDao {

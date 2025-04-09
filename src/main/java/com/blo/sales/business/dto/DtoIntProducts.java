@@ -1,4 +1,4 @@
-package com.blo.sales.service.dto;
+package com.blo.sales.business.dto;
 
 import lombok.Data;
 
