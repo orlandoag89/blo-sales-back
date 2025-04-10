@@ -13,6 +13,6 @@ public @Data class DtoIntWrapperSale implements Serializable {
 	
 	private DtoIntDebtor detor;
 	
-	private List<String> productsWithAlerts;
+	private List<DtoIntProduct> productsWithAlerts;
 
 }

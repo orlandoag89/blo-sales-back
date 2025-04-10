@@ -53,30 +53,31 @@ public class DebtorsService implements IDebtorsBusiness {
 		return dao.updateDebtor(id, debtor);
 	}
 
-	@Override
-	public DtoIntDebtor addPartialPyment(String id, DtoIntPartialPyment partialPyment)
-			throws BloSalesBusinessException {
-		LOGGER.info(String.format("Adding partial pyment %s to %s", Encode.forJava(String.valueOf(partialPyment)), id));
-		var debtorFound = getDebtorById(id);
-		var newAccount = debtorFound.getTotal().subtract(partialPyment.getPartial_pyment());
-		LOGGER.info(String.format("new account %s", newAccount));
-		
-		if (debtorFound.getTotal().compareTo(BigDecimal.ZERO) <= 0) {
-			LOGGER.info("this account was payed");
-			dao.deleteDebtorById(id);
-			return new DtoIntDebtor();
-		}
-		
-		LOGGER.info("Saving account");
-		debtorFound.setTotal(newAccount);
-		debtorFound.getPartial_pyments().add(partialPyment);
-		return dao.updateDebtor(id, debtorFound);
-	}
 
 	@Override
 	public DtoIntDebtor getDebtorOrNull(String id) throws BloSalesBusinessException {
 		LOGGER.info(String.format("getting debtor %s", id));
 		return dao.getDebtorOrNull(id);
+	}
+
+	@Override
+	public DtoIntDebtor addPay(String idDebtor, DtoIntPartialPyment partiaylPyment) throws BloSalesBusinessException {
+		LOGGER.info(String.format("adding pyment to %s. %s", idDebtor, Encode.forJava(String.valueOf(partiaylPyment))));
+		var debtorFound = getDebtorById(idDebtor);
+		var newAccount = debtorFound.getTotal().subtract(partiaylPyment.getPartial_pyment());
+		LOGGER.info(String.format("new account %s", newAccount));
+		
+		if (newAccount.compareTo(BigDecimal.ZERO) <= 0) {
+			LOGGER.info("partial pyment is sufficient");
+			deleteDebtorById(idDebtor);
+			return new DtoIntDebtor();
+		}
+		
+		debtorFound.setTotal(newAccount);
+		debtorFound.getPartial_pyments().add(partiaylPyment);
+		var debtorUpdated = updateDebtor(idDebtor, debtorFound);
+		LOGGER.info(String.format("debtor updated %s", String.valueOf(debtorUpdated)));
+		return debtorUpdated;
 	}
 
 }

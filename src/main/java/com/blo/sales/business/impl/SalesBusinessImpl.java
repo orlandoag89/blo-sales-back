@@ -16,6 +16,7 @@ import com.blo.sales.business.IDebtorsBusiness;
 import com.blo.sales.business.IProductsBusiness;
 import com.blo.sales.business.ISalesBusiness;
 import com.blo.sales.business.dto.DtoIntDebtor;
+import com.blo.sales.business.dto.DtoIntProduct;
 import com.blo.sales.business.dto.DtoIntSale;
 import com.blo.sales.business.dto.DtoIntSaleProduct;
 import com.blo.sales.business.dto.DtoIntSales;
@@ -53,9 +54,7 @@ public class SalesBusinessImpl implements ISalesBusiness {
 		
 		var output = new DtoIntWrapperSale();
 		
-		final List<String> productsWithAlert = getProductsAlertsAndUpdate(sale.getProducts());
-		
-		output.setProductsWithAlerts(productsWithAlert);
+		output.setProductsWithAlerts(getProductsAlertsAndUpdate(sale.getProducts()));
 		// valida si el total es igual a la suma total de los productos
 		LOGGER.info("sale is complete, saving");
 		var saleSaved = dao.addSale(sale);
@@ -153,9 +152,9 @@ public class SalesBusinessImpl implements ISalesBusiness {
 		return dao.updateSale(id, sale);
 	}
 	
-	private List<String> getProductsAlertsAndUpdate(List<DtoIntSaleProduct> products) throws BloSalesBusinessException {
+	private List<DtoIntProduct> getProductsAlertsAndUpdate(List<DtoIntSaleProduct> products) throws BloSalesBusinessException {
 		
-		final List<String> productsWithAlert = new ArrayList<>();
+		final List<DtoIntProduct> productsWithAlert = new ArrayList<>();
 		for (var product: products) {
 			LOGGER.info(String.format("Validating product %s", Encode.forJava(String.valueOf(product))));
 			var productFound = productsBusiness.getProduct(product.getId());
@@ -168,7 +167,7 @@ public class SalesBusinessImpl implements ISalesBusiness {
 			}
 			
 			if (newQuantity.compareTo(new BigDecimal("2")) <= 0) {
-				productsWithAlert.add(productFound.getName());
+				productsWithAlert.add(productFound);
 			}
 			
 			productFound.setQuantity(newQuantity);

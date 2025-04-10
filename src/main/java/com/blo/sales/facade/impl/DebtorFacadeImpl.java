@@ -72,11 +72,11 @@ public class DebtorFacadeImpl implements IDebtorFacade {
 	}
 
 	@Override
-	public ResponseEntity<DtoDebtor> addPartialPyment(String id, DtoPartialPyment partialPyment) {
+	public ResponseEntity<DtoDebtor> addPay(String id, DtoPartialPyment partialPyment) {
 		try {
 			LOGGER.info(String.format("adding payment %s to %s", Encode.forJava(String.valueOf(partialPyment)), id));
 			var partialPymentMapped = modelMapper.map(partialPyment, DtoIntPartialPyment.class);
-			var saved = business.addPartialPyment(id, partialPymentMapped);
+			var saved = business.addPay(id, partialPymentMapped);
 			
 			if (StringUtils.isEmpty(saved.getId())) {
 				LOGGER.info(String.format("%s was deleted, account was payed", id));

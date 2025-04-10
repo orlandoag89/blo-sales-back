@@ -25,6 +25,6 @@ public interface IDebtorFacade {
 	ResponseEntity<DtoDebtors> retrieveAllDebtors();
 	
 	@PutMapping("/{id}")
-	ResponseEntity<DtoDebtor> addPartialPyment(@PathVariable String id, @RequestBody DtoPartialPyment partialPyment);
+	ResponseEntity<DtoDebtor> addPay(@PathVariable String id, @RequestBody DtoPartialPyment partialPyment);
 	
 }
