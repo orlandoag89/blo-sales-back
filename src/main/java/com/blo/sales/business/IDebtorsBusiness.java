@@ -7,7 +7,7 @@ import com.blo.sales.exceptions.BloSalesBusinessException;
 
 public interface IDebtorsBusiness {
 	
-	DtoIntDebtor addPay(String idDebtor, DtoIntPartialPyment partiaylPyment) throws BloSalesBusinessException;
+	DtoIntDebtor addPay(String idDebtor, DtoIntPartialPyment partiaylPyment, long dateOnMils) throws BloSalesBusinessException;
 
 	DtoIntDebtor addDebtor(DtoIntDebtor debtor) throws BloSalesBusinessException;
 	

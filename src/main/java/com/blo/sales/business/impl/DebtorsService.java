@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.blo.sales.business.IDebtorsBusiness;
+import com.blo.sales.business.ISalesBusiness;
 import com.blo.sales.business.dto.DtoIntDebtor;
 import com.blo.sales.business.dto.DtoIntDebtors;
 import com.blo.sales.business.dto.DtoIntPartialPyment;
@@ -23,9 +24,11 @@ public class DebtorsService implements IDebtorsBusiness {
 	@Autowired
 	private IDebtorsDao dao;
 	
+	private ISalesBusiness sales;
+	
 	@Override
 	public DtoIntDebtor addDebtor(DtoIntDebtor debtor) throws BloSalesBusinessException {
-		LOGGER.info(String.format("Saving debtor: %s", String.valueOf(debtor)));
+		LOGGER.info(String.format("Saving debtor: %s", Encode.forJava(String.valueOf(debtor))));
 		return dao.addDebtor(debtor);
 	}
 
@@ -61,7 +64,7 @@ public class DebtorsService implements IDebtorsBusiness {
 	}
 
 	@Override
-	public DtoIntDebtor addPay(String idDebtor, DtoIntPartialPyment partiaylPyment) throws BloSalesBusinessException {
+	public DtoIntDebtor addPay(String idDebtor, DtoIntPartialPyment partiaylPyment, long dateOnMils) throws BloSalesBusinessException {
 		LOGGER.info(String.format("adding pyment to %s. %s", idDebtor, Encode.forJava(String.valueOf(partiaylPyment))));
 		var debtorFound = getDebtorById(idDebtor);
 		var newAccount = debtorFound.getTotal().subtract(partiaylPyment.getPartial_pyment());
@@ -69,6 +72,17 @@ public class DebtorsService implements IDebtorsBusiness {
 		
 		if (newAccount.compareTo(BigDecimal.ZERO) <= 0) {
 			LOGGER.info("partial pyment is sufficient");
+			
+			// cerrar todas las ventas
+			for (var sale: debtorFound.getSales()) {
+				LOGGER.info(String.format("search sale %s", sale.getId()));
+				var saleFound = sales.getSaleById(sale.getId());
+				LOGGER.info("Sale found");
+				saleFound.setClose_sale(dateOnMils);
+				var saleUpdated = sales.updateSale(sale.getId(), saleFound);
+				LOGGER.info(String.format("sale updated", String.valueOf(saleUpdated)));
+			}
+			
 			deleteDebtorById(idDebtor);
 			return new DtoIntDebtor();
 		}

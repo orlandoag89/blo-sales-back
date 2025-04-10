@@ -72,7 +72,7 @@ public class SalesBusinessImpl implements ISalesBusiness {
 			LOGGER.info(String.format("saving new debtor", Encode.forJava(String.valueOf(debtor))));
 			List<DtoIntSale> sales = new ArrayList<>();
 			sales.add(sale);
-			debtor.setSales_id(sales);
+			debtor.setSales(sales);
 			var debtorSaved = debtorBusiness.addDebtor(debtor);
 			output.setDetor(debtor);
 			LOGGER.info(String.format("debtor was saved %s", String.valueOf(debtorSaved)));
@@ -83,7 +83,7 @@ public class SalesBusinessImpl implements ISalesBusiness {
 		var debtorFound = debtorBusiness.getDebtorById(debtor.getId());
 		
 		// actualiza su lista compras
-		debtorFound.getSales_id().addAll(debtor.getSales_id());
+		debtorFound.getSales().addAll(debtor.getSales());
 		var newAmount = new BigDecimal("0");
 		//actualiza el monto
 		// no dejo algún pago

@@ -11,7 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.blo.sales.business.IDebtorsBusiness;
-import com.blo.sales.business.dto.DtoIntDebtor;
 import com.blo.sales.business.dto.DtoIntPartialPyment;
 import com.blo.sales.exceptions.BloSalesBusinessException;
 import com.blo.sales.facade.IDebtorFacade;
@@ -29,21 +28,6 @@ public class DebtorFacadeImpl implements IDebtorFacade {
 	
 	@Autowired
 	private ModelMapper modelMapper;
-
-	@Override
-	public ResponseEntity<DtoDebtor> saveDebtor(DtoDebtor debtor) {
-		LOGGER.info(String.format("Saving debtor %s", Encode.forJava(String.valueOf(debtor))));
-		var debtorInt = modelMapper.map(debtor, DtoIntDebtor.class);
-		try {
-			var saved = business.addDebtor(debtorInt);
-			LOGGER.info(String.format("Debtor saved %s", String.valueOf(saved)));
-			var out = modelMapper.map(saved, DtoDebtor.class);
-			return new ResponseEntity<DtoDebtor>(out, HttpStatus.CREATED);
-		} catch (BloSalesBusinessException e) {
-			LOGGER.error(e.getExceptionMessage());
-			return new ResponseEntity<>(e.getExceptHttpStatus());
-		}
-	}
 
 	@Override
 	public ResponseEntity<DtoDebtor> retrieveDebtorById(String id) {
@@ -72,11 +56,11 @@ public class DebtorFacadeImpl implements IDebtorFacade {
 	}
 
 	@Override
-	public ResponseEntity<DtoDebtor> addPay(String id, DtoPartialPyment partialPyment) {
+	public ResponseEntity<DtoDebtor> addPay(String id, long time, DtoPartialPyment partialPyment) {
 		try {
 			LOGGER.info(String.format("adding payment %s to %s", Encode.forJava(String.valueOf(partialPyment)), id));
 			var partialPymentMapped = modelMapper.map(partialPyment, DtoIntPartialPyment.class);
-			var saved = business.addPay(id, partialPymentMapped);
+			var saved = business.addPay(id, partialPymentMapped, time);
 			
 			if (StringUtils.isEmpty(saved.getId())) {
 				LOGGER.info(String.format("%s was deleted, account was payed", id));

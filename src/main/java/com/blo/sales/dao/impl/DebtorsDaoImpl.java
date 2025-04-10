@@ -84,7 +84,7 @@ public class DebtorsDaoImpl implements IDebtorsDao {
 		var debtorFound = getDebtorById(id);
 		debtorFound.setName(debtor.getName());
 		debtorFound.setPartial_pyments(debtor.getPartial_pyments());
-		debtorFound.setSales_id(debtor.getSales_id());
+		debtorFound.setSales(debtor.getSales());
 		debtorFound.setTotal(debtor.getTotal());
 		
 		var parsedDebtor = modelMapper.map(debtorFound, Debtor.class);

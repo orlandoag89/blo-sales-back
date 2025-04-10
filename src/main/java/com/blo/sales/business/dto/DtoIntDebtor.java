@@ -21,7 +21,7 @@ public @Data class DtoIntDebtor implements Serializable {
 	
 	private List<DtoIntPartialPyment> partial_pyments;
 	
-	private List<DtoIntSale> sales_id;
+	private List<DtoIntSale> sales;
 	
 	public List<DtoIntPartialPyment> getPartial_pyments() {
 		if (partial_pyments == null) {
