@@ -73,4 +73,10 @@ public class DebtorsService implements IDebtorsBusiness {
 		return dao.updateDebtor(id, debtorFound);
 	}
 
+	@Override
+	public DtoIntDebtor getDebtorOrNull(String id) throws BloSalesBusinessException {
+		LOGGER.info(String.format("getting debtor %s", id));
+		return dao.getDebtorOrNull(id);
+	}
+
 }
