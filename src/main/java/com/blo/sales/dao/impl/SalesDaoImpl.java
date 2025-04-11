@@ -112,5 +112,23 @@ public class SalesDaoImpl implements ISalesDao {
 		LOGGER.info(String.format("sales on db %s", String.valueOf(salesOut)));
 		return salesOut;
 	}
+
+	@Override
+	public DtoIntSales getSalesNotCashbox() throws BloSalesBusinessException {
+		LOGGER.info("retrieving sales no cashbox");
+		var sales = repository.findSaleNoCashbox();
+		DtoIntSales salesOut = new DtoIntSales();
+		List<DtoIntSale> salesItems = new ArrayList<>();
+		
+		sales.forEach(s -> {
+			var item = modelMapper.map(s, DtoIntSale.class);
+			salesItems.add(item);
+		});
+		
+		salesOut.setSales(salesItems);
+		
+		LOGGER.info(String.format("sales is not cashbox %s", String.valueOf(salesOut)));
+		return salesOut;
+	}
 	
 }

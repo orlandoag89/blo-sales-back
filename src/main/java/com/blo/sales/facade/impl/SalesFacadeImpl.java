@@ -1,5 +1,7 @@
 package com.blo.sales.facade.impl;
 
+import java.math.BigDecimal;
+
 import org.modelmapper.ModelMapper;
 import org.owasp.encoder.Encode;
 import org.slf4j.Logger;
@@ -10,12 +12,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.blo.sales.business.ISalesBusiness;
+import com.blo.sales.business.dto.DtoIntDebtor;
 import com.blo.sales.business.dto.DtoIntSale;
 import com.blo.sales.business.dto.DtoIntSales;
 import com.blo.sales.exceptions.BloSalesBusinessException;
 import com.blo.sales.facade.ISalesFacade;
 import com.blo.sales.facade.dto.DtoSale;
 import com.blo.sales.facade.dto.DtoSales;
+import com.blo.sales.facade.dto.DtoWrapperSale;
 import com.blo.sales.facade.enums.StatusSaleEnum;
 
 @RestController
@@ -50,15 +54,15 @@ public class SalesFacadeImpl implements ISalesFacade {
 		try {
 			var out = new DtoSales();
 			var sales = new DtoIntSales();
-			if (status.name() == "ALL") {
+			if (status.name().equals(StatusSaleEnum.ALL.name())) {
 				sales = business.getSales();
 				LOGGER.info(String.format("all sales %s", String.valueOf(sales)));
 			}
-			if (status.name() == "OPEN") {
+			if (status.name().equals(StatusSaleEnum.OPEN.name())) {
 				sales = business.getSalesOpen();
 				LOGGER.info(String.format("open sales %s", String.valueOf(sales)));
 			}
-			if (status.name() == "CLOSE") {
+			if (status.name().equals(StatusSaleEnum.CLOSE.name())) {
 				sales = business.getSalesClose();
 				LOGGER.info(String.format("close sales %s", String.valueOf(sales)));
 			}
@@ -80,6 +84,22 @@ public class SalesFacadeImpl implements ISalesFacade {
 			return new ResponseEntity<DtoSale>(out, HttpStatus.OK);
 		} catch (BloSalesBusinessException e) {
 			LOGGER.error(e.getExceptionMessage());
+			return new ResponseEntity<>(null, e.getExceptHttpStatus());
+		}
+	}
+
+	@Override
+	public ResponseEntity<DtoWrapperSale> registerSaleAndDebtor(DtoWrapperSale sale, BigDecimal totalDebtor) {
+		try {
+			LOGGER.info(String.format("sale data %s and total %s", Encode.forJava(String.valueOf(sale)), String.valueOf(totalDebtor)));
+			var saleMapped = modelMapper.map(sale.getSale(), DtoIntSale.class);
+			var debtorMapped = modelMapper.map(sale.getDetor(), DtoIntDebtor.class);
+			var wrapperSaleSaved = business.saveSaleAndDebtor(saleMapped, debtorMapped, totalDebtor);
+			var out = modelMapper.map(wrapperSaleSaved, DtoWrapperSale.class);
+			LOGGER.info(String.format("sale has been saved %s", String.valueOf(out)));
+			return new ResponseEntity<>(out, HttpStatus.CREATED);
+		} catch (BloSalesBusinessException e) {
+			LOGGER.info(e.getExceptionMessage());
 			return new ResponseEntity<>(null, e.getExceptHttpStatus());
 		}
 	}

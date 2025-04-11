@@ -23,5 +23,7 @@ public interface ISalesBusiness {
 	DtoIntSale getSaleById(String id) throws BloSalesBusinessException;
 	
 	DtoIntSale updateSale(String id, DtoIntSale sale) throws BloSalesBusinessException;
+	
+	DtoIntSales getSalesNotCashbox() throws BloSalesBusinessException;
 
 }

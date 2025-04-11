@@ -152,6 +152,12 @@ public class SalesBusinessImpl implements ISalesBusiness {
 		return dao.updateSale(id, sale);
 	}
 	
+	@Override
+	public DtoIntSales getSalesNotCashbox() throws BloSalesBusinessException {
+		LOGGER.info("retrieving sales no cashbox");
+		return dao.getSalesNotCashbox();
+	}
+	
 	private List<DtoIntProduct> getProductsAlertsAndUpdate(List<DtoIntSaleProduct> products) throws BloSalesBusinessException {
 		
 		final List<DtoIntProduct> productsWithAlert = new ArrayList<>();

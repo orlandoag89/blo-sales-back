@@ -8,11 +8,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.blo.sales.business.ICashboxBusiness;
 import com.blo.sales.business.IDebtorsBusiness;
 import com.blo.sales.business.ISalesBusiness;
+import com.blo.sales.business.dto.DtoIntCashbox;
 import com.blo.sales.business.dto.DtoIntDebtor;
 import com.blo.sales.business.dto.DtoIntDebtors;
 import com.blo.sales.business.dto.DtoIntPartialPyment;
+import com.blo.sales.business.enums.StatusCashboxIntEnum;
 import com.blo.sales.dao.IDebtorsDao;
 import com.blo.sales.exceptions.BloSalesBusinessException;
 
@@ -24,7 +27,11 @@ public class DebtorsService implements IDebtorsBusiness {
 	@Autowired
 	private IDebtorsDao dao;
 	
+	@Autowired
 	private ISalesBusiness sales;
+	
+	@Autowired
+	private ICashboxBusiness cashboxes;
 	
 	@Override
 	public DtoIntDebtor addDebtor(DtoIntDebtor debtor) throws BloSalesBusinessException {
@@ -70,10 +77,34 @@ public class DebtorsService implements IDebtorsBusiness {
 		var newAccount = debtorFound.getTotal().subtract(partiaylPyment.getPartial_pyment());
 		LOGGER.info(String.format("new account %s", newAccount));
 		
+		/** se crea cashbox porque el dinero que se agregue de un deudor va directo a la cuenta */
+		var cashbox = cashboxes.getCashboxOpen();
+		
+		/**
+		 * valida existencia de una cuenta abierta
+		 * si no hay cuenta abierta entonces la crea
+		 */
+		if (cashbox == null) {
+			LOGGER.info("saving a new cashbox");
+			var dataCashbox = new DtoIntCashbox();
+			dataCashbox.setDate(dateOnMils);
+			dataCashbox.setMoney(partiaylPyment.getPartial_pyment());
+			dataCashbox.setStatus(StatusCashboxIntEnum.valueOf(StatusCashboxIntEnum.OPEN.name()));
+			cashbox = cashboxes.saveCashbox(dataCashbox);
+			LOGGER.info(String.format("cashbox saved %s", String.valueOf(cashbox)));
+		} else {
+			LOGGER.info("cashbox exists");
+			var money = cashbox.getMoney().add(partiaylPyment.getPartial_pyment());
+			cashbox.setMoney(money);
+			cashboxes.updateCashbox(cashbox.getId(), cashbox);
+			LOGGER.info(String.format("cashbox updated", String.valueOf(cashboxes)));
+		}
+		
+		// valida que se haya pagado toda la cuenta
 		if (newAccount.compareTo(BigDecimal.ZERO) <= 0) {
 			LOGGER.info("partial pyment is sufficient");
 			
-			// cerrar todas las ventas
+			// cerrar todas las ventas de ese deudor porque ya se pagaron
 			for (var sale: debtorFound.getSales()) {
 				LOGGER.info(String.format("search sale %s", sale.getId()));
 				var saleFound = sales.getSaleById(sale.getId());
@@ -91,6 +122,11 @@ public class DebtorsService implements IDebtorsBusiness {
 		debtorFound.getPartial_pyments().add(partiaylPyment);
 		var debtorUpdated = updateDebtor(idDebtor, debtorFound);
 		LOGGER.info(String.format("debtor updated %s", String.valueOf(debtorUpdated)));
+		
+		// si agrega un pago al inicio del día entonces se debe guardar directamente en la caja
+		var openCashbox = cashboxes.getCashboxOpen();
+		LOGGER.info(String.format("cashbox found %s", String.valueOf(openCashbox)));
+		
 		return debtorUpdated;
 	}
 
