@@ -19,7 +19,7 @@ import com.blo.sales.facade.enums.StatusSaleEnum;
 public interface ISalesFacade {
 	
 	@PostMapping
-	ResponseEntity<DtoSale> registerSale(@RequestBody DtoSale sale);
+	ResponseEntity<DtoWrapperSale> registerSale(@RequestBody DtoSale sale);
 	
 	@GetMapping
 	ResponseEntity<DtoSales> retrieveSales(@RequestParam StatusSaleEnum status);

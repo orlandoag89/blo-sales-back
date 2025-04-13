@@ -55,14 +55,19 @@ public class SalesFacadeImpl implements ISalesFacade {
 	private String productInsufficientCode;
 	
 	@Override
-	public ResponseEntity<DtoSale> registerSale(DtoSale sale) {
+	public ResponseEntity<DtoWrapperSale> registerSale(DtoSale sale) {
 		LOGGER.info(String.format("registering sale %s", Encode.forJava(String.valueOf(sale))));
 		try {
+			var out = new DtoWrapperSale();
+			var productsAlert = getProductsAlertsAndUpdate(sale.getProducts());
+			
 			var saleIn = modelMapper.map(sale, DtoIntSale.class);
 			var saleSaved = business.addSale(saleIn);
+			
 			LOGGER.info(String.format("sale registered %s", String.valueOf(saleSaved)));
-			var out = modelMapper.map(saleSaved, DtoSale.class);
-			return new ResponseEntity<DtoSale>(out, HttpStatus.CREATED);
+			out.setSale(modelMapper.map(saleSaved, DtoSale.class));
+			out.setProductsWithAlerts(productsAlert);
+			return new ResponseEntity<DtoWrapperSale>(out, HttpStatus.CREATED);
 		} catch (BloSalesBusinessException e) {
 			LOGGER.error(e.getExceptionMessage());
 			return new ResponseEntity<>(null, e.getExceptHttpStatus());
@@ -141,7 +146,7 @@ public class SalesFacadeImpl implements ISalesFacade {
 			var saleInn = modelMapper.map(sale.getSale(), DtoIntSale.class);
 			var saleSaved = business.addSale(saleInn);
 			LOGGER.info(String.format("sale saved %s", String.valueOf(saleSaved)));
-			var saleSavedOut = modelMapper.map(saleSaved.getSale(), DtoSale.class);
+			var saleSavedOut = modelMapper.map(saleSaved, DtoSale.class);
 			output.setSale(saleSavedOut);
 			
 			// nuevo deudor flujo
@@ -165,7 +170,7 @@ public class SalesFacadeImpl implements ISalesFacade {
 			}
 			
 			// actualiza su lista compras
-			debtorInDb.getSales().add(saleSaved.getSale());
+			debtorInDb.getSales().add(saleSaved);
 			var newAmount = new BigDecimal("0");
 			// actualiza montos
 			
@@ -201,7 +206,7 @@ public class SalesFacadeImpl implements ISalesFacade {
 		}
 	}
 	
-private List<DtoProduct> getProductsAlertsAndUpdate(List<DtoSaleProduct> products) throws BloSalesBusinessException {
+	private List<DtoProduct> getProductsAlertsAndUpdate(List<DtoSaleProduct> products) throws BloSalesBusinessException {
 		
 		final List<DtoProduct> productsWithAlert = new ArrayList<>();
 		for (var product: products) {

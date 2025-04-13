@@ -1,18 +1,14 @@
 package com.blo.sales.business;
 
-import java.math.BigDecimal;
-
-import com.blo.sales.business.dto.DtoIntDebtor;
 import com.blo.sales.business.dto.DtoIntSale;
 import com.blo.sales.business.dto.DtoIntSales;
-import com.blo.sales.business.dto.DtoIntWrapperSale;
 import com.blo.sales.exceptions.BloSalesBusinessException;
 
 public interface ISalesBusiness {
 	
-	DtoIntWrapperSale saveSaleAndDebtor(DtoIntSale sale, DtoIntDebtor debtor, BigDecimal partialPyment) throws BloSalesBusinessException;
+	//DtoIntWrapperSale saveSaleAndDebtor(DtoIntSale sale, DtoIntDebtor debtor, BigDecimal partialPyment) throws BloSalesBusinessException;
 	
-	DtoIntWrapperSale addSale(DtoIntSale sale) throws BloSalesBusinessException;
+	DtoIntSale addSale(DtoIntSale sale) throws BloSalesBusinessException;
 	
 	DtoIntSales getSales() throws BloSalesBusinessException;
 	

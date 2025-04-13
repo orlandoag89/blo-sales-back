@@ -4,6 +4,8 @@ import java.time.Instant;
 
 public final class Utils {
 	
+	private Utils() { }
+	
 	/**
 	 * metodo para recuperar el tiempo en mili segundos
 	 * @return la fecha actual en milisegundos
@@ -11,5 +13,5 @@ public final class Utils {
 	public static long getTimeNow() {
 		return Instant.now().toEpochMilli();
 	}
-
+	
 }

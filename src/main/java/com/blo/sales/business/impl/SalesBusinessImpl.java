@@ -1,27 +1,15 @@
 package com.blo.sales.business.impl;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.commons.lang3.StringUtils;
 import org.owasp.encoder.Encode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import com.blo.sales.business.IDebtorsBusiness;
-import com.blo.sales.business.IProductsBusiness;
 import com.blo.sales.business.ISalesBusiness;
-import com.blo.sales.business.dto.DtoIntDebtor;
-import com.blo.sales.business.dto.DtoIntProduct;
 import com.blo.sales.business.dto.DtoIntSale;
-import com.blo.sales.business.dto.DtoIntSaleProduct;
 import com.blo.sales.business.dto.DtoIntSales;
-import com.blo.sales.business.dto.DtoIntWrapperSale;
 import com.blo.sales.dao.ISalesDao;
 import com.blo.sales.exceptions.BloSalesBusinessException;
 
@@ -42,14 +30,14 @@ public class SalesBusinessImpl implements ISalesBusiness {
 	@Value("${exceptions.codes.field-is-empty}")
 	private String fieldIsEmptyCdode;*/
 	
-	//@Value("${exceptions.codes.product-insufficient}")
-	//private String productInsufficientCode;
+	@Value("${exceptions.codes.product-insufficient}")
+	private String productInsufficientCode;
 	
 	@Value("${exceptions.messages.field-is-empty}")
 	private String fieldsIsEmptyMessage;
 	
-	//@Value("${exceptions.messages.product-insufficient}")
-	//private String productInsufficientMessage;
+	@Value("${exceptions.messages.product-insufficient}")
+	private String productInsufficientMessage;
 	
 	/*@Override
 	public DtoIntWrapperSale saveSaleAndDebtor(DtoIntSale sale, DtoIntDebtor debtor, BigDecimal partialPyment) throws BloSalesBusinessException {
@@ -116,13 +104,12 @@ public class SalesBusinessImpl implements ISalesBusiness {
 	}*/
 
 	@Override
-	public DtoIntWrapperSale addSale(DtoIntSale sale) throws BloSalesBusinessException {
+	public DtoIntSale addSale(DtoIntSale sale) throws BloSalesBusinessException {
 		LOGGER.info(String.format("saving sale %s", Encode.forJava(String.valueOf(sale))));
-		var out = new DtoIntWrapperSale();
-		var saleSaved = dao.addSale(sale);
-		out.setProductsWithAlerts(getProductsAlertsAndUpdate(sale.getProducts()));
+		return dao.addSale(sale);
+		/*out.setProductsWithAlerts(getProductsAlertsAndUpdate(sale.getProducts()));
 		out.setSale(saleSaved);
-		return out;
+		return out;*/
 	}
 
 	@Override
