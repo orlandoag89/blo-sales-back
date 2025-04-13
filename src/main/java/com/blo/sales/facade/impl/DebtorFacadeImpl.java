@@ -2,7 +2,6 @@ package com.blo.sales.facade.impl;
 
 import java.math.BigDecimal;
 
-import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.owasp.encoder.Encode;
 import org.slf4j.Logger;
@@ -16,7 +15,6 @@ import com.blo.sales.business.ICashboxBusiness;
 import com.blo.sales.business.IDebtorsBusiness;
 import com.blo.sales.business.ISalesBusiness;
 import com.blo.sales.business.dto.DtoIntCashbox;
-import com.blo.sales.business.dto.DtoIntDebtor;
 import com.blo.sales.business.dto.DtoIntPartialPyment;
 import com.blo.sales.business.enums.StatusCashboxIntEnum;
 import com.blo.sales.exceptions.BloSalesBusinessException;

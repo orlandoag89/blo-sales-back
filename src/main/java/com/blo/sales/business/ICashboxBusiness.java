@@ -14,5 +14,4 @@ public interface ICashboxBusiness {
 
 	DtoIntCashbox updateCashbox(String id, DtoIntCashbox cashbox) throws BloSalesBusinessException;
 	
-	DtoIntCashbox closeCashbox() throws BloSalesBusinessException;
 }

@@ -11,10 +11,10 @@ import com.blo.sales.facade.dto.DtoCashboxes;
 @RequestMapping("/api/v1/cashbox")
 public interface ICashboxFacade {
 	
-	@PostMapping
-	ResponseEntity<DtoCashbox> closeCashbox();
-	
 	@GetMapping
 	ResponseEntity<DtoCashboxes> getAllCashboxes();
+	
+	@PostMapping
+	ResponseEntity<DtoCashbox> closeCashbox();
 
 }

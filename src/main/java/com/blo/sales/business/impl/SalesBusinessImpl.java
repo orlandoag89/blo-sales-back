@@ -33,25 +33,25 @@ public class SalesBusinessImpl implements ISalesBusiness {
 	@Autowired
 	private ISalesDao dao;
 	
-	@Autowired
+	/*@Autowired
 	private IDebtorsBusiness debtorBusiness;
 	
 	@Autowired
 	private IProductsBusiness productsBusiness;
 	
 	@Value("${exceptions.codes.field-is-empty}")
-	private String fieldIsEmptyCdode;
+	private String fieldIsEmptyCdode;*/
 	
-	@Value("${exceptions.codes.product-insufficient}")
-	private String productInsufficientCode;
+	//@Value("${exceptions.codes.product-insufficient}")
+	//private String productInsufficientCode;
 	
 	@Value("${exceptions.messages.field-is-empty}")
 	private String fieldsIsEmptyMessage;
 	
-	@Value("${exceptions.messages.product-insufficient}")
-	private String productInsufficientMessage;
+	//@Value("${exceptions.messages.product-insufficient}")
+	//private String productInsufficientMessage;
 	
-	@Override
+	/*@Override
 	public DtoIntWrapperSale saveSaleAndDebtor(DtoIntSale sale, DtoIntDebtor debtor, BigDecimal partialPyment) throws BloSalesBusinessException {
 		LOGGER.info(String.format("saving sale %s and debtor %s", Encode.forJava(String.valueOf(sale)), Encode.forJava(String.valueOf(debtor))));
 		
@@ -113,7 +113,7 @@ public class SalesBusinessImpl implements ISalesBusiness {
 		LOGGER.info(String.format("saved debtor %s width debt %s", Encode.forJava(String.valueOf(debtorSaved))), newAmount);
 		output.setDetor(debtorSaved);
 		return output;
-	}
+	}*/
 
 	@Override
 	public DtoIntWrapperSale addSale(DtoIntSale sale) throws BloSalesBusinessException {
@@ -161,7 +161,7 @@ public class SalesBusinessImpl implements ISalesBusiness {
 		return dao.getSalesNotCashbox();
 	}
 	
-	private List<DtoIntProduct> getProductsAlertsAndUpdate(List<DtoIntSaleProduct> products) throws BloSalesBusinessException {
+	/*private List<DtoIntProduct> getProductsAlertsAndUpdate(List<DtoIntSaleProduct> products) throws BloSalesBusinessException {
 		
 		final List<DtoIntProduct> productsWithAlert = new ArrayList<>();
 		for (var product: products) {
@@ -185,6 +185,6 @@ public class SalesBusinessImpl implements ISalesBusiness {
 		}
 		
 		return productsWithAlert;
-	}
+	}*/
 
 }
