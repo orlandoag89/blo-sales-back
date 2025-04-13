@@ -18,6 +18,8 @@ import com.blo.sales.exceptions.BloSalesBusinessException;
 import com.blo.sales.facade.ICashboxFacade;
 import com.blo.sales.facade.dto.DtoCashbox;
 import com.blo.sales.facade.dto.DtoCashboxes;
+import com.blo.sales.facade.mapper.DtoCashboxMapper;
+import com.blo.sales.facade.mapper.DtoCashboxesMapper;
 import com.blo.sales.utils.Utils;
 
 @RestController
@@ -26,7 +28,10 @@ public class CashboxFacadeImpl implements ICashboxFacade {
 	private static final Logger LOGGER = LoggerFactory.getLogger(CashboxFacadeImpl.class);
 	
 	@Autowired
-	private ModelMapper modelMapper;
+	private DtoCashboxMapper cashboxMapper;
+	
+	@Autowired
+	private DtoCashboxesMapper cashboxesMapper;
 	
 	@Autowired
 	private ICashboxBusiness business;
@@ -50,7 +55,7 @@ public class CashboxFacadeImpl implements ICashboxFacade {
 				openCashbox.setDate(Utils.getTimeNow());
 				openCashbox.setMoney(BigDecimal.ZERO);
 			} else {
-				openCashbox = modelMapper.map(busCashbox, DtoCashbox.class);
+				openCashbox = cashboxMapper.toOuter(busCashbox);
 			}
 			
 			var totalSalesOnDay = BigDecimal.ZERO;
@@ -70,16 +75,16 @@ public class CashboxFacadeImpl implements ICashboxFacade {
 			openCashbox.setMoney(total);
 			LOGGER.info(String.format("open cashbox %s", String.valueOf(openCashbox)));
 			
-			var innerCashbox = modelMapper.map(openCashbox, DtoIntCashbox.class);
+			var innerCashbox = cashboxMapper.toInner(openCashbox);
 			if (isNewCashbox) {
 				var saved = business.saveCashbox(innerCashbox);
-				var out = modelMapper.map(saved, DtoCashbox.class);
+				var out = cashboxMapper.toOuter(saved);
 				LOGGER.info(String.format("save format %s", String.valueOf(out)));
 				return new ResponseEntity<>(out, HttpStatus.CREATED);
 			}
 			
 			var updated = business.updateCashbox(innerCashbox.getId(), innerCashbox);
-			var out =  modelMapper.map(updated, DtoCashbox.class);
+			var out =  cashboxMapper.toOuter(updated);
 			LOGGER.info(String.format("cashbox has been updated %s", String.valueOf(updated)));
 			return new ResponseEntity<>(out, HttpStatus.OK);
 		} catch (BloSalesBusinessException e) {
@@ -91,7 +96,7 @@ public class CashboxFacadeImpl implements ICashboxFacade {
 	@Override
 	public ResponseEntity<DtoCashboxes> getAllCashboxes() {
 		var cashboxes = business.getAllCashboxes();
-		var out = modelMapper.map(cashboxes, DtoCashboxes.class);
+		var out = cashboxesMapper.toOuter(cashboxes);
 		LOGGER.info(String.format("cashboxes %s", String.valueOf(out)));
 		return new ResponseEntity<DtoCashboxes>(out, HttpStatus.OK);
 	}
