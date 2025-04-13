@@ -53,14 +53,14 @@ public class SalesDaoImpl implements ISalesDao {
 		return toDtoIntSales(sales);
 	}
 	
-	@Autowired
+	@Override
 	public DtoIntSales getSalesOpen() throws BloSalesBusinessException {
 		var openSales = repository.findSalesNotClosed();
 		
 		return toDtoIntSales(openSales);
 	}
 	
-	@Autowired
+	@Override
 	public DtoIntSales getSalesClose() throws BloSalesBusinessException {
 		var closeSales = repository.findSalesClosed();
 		

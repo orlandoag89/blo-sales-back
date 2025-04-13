@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
 
 import com.blo.sales.business.IDebtorsBusiness;
 import com.blo.sales.business.IProductsBusiness;
@@ -24,6 +25,7 @@ import com.blo.sales.business.dto.DtoIntWrapperSale;
 import com.blo.sales.dao.ISalesDao;
 import com.blo.sales.exceptions.BloSalesBusinessException;
 
+@Service
 public class SalesBusinessImpl implements ISalesBusiness {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(SalesBusinessImpl.class);
@@ -34,6 +36,7 @@ public class SalesBusinessImpl implements ISalesBusiness {
 	@Autowired
 	private IDebtorsBusiness debtorBusiness;
 	
+	@Autowired
 	private IProductsBusiness productsBusiness;
 	
 	@Value("${exceptions.codes.field-is-empty}")
