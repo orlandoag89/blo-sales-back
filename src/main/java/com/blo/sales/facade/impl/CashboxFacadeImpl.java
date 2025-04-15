@@ -11,11 +11,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.blo.sales.business.ICashboxBusiness;
 import com.blo.sales.business.ISalesBusiness;
-import com.blo.sales.business.enums.StatusCashboxIntEnum;
 import com.blo.sales.exceptions.BloSalesBusinessException;
 import com.blo.sales.facade.ICashboxFacade;
 import com.blo.sales.facade.dto.DtoCashbox;
 import com.blo.sales.facade.dto.DtoCashboxes;
+import com.blo.sales.facade.enums.StatusCashboxEnum;
 import com.blo.sales.facade.mapper.DtoCashboxMapper;
 import com.blo.sales.facade.mapper.DtoCashboxesMapper;
 import com.blo.sales.utils.Utils;
@@ -69,7 +69,7 @@ public class CashboxFacadeImpl implements ICashboxFacade {
 			
 			LOGGER.info(String.format("total from sales %s", totalSalesOnDay));
 			var total = totalSalesOnDay.add(openCashbox.getMoney());
-			openCashbox.setStatus(StatusCashboxIntEnum.CLOSE);
+			openCashbox.setStatus(StatusCashboxEnum.CLOSE);
 			openCashbox.setMoney(total);
 			LOGGER.info(String.format("open cashbox %s", String.valueOf(openCashbox)));
 			

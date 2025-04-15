@@ -27,7 +27,7 @@ public class DtoProductsMapper implements IToInner<DtoIntProducts, DtoProducts>,
 		DtoProducts out = new DtoProducts();
 		List<DtoProduct> products = new ArrayList<>();
 		
-		if (out.getProducts() != null && !out.getProducts().isEmpty()) {
+		if (inner.getProducts() != null && !inner.getProducts().isEmpty()) {
 			inner.getProducts().forEach(p -> products.add(modelMapper.toOuter(p)));
 		}
 		
