@@ -2,7 +2,6 @@ package com.blo.sales.facade.impl;
 
 import java.math.BigDecimal;
 
-import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +11,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.blo.sales.business.ICashboxBusiness;
 import com.blo.sales.business.ISalesBusiness;
-import com.blo.sales.business.dto.DtoIntCashbox;
 import com.blo.sales.business.enums.StatusCashboxIntEnum;
 import com.blo.sales.exceptions.BloSalesBusinessException;
 import com.blo.sales.facade.ICashboxFacade;

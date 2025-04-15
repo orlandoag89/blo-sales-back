@@ -5,7 +5,7 @@ import java.math.BigDecimal;
 
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import com.blo.sales.dao.enums.StatusCashboxEnum;
+import com.blo.sales.dao.enums.DocStatusCashboxEnum;
 
 import lombok.Data;
 
@@ -20,6 +20,6 @@ public @Data class Cashbox implements Serializable {
 	
 	private long date;
 	
-	private StatusCashboxEnum status;
+	private DocStatusCashboxEnum status;
 
 }

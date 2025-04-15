@@ -3,7 +3,6 @@ package com.blo.sales.facade.mapper;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -18,7 +17,7 @@ import com.blo.sales.utils.IToOuter;
 public class DtoProductsMapper implements IToInner<DtoIntProducts, DtoProducts>, IToOuter<DtoIntProducts, DtoProducts> {
 	
 	@Autowired
-	private ModelMapper modelMapper;
+	private DtoProductMapper modelMapper;
 
 	@Override
 	public DtoProducts toOuter(DtoIntProducts inner) {
@@ -29,7 +28,7 @@ public class DtoProductsMapper implements IToInner<DtoIntProducts, DtoProducts>,
 		List<DtoProduct> products = new ArrayList<>();
 		
 		if (out.getProducts() != null && !out.getProducts().isEmpty()) {
-			inner.getProducts().forEach(p -> products.add(modelMapper.map(p, DtoProduct.class)));
+			inner.getProducts().forEach(p -> products.add(modelMapper.toOuter(p)));
 		}
 		
 		out.setProducts(products);
@@ -45,7 +44,7 @@ public class DtoProductsMapper implements IToInner<DtoIntProducts, DtoProducts>,
 		List<DtoIntProduct> products = new ArrayList<>();
 		
 		if (outer.getProducts() != null && !outer.getProducts().isEmpty()) {
-			outer.getProducts().forEach(p -> products.add(modelMapper.map(p, DtoIntProduct.class)));
+			outer.getProducts().forEach(p -> products.add(modelMapper.toInner(p)));
 		}
 		
 		out.setProducts(products);

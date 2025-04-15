@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.modelmapper.ModelMapper;
 import org.owasp.encoder.Encode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +18,6 @@ import com.blo.sales.business.IDebtorsBusiness;
 import com.blo.sales.business.IProductsBusiness;
 import com.blo.sales.business.ISalesBusiness;
 import com.blo.sales.business.dto.DtoIntDebtor;
-import com.blo.sales.business.dto.DtoIntSale;
 import com.blo.sales.business.dto.DtoIntSales;
 import com.blo.sales.exceptions.BloSalesBusinessException;
 import com.blo.sales.facade.ISalesFacade;
@@ -30,6 +28,10 @@ import com.blo.sales.facade.dto.DtoSaleProduct;
 import com.blo.sales.facade.dto.DtoSales;
 import com.blo.sales.facade.dto.DtoWrapperSale;
 import com.blo.sales.facade.enums.StatusSaleEnum;
+import com.blo.sales.facade.mapper.DtoDebtorMapper;
+import com.blo.sales.facade.mapper.DtoProductMapper;
+import com.blo.sales.facade.mapper.DtoSaleMapper;
+import com.blo.sales.facade.mapper.DtoSalesMapper;
 
 @RestController
 public class SalesFacadeImpl implements ISalesFacade {
@@ -46,7 +48,16 @@ public class SalesFacadeImpl implements ISalesFacade {
 	private IProductsBusiness productsBusiness;
 	
 	@Autowired
-	private ModelMapper modelMapper;
+	private DtoSalesMapper salesMapper;
+	
+	@Autowired
+	private DtoSaleMapper saleMapper;
+	
+	@Autowired
+	private DtoProductMapper productMapper;
+	
+	@Autowired
+	private DtoDebtorMapper debtorMapper;
 	
 	@Value("${exceptions.messages.product-insufficient}")
 	private String productInsufficientMessage;
@@ -61,11 +72,11 @@ public class SalesFacadeImpl implements ISalesFacade {
 			var out = new DtoWrapperSale();
 			var productsAlert = getProductsAlertsAndUpdate(sale.getProducts());
 			
-			var saleIn = modelMapper.map(sale, DtoIntSale.class);
+			var saleIn = saleMapper.toInner(sale);
 			var saleSaved = business.addSale(saleIn);
 			
 			LOGGER.info(String.format("sale registered %s", String.valueOf(saleSaved)));
-			out.setSale(modelMapper.map(saleSaved, DtoSale.class));
+			out.setSale(saleMapper.toOuter(saleSaved));
 			out.setProductsWithAlerts(productsAlert);
 			return new ResponseEntity<DtoWrapperSale>(out, HttpStatus.CREATED);
 		} catch (BloSalesBusinessException e) {
@@ -92,7 +103,7 @@ public class SalesFacadeImpl implements ISalesFacade {
 				sales = business.getSalesClose();
 				LOGGER.info(String.format("close sales %s", String.valueOf(sales)));
 			}
-			out = modelMapper.map(sales, DtoSales.class);
+			out = salesMapper.toOuter(sales);
 			LOGGER.info(String.format("sales %s found %s", String.valueOf(out), status));
 			return new ResponseEntity<DtoSales>(out, HttpStatus.OK);
 		} catch (BloSalesBusinessException e) {
@@ -106,7 +117,7 @@ public class SalesFacadeImpl implements ISalesFacade {
 		LOGGER.info(String.format("retrieving sales by flag %s", id));
 		try {
 			var sale = business.getSaleById(id);
-			var out = modelMapper.map(sale, DtoSale.class);
+			var out = saleMapper.toOuter(sale);
 			return new ResponseEntity<DtoSale>(out, HttpStatus.OK);
 		} catch (BloSalesBusinessException e) {
 			LOGGER.error(e.getExceptionMessage());
@@ -143,10 +154,10 @@ public class SalesFacadeImpl implements ISalesFacade {
 			
 			LOGGER.info(String.format("new data info %s", Encode.forJava(String.valueOf(sale))));
 			output.setProductsWithAlerts(getProductsAlertsAndUpdate(sale.getSale().getProducts()));
-			var saleInn = modelMapper.map(sale.getSale(), DtoIntSale.class);
+			var saleInn = saleMapper.toInner(sale.getSale());
 			var saleSaved = business.addSale(saleInn);
 			LOGGER.info(String.format("sale saved %s", String.valueOf(saleSaved)));
-			var saleSavedOut = modelMapper.map(saleSaved, DtoSale.class);
+			var saleSavedOut = saleMapper.toOuter(saleSaved);
 			output.setSale(saleSavedOut);
 			
 			// nuevo deudor flujo
@@ -155,9 +166,9 @@ public class SalesFacadeImpl implements ISalesFacade {
 				List<DtoSale> sales = new ArrayList<>();
 				sales.add(saleSavedOut);
 				sale.getDetor().setSales(sales);
-				var debtorToSave = modelMapper.map(sale.getDetor(), DtoIntDebtor.class);
+				var debtorToSave = debtorMapper.toInner(sale.getDetor());
 				var debtorSaved = debtorBusiness.addDebtor(debtorToSave);
-				var out = modelMapper.map(debtorSaved, DtoDebtor.class);
+				var out = debtorMapper.toOuter(debtorSaved);
 				LOGGER.info(String.format("Debtor saved %s", String.valueOf(out)));
 				output.setDetor(out);
 				return new ResponseEntity<DtoWrapperSale>(output, HttpStatus.CREATED);
@@ -197,7 +208,7 @@ public class SalesFacadeImpl implements ISalesFacade {
 			
 			var debtorUpdated = debtorBusiness.updateDebtor(debtorInDb.getId(), debtorInDb);
 			LOGGER.info(String.format("debtor updated %s", String.valueOf(debtorUpdated)));
-			var mappedDebtor = modelMapper.map(debtorUpdated, DtoDebtor.class);
+			var mappedDebtor = debtorMapper.toOuter(debtorUpdated);
 			output.setDetor(mappedDebtor);
 			return new ResponseEntity<>(output, HttpStatus.CREATED);
 		} catch (BloSalesBusinessException e) {
@@ -221,7 +232,7 @@ public class SalesFacadeImpl implements ISalesFacade {
 			}
 			
 			if (newQuantity.compareTo(new BigDecimal("2")) <= 0) {
-				var productOut = modelMapper.map(productFound, DtoProduct.class);
+				var productOut = productMapper.toOuter(productFound);
 				productsWithAlert.add(productOut);
 			}
 			

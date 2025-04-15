@@ -1,6 +1,5 @@
 package com.blo.sales.facade.impl;
 
-import org.modelmapper.ModelMapper;
 import org.owasp.encoder.Encode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,8 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.blo.sales.business.IProductsBusiness;
-import com.blo.sales.business.dto.DtoIntProduct;
-import com.blo.sales.business.dto.DtoIntProducts;
 import com.blo.sales.exceptions.BloSalesBusinessException;
 import com.blo.sales.facade.IProductsFacade;
 import com.blo.sales.facade.dto.DtoProduct;

@@ -3,7 +3,7 @@ package com.blo.sales.facade.dto;
 import java.io.Serializable;
 import java.math.BigDecimal;
 
-import com.blo.sales.business.enums.StatusCashboxIntEnum;
+import com.blo.sales.facade.enums.StatusCashboxEnum;
 
 import lombok.Data;
 
@@ -17,5 +17,5 @@ public @Data class DtoCashbox implements Serializable {
 
 	private long date;
 
-	private StatusCashboxIntEnum status;
+	private StatusCashboxEnum status;
 }

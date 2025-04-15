@@ -1,6 +1,6 @@
 package com.blo.sales.dao.enums;
 
-public enum StatusCashboxEnum {
+public enum DocStatusCashboxEnum {
 
 	OPEN, CLOSE
 }

@@ -5,7 +5,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.blo.sales.business.dto.DtoIntCashbox;
+import com.blo.sales.business.enums.StatusCashboxIntEnum;
 import com.blo.sales.facade.dto.DtoCashbox;
+import com.blo.sales.facade.enums.StatusCashboxEnum;
 import com.blo.sales.utils.IToInner;
 import com.blo.sales.utils.IToOuter;
 
@@ -20,7 +22,10 @@ public class DtoCashboxMapper implements IToInner<DtoIntCashbox, DtoCashbox>, IT
 		if (outer == null) {
 			return null;
 		}
-		return mapper.map(outer, DtoIntCashbox.class);
+		
+		var output = mapper.map(outer, DtoIntCashbox.class);
+		output.setStatus(StatusCashboxIntEnum.valueOf(outer.getStatus().name()));
+		return output;
 	}
 
 	@Override
@@ -28,6 +33,8 @@ public class DtoCashboxMapper implements IToInner<DtoIntCashbox, DtoCashbox>, IT
 		if (inner == null) {
 			return null;
 		}
-		return mapper.map(inner, DtoCashbox.class);
+		var output = mapper.map(inner, DtoCashbox.class);
+		output.setStatus(StatusCashboxEnum.valueOf(inner.getStatus().name()));
+		return output;
 	}
 }

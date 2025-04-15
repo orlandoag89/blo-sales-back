@@ -16,7 +16,7 @@ import com.blo.sales.business.dto.DtoIntCashbox;
 import com.blo.sales.business.dto.DtoIntCashboxes;
 import com.blo.sales.dao.ICashboxesDao;
 import com.blo.sales.dao.docs.Cashbox;
-import com.blo.sales.dao.enums.StatusCashboxEnum;
+import com.blo.sales.dao.enums.DocStatusCashboxEnum;
 import com.blo.sales.dao.repository.CashboxesRepository;
 import com.blo.sales.exceptions.BloSalesBusinessException;
 
@@ -66,7 +66,7 @@ public class CashboxesDaoImpl implements ICashboxesDao {
 	@Override
 	public DtoIntCashbox getCashboxOpen() {
 		LOGGER.info("retrieving open cashbox");
-		var openCashbox = repository.findCashboxByStatus(StatusCashboxEnum.OPEN.name());
+		var openCashbox = repository.findCashboxByStatus(DocStatusCashboxEnum.OPEN.name());
 		LOGGER.info(String.format("open cashboxes %s", String.valueOf(openCashbox)));
 		var cashbox = openCashbox.getBoxes().stream().findFirst().orElse(null);
 		LOGGER.info(String.format("cashbox data %s", String.valueOf(cashbox)));
@@ -78,7 +78,7 @@ public class CashboxesDaoImpl implements ICashboxesDao {
 	@Override
 	public DtoIntCashboxes getCashboxesClose() {
 		LOGGER.info("retrieving close cashboxes");
-		var closeCashboxes = repository.findCashboxByStatus(StatusCashboxEnum.CLOSE.name());
+		var closeCashboxes = repository.findCashboxByStatus(DocStatusCashboxEnum.CLOSE.name());
 		LOGGER.info(String.format("close cashboxes %s", String.valueOf(closeCashboxes)));
 		var cashbox = closeCashboxes.getBoxes();
 		LOGGER.info(String.format("close cashbox data %s", String.valueOf(cashbox)));
@@ -107,7 +107,7 @@ public class CashboxesDaoImpl implements ICashboxesDao {
 		}
 		var cashboxData = foundCashbox.get();
 		cashboxData.setMoney(cashbox.getMoney());
-		cashboxData.setStatus(StatusCashboxEnum.valueOf(cashbox.getStatus().name()));
+		cashboxData.setStatus(DocStatusCashboxEnum.valueOf(cashbox.getStatus().name()));
 		cashboxData.setDate(cashbox.getDate());
 		var saved = repository.save(cashboxData);
 		var out = modelMapper.map(saved, DtoIntCashbox.class);

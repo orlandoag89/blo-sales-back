@@ -2,7 +2,6 @@ package com.blo.sales.facade.impl;
 
 import java.math.BigDecimal;
 
-import org.modelmapper.ModelMapper;
 import org.owasp.encoder.Encode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,7 +14,6 @@ import com.blo.sales.business.ICashboxBusiness;
 import com.blo.sales.business.IDebtorsBusiness;
 import com.blo.sales.business.ISalesBusiness;
 import com.blo.sales.business.dto.DtoIntCashbox;
-import com.blo.sales.business.dto.DtoIntPartialPyment;
 import com.blo.sales.business.enums.StatusCashboxIntEnum;
 import com.blo.sales.exceptions.BloSalesBusinessException;
 import com.blo.sales.facade.IDebtorFacade;
@@ -23,6 +21,9 @@ import com.blo.sales.facade.dto.DtoDebtor;
 import com.blo.sales.facade.dto.DtoDebtors;
 import com.blo.sales.facade.dto.DtoPartialPyment;
 import com.blo.sales.facade.enums.StatusCashboxEnum;
+import com.blo.sales.facade.mapper.DtoDebtorMapper;
+import com.blo.sales.facade.mapper.DtoDebtorsMapper;
+import com.blo.sales.facade.mapper.DtoPartialPymentMapper;
 
 @RestController
 public class DebtorFacadeImpl implements IDebtorFacade {
@@ -39,14 +40,20 @@ public class DebtorFacadeImpl implements IDebtorFacade {
 	private ICashboxBusiness cashboxes;
 	
 	@Autowired
-	private ModelMapper modelMapper;
+	private DtoDebtorMapper debtorMapper;
+
+	@Autowired
+	private DtoDebtorsMapper debtorsMapper;
+	
+	@Autowired
+	private DtoPartialPymentMapper partialPymentMapper;
 
 	@Override
 	public ResponseEntity<DtoDebtor> retrieveDebtorById(String id) {
 		try {
 			var debtorFound = business.getDebtorById(id);
 			LOGGER.info(String.format("Debtor found %s", String.valueOf(debtorFound)));
-			var out = modelMapper.map(debtorFound, DtoDebtor.class);
+			var out = debtorMapper.toOuter(debtorFound);
 			return new ResponseEntity<DtoDebtor>(out, HttpStatus.OK);
 		} catch (BloSalesBusinessException e) {
 			LOGGER.error(e.getExceptionMessage());
@@ -59,7 +66,7 @@ public class DebtorFacadeImpl implements IDebtorFacade {
 		try {
 			var debtors = business.getDebtors();
 			LOGGER.info(String.format("Debtors %s", String.valueOf(debtors)));
-			var out = modelMapper.map(debtors, DtoDebtors.class);
+			var out = debtorsMapper.toOuter(debtors);
 			return new ResponseEntity<DtoDebtors>(out, HttpStatus.OK);
 		} catch (BloSalesBusinessException e) {
 			LOGGER.error(e.getExceptionMessage());
@@ -71,25 +78,24 @@ public class DebtorFacadeImpl implements IDebtorFacade {
 	public ResponseEntity<DtoDebtor> addPay(String id, long time, DtoPartialPyment partialPyment) {
 		try {
 			LOGGER.info(String.format("adding payment %s to %s", Encode.forJava(String.valueOf(partialPyment)), id));
-			var partialPymentMapped = modelMapper.map(partialPyment, DtoIntPartialPyment.class);
+			var partialPymentMapped = partialPymentMapper.toInner(partialPyment);
 			var saved = business.addPay(id, partialPymentMapped, time);
 			
 			var currentCashbox = cashboxes.getCashboxOpen();
-			var innerPartialPyment = modelMapper.map(partialPyment, DtoIntPartialPyment.class);
 			// valida si hay un nuevo cashbox
 			if (currentCashbox == null) {
 				// abre una caja
 				LOGGER.info("saving a new cashbox");
 				var dataCashbox = new DtoIntCashbox();
 				dataCashbox.setDate(time);
-				dataCashbox.setMoney(innerPartialPyment.getPartial_pyment());
+				dataCashbox.setMoney(partialPymentMapped.getPartial_pyment());
 				dataCashbox.setStatus(StatusCashboxIntEnum.valueOf(StatusCashboxEnum.OPEN.name()));
 				currentCashbox = cashboxes.saveCashbox(dataCashbox);
 				LOGGER.info(String.format("cashbox saved %s", String.valueOf(currentCashbox)));
 			} else {
 				// agrega dinero a la caja actual
 				LOGGER.info("cashbox exists");
-				var money = currentCashbox.getMoney().add(innerPartialPyment.getPartial_pyment());
+				var money = currentCashbox.getMoney().add(partialPymentMapped.getPartial_pyment());
 				currentCashbox.setMoney(money);
 				cashboxes.updateCashbox(currentCashbox.getId(), currentCashbox);
 				LOGGER.info(String.format("cashbox updated", String.valueOf(cashboxes)));
@@ -112,7 +118,7 @@ public class DebtorFacadeImpl implements IDebtorFacade {
 				return new ResponseEntity<>(null, HttpStatus.OK);
 			}
 			
-			var out = modelMapper.map(saved, DtoDebtor.class);
+			var out = debtorMapper.toOuter(saved);
 			LOGGER.info(String.format("partial payment was added to %s", id));
 			return new ResponseEntity<DtoDebtor>(out, HttpStatus.OK);
 		} catch (BloSalesBusinessException e) {
