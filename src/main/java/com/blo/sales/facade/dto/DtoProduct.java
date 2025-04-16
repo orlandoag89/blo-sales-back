@@ -11,13 +11,13 @@ public @Data class DtoProduct implements Serializable {
 
 	private String id;
 
-    private String name;
+    private String name; // nombre del producto
 
-    private BigDecimal total_price;
+    private BigDecimal total_price; // precio del producto
 
-    private BigDecimal quantity;
+    private BigDecimal quantity; // cantidad en existencia
 
-    private String desc;
+    private String desc; //breve descripción
 
-    private  boolean its_kg;
+    private  boolean its_kg; //son kg
 }

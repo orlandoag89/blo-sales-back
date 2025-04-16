@@ -45,7 +45,7 @@ public class DtoSalesMapper implements IToInner<DtoIntSales, DtoSales>, IToOuter
 		DtoIntSales salesOut = new DtoIntSales();
 		List<DtoIntSale> sales = new ArrayList<>();
 		
-		if (outer.getSales() == null && !outer.getSales().isEmpty()) {
+		if (outer.getSales() != null && !outer.getSales().isEmpty()) {
 			outer.getSales().forEach(s -> sales.add(saleMapper.toInner(s)));
 		}
 		

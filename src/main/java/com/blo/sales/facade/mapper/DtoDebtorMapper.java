@@ -8,8 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.blo.sales.business.dto.DtoIntDebtor;
+import com.blo.sales.business.dto.DtoIntPartialPyment;
 import com.blo.sales.business.dto.DtoIntSale;
 import com.blo.sales.facade.dto.DtoDebtor;
+import com.blo.sales.facade.dto.DtoPartialPyment;
 import com.blo.sales.facade.dto.DtoSale;
 import com.blo.sales.utils.IToInner;
 import com.blo.sales.utils.IToOuter;
@@ -22,6 +24,9 @@ public class DtoDebtorMapper implements IToInner<DtoIntDebtor, DtoDebtor>, IToOu
 	
 	@Autowired
 	private DtoSaleMapper saleMapper;
+	
+	@Autowired
+	private DtoPartialPymentMapper partialPymentsMapper;
 
 	@Override
 	public DtoIntDebtor toInner(DtoDebtor outer) {
@@ -36,7 +41,13 @@ public class DtoDebtorMapper implements IToInner<DtoIntDebtor, DtoDebtor>, IToOu
 			outer.getSales().forEach(s -> sales.add(saleMapper.toInner(s)));
 		}
 		
+		List<DtoIntPartialPyment> partialPyments = new ArrayList<>();
+		if (outer.getPartial_pyments() != null && !outer.getPartial_pyments().isEmpty()) {
+			outer.getPartial_pyments().forEach(p -> partialPyments.add(partialPymentsMapper.toInner(p)));
+		}
+		
 		debtor.setSales(sales);
+		debtor.setPartial_pyments(partialPyments);
 		return debtor;
 	}
 
@@ -52,7 +63,13 @@ public class DtoDebtorMapper implements IToInner<DtoIntDebtor, DtoDebtor>, IToOu
 			inner.getSales().forEach(s -> sales.add(saleMapper.toOuter(s)));
 		}
 		
+		List<DtoPartialPyment> partialPyments = new ArrayList<>();
+		if (inner.getPartial_pyments() != null && !inner.getPartial_pyments().isEmpty()) {
+			inner.getPartial_pyments().forEach(p -> partialPyments.add(partialPymentsMapper.toOuter(p)));
+		}
+		
 		debtor.setSales(sales);
+		debtor.setPartial_pyments(partialPyments);
 		return debtor;
 	}
 
