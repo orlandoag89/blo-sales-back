@@ -91,6 +91,24 @@ public final class MocksFactory {
 		out.setProducts(products);
 		return out;
 	}
+	
+	public static DtoProducts createDtoProductsSaved() {
+		var out = new DtoProducts();
+		List<DtoProduct> products = new ArrayList<>();
+		products.add(createDtoProduct());
+		products.add(createDtoProduct());
+		out.setProducts(products);
+		return out;
+	}
+	
+	public static DtoIntProducts createDtoIntProductsSaved() {
+		var out = new DtoIntProducts();
+		List<DtoIntProduct> products = new ArrayList<>();
+		products.add(createDtoIntProduct());
+		products.add(createDtoIntProduct());
+		out.setProducts(products);
+		return out;
+	}
 
 	public static DtoIntProducts createDtoIntProductsEmptyList() {
 		var out = new DtoIntProducts();

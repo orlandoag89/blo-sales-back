@@ -2,9 +2,13 @@ package com.blo.sales.utils;
 
 import java.time.Instant;
 
+import org.apache.commons.lang3.StringUtils;
+
 public final class Utils {
 	
 	private Utils() { }
+	
+	private static final String UNDEFINED = "undefined"; 
 	
 	/**
 	 * metodo para recuperar el tiempo en mili segundos
@@ -14,4 +18,7 @@ public final class Utils {
 		return Instant.now().toEpochMilli();
 	}
 	
+	public static boolean includesUndefined(String input) {
+		return StringUtils.contains(UNDEFINED, input.toLowerCase());
+	}
 }
