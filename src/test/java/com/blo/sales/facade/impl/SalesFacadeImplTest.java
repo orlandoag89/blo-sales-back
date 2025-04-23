@@ -1,0 +1,546 @@
+package com.blo.sales.facade.impl;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.web.servlet.MockMvc;
+
+import com.blo.sales.business.IDebtorsBusiness;
+import com.blo.sales.business.IProductsBusiness;
+import com.blo.sales.business.ISalesBusiness;
+import com.blo.sales.facade.dto.DtoSale;
+import com.blo.sales.facade.dto.DtoSales;
+import com.blo.sales.facade.dto.DtoWrapperSale;
+import com.blo.sales.facade.mapper.DtoDebtorMapper;
+import com.blo.sales.facade.mapper.DtoProductMapper;
+import com.blo.sales.facade.mapper.DtoSaleMapper;
+import com.blo.sales.facade.mapper.DtoSalesMapper;
+import com.blo.sales.factory.MocksFactory;
+import com.blo.sales.factory.MocksUtils;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+@SpringBootTest
+@AutoConfigureMockMvc
+@TestPropertySource(properties = {
+	"exceptions.messages.product-insufficient=Productos insuficientes",
+	"exceptions.codes.product-insufficient=ERR03"
+})
+public class SalesFacadeImplTest {
+	
+	@Autowired
+	private MockMvc mockMvc;
+	
+	@Autowired
+	private ObjectMapper objectMapper;
+	
+	@MockBean
+	private ISalesBusiness business;
+	
+	@MockBean
+	private IDebtorsBusiness debtorBusiness;
+	
+	@MockBean
+	private IProductsBusiness productsBusiness;
+	
+	@MockBean
+	private DtoSalesMapper salesMapper;
+	
+	@MockBean
+	private DtoSaleMapper saleMapper;
+	
+	@MockBean
+	private DtoProductMapper productMapper;
+	
+	@MockBean
+	private DtoDebtorMapper debtorMapper;
+
+	/**
+	 * Venta cerrada sin deudor y sin productos con alerta de terminar
+	 * @throws Exception 
+	 */
+	@Test
+	public void registerSaleTest() throws Exception {
+		var sale = MocksFactory.createDtoNewSaleNoCashbox();
+		var saleSaved = MocksFactory.createDtoIntSaleNoCashbox();
+		var saleAsString = objectMapper.writeValueAsString(sale);
+		
+		Mockito.when(saleMapper.toInner(Mockito.any())).thenReturn(saleSaved);
+		Mockito.when(business.addSale(Mockito.any())).thenReturn(saleSaved);
+		Mockito.when(saleMapper.toOuter(Mockito.any())).thenReturn(MocksFactory.createDtoSaleNoCashbox());
+		Mockito.when(productsBusiness.getProduct(Mockito.anyString())).thenReturn(MocksFactory.createDtoIntProduct());
+		Mockito.when(productsBusiness.updateProduct(Mockito.anyString(), Mockito.any())).thenReturn(MocksFactory.createDtoIntProduct());
+		
+		 var result = mockMvc.perform(post("/api/v1/sales")
+	                .contentType(MediaType.APPLICATION_JSON)
+	                .content(saleAsString))
+	            .andExpect(status().isCreated())
+	            .andReturn();
+		
+		var registerSale = MocksUtils.getContentAsString(result, "registerSaleTest");
+		var objtSale = objectMapper.readValue(registerSale, DtoWrapperSale.class);
+		
+		Mockito.verify(saleMapper, Mockito.atLeastOnce()).toInner(Mockito.any());
+		Mockito.verify(business, Mockito.atLeastOnce()).addSale(Mockito.any());
+		Mockito.verify(saleMapper, Mockito.atLeastOnce()).toOuter(Mockito.any());
+		Mockito.verify(productsBusiness, Mockito.atLeastOnce()).getProduct(Mockito.anyString());
+		Mockito.verify(productsBusiness, Mockito.atLeastOnce()).updateProduct(Mockito.anyString(), Mockito.any());
+		
+		assertNotNull(result);
+		assertNotNull(registerSale);
+		assertNotNull(objtSale.getSale());
+		assertNotNull(objtSale.getSale().getId());
+		assertNull(objtSale.getDebtor());
+		assertTrue(objtSale.getProductsWithAlerts().isEmpty());
+	}
+	
+	/**
+	 * Se intenta registrar una venta con productos insuficientes
+	 * @throws Exception
+	 */
+	@Test
+	public void registerSaleWithInsuficientProductsTest() throws Exception {
+		var sale = MocksFactory.createDtoNewSaleNoCashbox();
+		sale.getProducts().get(0).setQuantity_on_sale(MocksUtils.BIG_DECIMAL_10);
+		
+		Mockito.when(productsBusiness.getProduct(Mockito.anyString())).thenReturn(MocksFactory.createDtoIntProduct());
+		
+		var saleAsString = objectMapper.writeValueAsString(sale);
+		
+		 var result = mockMvc.perform(post("/api/v1/sales")
+	                .contentType(MediaType.APPLICATION_JSON)
+	                .content(saleAsString))
+	            .andExpect(status().isUnprocessableEntity())
+	            .andReturn();
+		 
+		 var content = MocksUtils.getContentAsString(result, "registerSaleWithInsuficientProductsTest");
+		 
+		 Mockito.verify(productsBusiness, Mockito.atLeastOnce()).getProduct(Mockito.anyString());
+		 
+		 assertEquals(MocksUtils.EMPTY_STRING, content);
+	}
+	
+	/**
+	 * se registran ventas y productos que traen alerta
+	 * @throws Exception
+	 */
+	@Test
+	public void registerSaleWithAlertsProductsTest() throws Exception {
+		var saleSaved = MocksFactory.createDtoIntSaleNoCashbox();
+		var sale = MocksFactory.createDtoNewSaleNoCashbox();
+		sale.getProducts().get(0).setQuantity_on_sale(MocksUtils.BIG_DECIMAL_3);
+		
+		Mockito.when(saleMapper.toInner(Mockito.any())).thenReturn(saleSaved);
+		Mockito.when(business.addSale(Mockito.any())).thenReturn(saleSaved);
+		Mockito.when(saleMapper.toOuter(Mockito.any())).thenReturn(MocksFactory.createDtoSaleNoCashbox());
+		Mockito.when(productMapper.toOuter(Mockito.any())).thenReturn(MocksFactory.createDtoProduct());
+		Mockito.when(productsBusiness.getProduct(Mockito.anyString())).thenReturn(MocksFactory.createDtoIntProduct());
+		Mockito.when(productsBusiness.updateProduct(Mockito.anyString(), Mockito.any())).thenReturn(MocksFactory.createDtoIntProduct());
+		
+		var saleAsString = objectMapper.writeValueAsString(sale);
+		
+		 var result = mockMvc.perform(post("/api/v1/sales")
+	                .contentType(MediaType.APPLICATION_JSON)
+	                .content(saleAsString))
+	            .andExpect(status().isCreated())
+	            .andReturn();
+		 
+		Mockito.verify(saleMapper, Mockito.atLeastOnce()).toInner(Mockito.any());
+		Mockito.verify(business, Mockito.atLeastOnce()).addSale(Mockito.any());
+		Mockito.verify(saleMapper, Mockito.atLeastOnce()).toOuter(Mockito.any());
+		Mockito.verify(productMapper, Mockito.atLeastOnce()).toOuter(Mockito.any());
+		Mockito.verify(productsBusiness, Mockito.atLeastOnce()).getProduct(Mockito.anyString());
+		Mockito.verify(productsBusiness, Mockito.atLeastOnce()).updateProduct(Mockito.anyString(), Mockito.any());
+		 
+		 var product = MocksUtils.getContentAsString(result, "registerSaleWithAlertsProductsTest");
+		 var obj = objectMapper.readValue(product, DtoWrapperSale.class);
+		 
+		 assertNotNull(product);
+		 assertNotNull(obj);
+		 assertNotNull(obj.getSale());
+		 assertNotNull(obj.getSale().getId());
+		 assertFalse(obj.getProductsWithAlerts().isEmpty());
+	}
+	
+	/**
+	 * Recupera todas las ventas
+	 * @throws Exception
+	 */
+	@Test
+	public void retrieveAllSalesTest() throws Exception {
+		Mockito.when(business.getSales()).thenReturn(MocksFactory.createDtoIntSales());
+		Mockito.when(salesMapper.toOuter(Mockito.any())).thenReturn(MocksFactory.createDtoSales());
+		
+		var result = mockMvc.perform(get("/api/v1/sales?status=ALL")
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andReturn();
+		
+		var product = MocksUtils.getContentAsString(result, "retrieveAllSalesTest");
+		var obj = objectMapper.readValue(product, DtoSales.class);
+		
+		Mockito.verify(business, Mockito.atLeastOnce()).getSales();
+		Mockito.verify(salesMapper, Mockito.atLeastOnce()).toOuter(Mockito.any());
+		
+		assertNotNull(product);
+		assertNotNull(obj);
+		assertNotNull(obj.getSales());
+		assertFalse(obj.getSales().isEmpty());
+	}
+	
+	/**
+	 * Recupera las ventas incompletas
+	 * @throws Exception
+	 */
+	@Test
+	public void retrieveOpenSalesTest() throws Exception {
+		Mockito.when(business.getSalesOpen()).thenReturn(MocksFactory.createOpenDtoIntSales());
+		Mockito.when(salesMapper.toOuter(Mockito.any())).thenReturn(MocksFactory.createOpenDtoSales());
+		
+		var result = mockMvc.perform(get("/api/v1/sales?status=OPEN")
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andReturn();
+		
+		var product = MocksUtils.getContentAsString(result, "retrieveOpenSalesTest");
+		var obj = objectMapper.readValue(product, DtoSales.class);
+		
+		Mockito.verify(business, Mockito.atLeastOnce()).getSalesOpen();
+		Mockito.verify(salesMapper, Mockito.atLeastOnce()).toOuter(Mockito.any());
+		
+		assertNotNull(product);
+		assertNotNull(obj);
+		assertNotNull(obj.getSales());
+		assertFalse(obj.getSales().isEmpty());
+	}
+	
+	/**
+	 * recupera todas las ventas
+	 * @throws Exception
+	 */
+	@Test
+	public void retrieveCloseTest() throws Exception {
+		Mockito.when(business.getSalesClose()).thenReturn(MocksFactory.createOpenDtoIntSales());
+		Mockito.when(salesMapper.toOuter(Mockito.any())).thenReturn(MocksFactory.createOpenDtoSales());
+		
+		var result = mockMvc.perform(get("/api/v1/sales?status=CLOSE")
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andReturn();
+		
+		var product = MocksUtils.getContentAsString(result, "retrieveCloseTest");
+		var obj = objectMapper.readValue(product, DtoSales.class);
+		
+		Mockito.verify(business, Mockito.atLeastOnce()).getSalesClose();
+		Mockito.verify(salesMapper, Mockito.atLeastOnce()).toOuter(Mockito.any());
+		
+		assertNotNull(product);
+		assertNotNull(obj);
+		assertNotNull(obj.getSales());
+		assertFalse(obj.getSales().isEmpty());
+	}
+	
+	/**
+	 * Recupera todos los detalles de una venta por id
+	 * @throws Exception
+	 */
+	@Test
+	public void retrieveSaleByIdTest() throws Exception {
+		Mockito.when(business.getSaleById(Mockito.anyString())).thenReturn(MocksFactory.createDtoIntSaleOnCashbox());
+		Mockito.when(saleMapper.toOuter(Mockito.any())).thenReturn(MocksFactory.createDtoSaleOnCashbox());
+		
+		var result = mockMvc.perform(get("/api/v1/sales/1a2b3c4d5e")
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andReturn();
+		
+		Mockito.verify(business, Mockito.atLeastOnce()).getSaleById(Mockito.anyString());
+		Mockito.verify(saleMapper, Mockito.atLeastOnce()).toOuter(Mockito.any());
+		
+		var sale = MocksUtils.getContentAsString(result, "retrieveSaleByIdTest");
+		var obj = objectMapper.readValue(sale, DtoSale.class);
+		
+		assertNotNull(sale);
+		assertNotNull(obj);
+		assertNotNull(obj.getId());
+	}
+	
+	/**
+	 * Se registra una venta con un nuevo deudor que no existe en la base de datos y
+	 * en la respuesta no tiene productos con alerta
+	 * @throws Exception
+	 */
+	@Test
+	public void registerSaleAndNewDebtorTest() throws Exception {
+		var newDebtor = MocksFactory.createNewDtoDebtor();
+		var saleFromDebtor = MocksFactory.createDtoSaleNoCashboxAndOpen();
+		var wrapperSale = new DtoWrapperSale();
+		wrapperSale.setDebtor(newDebtor);
+		wrapperSale.setSale(saleFromDebtor);
+		
+		Mockito.when(productsBusiness.getProduct(Mockito.anyString())).thenReturn(MocksFactory.createDtoIntProduct());
+		Mockito.when(productsBusiness.updateProduct(Mockito.anyString(), Mockito.any())).thenReturn(MocksFactory.createDtoIntProduct());
+		Mockito.when(saleMapper.toInner(Mockito.any())).thenReturn(MocksFactory.createDtoIntSaleNoCashboxAndOpen());
+		Mockito.when(business.addSale(Mockito.any())).thenReturn(MocksFactory.createSavedDtoIntSaleNoCashbox());
+		Mockito.when(saleMapper.toOuter(Mockito.any())).thenReturn(MocksFactory.createDtoNewSaleNoCashbox());
+		Mockito.when(debtorMapper.toInner(Mockito.any())).thenReturn(MocksFactory.createNewDtoIntDebtor());
+		Mockito.when(debtorBusiness.addDebtor(Mockito.any())).thenReturn(MocksFactory.createExistsDtoIntDebtor());
+		Mockito.when(debtorMapper.toOuter(Mockito.any())).thenReturn(MocksFactory.createExistsDtoDebtor());
+		
+		var body = objectMapper.writeValueAsString(wrapperSale);
+		
+		var response = mockMvc.perform(post("/api/v1/sales/debtors?partialPyment=10")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(body))
+				.andExpect(status().isCreated()).andReturn();
+		
+		var data = MocksUtils.getContentAsString(response, "registerSaleAndNewDebtor");
+		var obj = objectMapper.readValue(data, DtoWrapperSale.class);
+		
+		Mockito.verify(productsBusiness, Mockito.atLeastOnce()).getProduct(Mockito.anyString());
+		Mockito.verify(productsBusiness, Mockito.atLeastOnce()).updateProduct(Mockito.anyString(), Mockito.any());
+		Mockito.verify(saleMapper, Mockito.atLeastOnce()).toInner(Mockito.any());
+		Mockito.verify(business, Mockito.atLeastOnce()).addSale(Mockito.any());
+		Mockito.verify(saleMapper, Mockito.atLeastOnce()).toOuter(Mockito.any());
+		Mockito.verify(debtorMapper, Mockito.atLeastOnce()).toInner(Mockito.any());
+		Mockito.verify(debtorBusiness, Mockito.atLeastOnce()).addDebtor(Mockito.any());
+		Mockito.verify(debtorMapper, Mockito.atLeastOnce()).toOuter(Mockito.any());
+		
+		assertNotNull(obj);
+		assertNotNull(obj.getDebtor());
+		assertNotNull(obj.getDebtor().getId());
+		assertFalse(obj.getDebtor().getPartial_pyments().isEmpty());
+	}
+	
+	/**
+	 * Se registra una venta con un nuevo deudor que no existe en la base de datos y
+	 * en la respuesta tiene productos con alerta
+	 * @throws Exception
+	 */
+	@Test
+	public void registerSaleAndNewDebtorAlertProductsTest() throws Exception {
+		var newDebtor = MocksFactory.createNewDtoDebtor();
+		var saleFromDebtor = MocksFactory.createDtoSaleNoCashboxAndOpen();
+		saleFromDebtor.getProducts().get(0).setQuantity_on_sale(MocksUtils.BIG_DECIMAL_3);
+		var wrapperSale = new DtoWrapperSale();
+		wrapperSale.setDebtor(newDebtor);
+		wrapperSale.setSale(saleFromDebtor);
+		
+		
+		Mockito.when(productsBusiness.getProduct(Mockito.anyString())).thenReturn(MocksFactory.createDtoIntProduct());
+		Mockito.when(productsBusiness.updateProduct(Mockito.anyString(), Mockito.any())).thenReturn(MocksFactory.createDtoIntProduct());
+		Mockito.when(saleMapper.toInner(Mockito.any())).thenReturn(MocksFactory.createDtoIntSaleNoCashboxAndOpen());
+		Mockito.when(business.addSale(Mockito.any())).thenReturn(MocksFactory.createSavedDtoIntSaleNoCashbox());
+		Mockito.when(saleMapper.toOuter(Mockito.any())).thenReturn(MocksFactory.createDtoNewSaleNoCashbox());
+		Mockito.when(debtorMapper.toInner(Mockito.any())).thenReturn(MocksFactory.createNewDtoIntDebtor());
+		Mockito.when(debtorBusiness.addDebtor(Mockito.any())).thenReturn(MocksFactory.createExistsDtoIntDebtor());
+		Mockito.when(debtorMapper.toOuter(Mockito.any())).thenReturn(MocksFactory.createExistsDtoDebtor());
+		
+		var body = objectMapper.writeValueAsString(wrapperSale);
+		
+		var response = mockMvc.perform(post("/api/v1/sales/debtors?partialPyment=10")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(body))
+				.andExpect(status().isCreated()).andReturn();
+		
+		var data = MocksUtils.getContentAsString(response, "registerSaleAndNewDebtor");
+		var obj = objectMapper.readValue(data, DtoWrapperSale.class);
+		
+		Mockito.verify(productsBusiness, Mockito.atLeastOnce()).getProduct(Mockito.anyString());
+		Mockito.verify(productsBusiness, Mockito.atLeastOnce()).updateProduct(Mockito.anyString(), Mockito.any());
+		Mockito.verify(saleMapper, Mockito.atLeastOnce()).toInner(Mockito.any());
+		Mockito.verify(business, Mockito.atLeastOnce()).addSale(Mockito.any());
+		Mockito.verify(saleMapper, Mockito.atLeastOnce()).toOuter(Mockito.any());
+		Mockito.verify(debtorMapper, Mockito.atLeastOnce()).toInner(Mockito.any());
+		Mockito.verify(debtorBusiness, Mockito.atLeastOnce()).addDebtor(Mockito.any());
+		Mockito.verify(debtorMapper, Mockito.atLeastOnce()).toOuter(Mockito.any());
+		
+		assertNotNull(obj);
+		assertNotNull(obj.getDebtor());
+		assertNotNull(obj.getDebtor().getId());
+		assertFalse(obj.getDebtor().getPartial_pyments().isEmpty());
+		assertFalse(obj.getProductsWithAlerts().isEmpty());
+	}
+	
+	/**
+	 * se registra una venta con un deudor que existe y no tiene productos con alerta
+	 * el deudor tiene una deuda de 50 pesos y una compra de 50
+	 * no dejó abono, así que su deuda ahora será 100
+	 * @throws Exception
+	 */
+	@Test
+	public void registerSaleAndOldDebtor() throws Exception {
+		var debtor = MocksFactory.createExistsDtoDebtor();
+		var sale = MocksFactory.createDtoSaleNoCashboxAndOpen();
+		var wrapper = new DtoWrapperSale();
+		wrapper.setDebtor(debtor);
+		wrapper.setSale(sale);
+		
+		var body = objectMapper.writeValueAsString(wrapper);
+		
+		var debtorUpdated = MocksFactory.createExistsDtoIntDebtor();
+		var total = debtorUpdated.getTotal().add(sale.getTotal());
+		debtorUpdated.setTotal(total);
+		
+		var debtorUpdated2 = MocksFactory.createExistsDtoDebtor();
+		debtorUpdated2.setTotal(MocksUtils.BIG_DECIMAL_100);
+				
+		Mockito.when(productsBusiness.getProduct(Mockito.anyString())).thenReturn(MocksFactory.createDtoIntProduct());
+		Mockito.when(productsBusiness.updateProduct(Mockito.anyString(), Mockito.any())).thenReturn(MocksFactory.createDtoIntProduct());
+		Mockito.when(debtorBusiness.getDebtorById(Mockito.anyString())).thenReturn(MocksFactory.createExistsDtoIntDebtor());
+		Mockito.when(saleMapper.toInner(Mockito.any())).thenReturn(MocksFactory.createDtoIntSaleNoCashboxAndOpen());
+		Mockito.when(business.addSale(Mockito.any())).thenReturn(MocksFactory.createDtoIntSaleNoCashbox());
+		Mockito.when(saleMapper.toOuter(Mockito.any())).thenReturn(MocksFactory.createDtoNewSaleNoCashbox());
+		Mockito.when(debtorBusiness.updateDebtor(Mockito.anyString(), Mockito.any())).thenReturn(debtorUpdated);
+		Mockito.when(debtorMapper.toOuter(Mockito.any())).thenReturn(debtorUpdated2);
+		
+		var response = mockMvc.perform(post("/api/v1/sales/debtors?partialPyment=0")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(body))
+				.andExpect(status().isCreated()).andReturn();
+		
+		var data = MocksUtils.getContentAsString(response, "registerSaleAndOldDebtor");
+		var obj = objectMapper.readValue(data, DtoWrapperSale.class);
+		
+		Mockito.verify(productsBusiness, Mockito.atLeastOnce()).getProduct(Mockito.anyString());
+		Mockito.verify(productsBusiness, Mockito.atLeastOnce()).updateProduct(Mockito.anyString(), Mockito.any());
+		Mockito.verify(debtorBusiness, Mockito.atLeastOnce()).getDebtorById(Mockito.anyString());
+		Mockito.verify(saleMapper, Mockito.atLeastOnce()).toInner(Mockito.any());
+		Mockito.verify(business, Mockito.atLeastOnce()).addSale(Mockito.any());
+		Mockito.verify(saleMapper, Mockito.atLeastOnce()).toOuter(Mockito.any());
+		Mockito.verify(debtorBusiness, Mockito.atLeastOnce()).updateDebtor(Mockito.anyString(), Mockito.any());
+		Mockito.verify(debtorMapper, Mockito.atLeastOnce()).toOuter(Mockito.any());
+		
+		assertNotNull(data);
+		assertNotNull(obj);
+		assertNotNull(obj);
+		assertNotNull(obj.getDebtor());
+		assertNotNull(obj.getDebtor().getId());
+		assertFalse(obj.getDebtor().getPartial_pyments().isEmpty());
+		assertTrue(obj.getProductsWithAlerts().isEmpty());
+		assertEquals(MocksUtils.BIG_DECIMAL_100, obj.getDebtor().getTotal());
+	}
+	
+	/**
+	 * se registra una venta con un deudor que existe y no tiene productos con alerta
+	 * el deudor tiene una deuda de 50 pesos y una compra de 50
+	 * dejó abono de 30, así que su deuda se reduce a 70 
+	 * @throws Exception
+	 */
+	@Test
+	public void registerSaleAndOldDebtorWithPartialPyment() throws Exception {
+		var debtor = MocksFactory.createExistsDtoDebtor();
+		var sale = MocksFactory.createDtoSaleNoCashboxAndOpen();
+		var wrapper = new DtoWrapperSale();
+		wrapper.setDebtor(debtor);
+		wrapper.setSale(sale);
+		
+		var body = objectMapper.writeValueAsString(wrapper);
+		
+		var debtorUpdated = MocksFactory.createExistsDtoIntDebtor();
+		debtorUpdated.setTotal(MocksUtils.BIG_DECIMAL_70);
+		
+		var debtorUpdated2 = MocksFactory.createExistsDtoDebtor();
+		debtorUpdated2.setTotal(MocksUtils.BIG_DECIMAL_70);
+				
+		Mockito.when(productsBusiness.getProduct(Mockito.anyString())).thenReturn(MocksFactory.createDtoIntProduct());
+		Mockito.when(productsBusiness.updateProduct(Mockito.anyString(), Mockito.any())).thenReturn(MocksFactory.createDtoIntProduct());
+		Mockito.when(debtorBusiness.getDebtorById(Mockito.anyString())).thenReturn(MocksFactory.createExistsDtoIntDebtor());
+		Mockito.when(saleMapper.toInner(Mockito.any())).thenReturn(MocksFactory.createDtoIntSaleNoCashboxAndOpen());
+		Mockito.when(business.addSale(Mockito.any())).thenReturn(MocksFactory.createDtoIntSaleNoCashbox());
+		Mockito.when(saleMapper.toOuter(Mockito.any())).thenReturn(MocksFactory.createDtoNewSaleNoCashbox());
+		Mockito.when(debtorBusiness.updateDebtor(Mockito.anyString(), Mockito.any())).thenReturn(debtorUpdated);
+		Mockito.when(debtorMapper.toOuter(Mockito.any())).thenReturn(debtorUpdated2);
+		
+		var response = mockMvc.perform(post("/api/v1/sales/debtors?partialPyment=30")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(body))
+				.andExpect(status().isCreated()).andReturn();
+		
+		var data = MocksUtils.getContentAsString(response, "registerSaleAndOldDebtor");
+		var obj = objectMapper.readValue(data, DtoWrapperSale.class);
+		
+		Mockito.verify(productsBusiness, Mockito.atLeastOnce()).getProduct(Mockito.anyString());
+		Mockito.verify(productsBusiness, Mockito.atLeastOnce()).updateProduct(Mockito.anyString(), Mockito.any());
+		Mockito.verify(debtorBusiness, Mockito.atLeastOnce()).getDebtorById(Mockito.anyString());
+		Mockito.verify(saleMapper, Mockito.atLeastOnce()).toInner(Mockito.any());
+		Mockito.verify(business, Mockito.atLeastOnce()).addSale(Mockito.any());
+		Mockito.verify(saleMapper, Mockito.atLeastOnce()).toOuter(Mockito.any());
+		Mockito.verify(debtorBusiness, Mockito.atLeastOnce()).updateDebtor(Mockito.anyString(), Mockito.any());
+		Mockito.verify(debtorMapper, Mockito.atLeastOnce()).toOuter(Mockito.any());
+		
+		assertNotNull(data);
+		assertNotNull(obj);
+		assertNotNull(obj);
+		assertNotNull(obj.getDebtor());
+		assertNotNull(obj.getDebtor().getId());
+		assertFalse(obj.getDebtor().getPartial_pyments().isEmpty());
+		assertTrue(obj.getProductsWithAlerts().isEmpty());
+		assertEquals(MocksUtils.BIG_DECIMAL_70, obj.getDebtor().getTotal());
+	}
+	
+	/**
+	 * se registra una venta con un deudor que existe y no tiene productos con alerta
+	 * el deudor tiene una deuda de 50 pesos y una compra de 50
+	 * dejó abono de 500, así que el deudor se elimina
+	 * @throws Exception
+	 */
+	@Test
+	public void registerSaleAndOldDebtorWithAllPyment() throws Exception {
+		var debtor = MocksFactory.createExistsDtoDebtor();
+		var sale = MocksFactory.createDtoSaleNoCashboxAndOpen();
+		var wrapper = new DtoWrapperSale();
+		wrapper.setDebtor(debtor);
+		wrapper.setSale(sale);
+		
+		var body = objectMapper.writeValueAsString(wrapper);
+		
+		var debtorUpdatedInt = MocksFactory.createExistsDtoIntDebtor();
+		debtorUpdatedInt.setTotal(MocksUtils.BIG_DECIMAL_70);
+		
+		var debtorUpdatedOuter = MocksFactory.createExistsDtoDebtor();
+		debtorUpdatedOuter.setTotal(MocksUtils.BIG_DECIMAL_70);
+		
+		Mockito.when(productsBusiness.getProduct(Mockito.anyString())).thenReturn(MocksFactory.createDtoIntProduct());
+		Mockito.when(productsBusiness.updateProduct(Mockito.anyString(), Mockito.any())).thenReturn(MocksFactory.createDtoIntProduct());
+		Mockito.when(debtorBusiness.getDebtorById(Mockito.anyString())).thenReturn(MocksFactory.createExistsDtoIntDebtor());
+		Mockito.when(saleMapper.toInner(Mockito.any())).thenReturn(MocksFactory.createDtoIntSaleNoCashboxAndOpen());
+		Mockito.when(business.addSale(Mockito.any())).thenReturn(MocksFactory.createDtoIntSaleNoCashbox());
+		Mockito.when(saleMapper.toOuter(Mockito.any())).thenReturn(MocksFactory.createDtoSaleNoCashbox());
+		Mockito.doNothing().when(debtorBusiness).deleteDebtorById(Mockito.anyString());
+		
+		var response = mockMvc.perform(post("/api/v1/sales/debtors?partialPyment=500")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(body))
+				.andExpect(status().isCreated()).andReturn();
+		
+		var data = MocksUtils.getContentAsString(response, "registerSaleAndOldDebtor");
+		var obj = objectMapper.readValue(data, DtoWrapperSale.class);
+		
+		Mockito.verify(productsBusiness, Mockito.atLeastOnce()).getProduct(Mockito.anyString());
+		Mockito.verify(productsBusiness, Mockito.atLeastOnce()).updateProduct(Mockito.anyString(), Mockito.any());
+		Mockito.verify(debtorBusiness, Mockito.atLeastOnce()).getDebtorById(Mockito.anyString());
+		Mockito.verify(saleMapper, Mockito.atLeastOnce()).toInner(Mockito.any());
+		Mockito.verify(business, Mockito.atLeastOnce()).addSale(Mockito.any());
+		Mockito.verify(saleMapper, Mockito.atLeastOnce()).toOuter(Mockito.any());
+		Mockito.verify(debtorBusiness, Mockito.atLeastOnce()).deleteDebtorById(Mockito.anyString());
+		
+		assertNotNull(data);
+		assertNotNull(obj);
+		assertNotNull(obj.getSale());
+		assertNull(obj.getDebtor().getId());
+	}
+}

@@ -12,10 +12,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 
-import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,12 +23,12 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 
 import com.blo.sales.business.IProductsBusiness;
 import com.blo.sales.facade.mapper.DtoProductMapper;
 import com.blo.sales.facade.mapper.DtoProductsMapper;
 import com.blo.sales.factory.MocksFactory;
+import com.blo.sales.factory.MocksUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -41,8 +39,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 	"excpetions.codes.products-empty=Productos no presente"
 })
 public class ProductsFacadeImplTest {
-	
-	private static final String EMPTY_STRING = "";
 
 	@Autowired
 	private MockMvc mockMvc;
@@ -59,10 +55,6 @@ public class ProductsFacadeImplTest {
 	@MockBean
 	private DtoProductMapper productMapper;
 	
-	public void beforeEach() {
-		
-	}
-
 	/**
 	 * se registran nuevos productos
 	 * @throws Exception 
@@ -76,7 +68,6 @@ public class ProductsFacadeImplTest {
 
 	    when(productsMapper.toInner(Mockito.any())).thenReturn(MocksFactory.createDtoIntProducts());
 	    when(productsMapper.toOuter(Mockito.any())).thenReturn(MocksFactory.createDtoProductsSaved());
-
 	    when(service.addProducts(Mockito.any())).thenReturn(allProducts); 
 
 	    var result = mockMvc.perform(post("/api/v1/products")
@@ -88,7 +79,7 @@ public class ProductsFacadeImplTest {
 	   verify(productsMapper, atLeastOnce()).toInner(Mockito.any());
 	   verify(productsMapper, atLeastOnce()).toOuter(Mockito.any());
 	   assertNotNull(result);
-	   assertEquals(allProductsAsString, getContentAsString(result, "addProductsTest"));
+	   assertEquals(allProductsAsString,  MocksUtils.getContentAsString(result, "addProductsTest"));
 	}
 	
 	/**
@@ -106,7 +97,7 @@ public class ProductsFacadeImplTest {
 		
 		
 		assertNotNull(result);
-		assertEquals(EMPTY_STRING, getContentAsString(result, "addProductsEmptyListTest"));
+		assertEquals(MocksUtils.EMPTY_STRING,  MocksUtils.getContentAsString(result, "addProductsEmptyListTest"));
 	}
 	
 	/**
@@ -127,7 +118,7 @@ public class ProductsFacadeImplTest {
 		
 		
 		assertNotNull(result);
-		assertEquals(EMPTY_STRING, getContentAsString(result, "addProductsEmptyListTest"));
+		assertEquals(MocksUtils.EMPTY_STRING,  MocksUtils.getContentAsString(result, "addProductsEmptyListTest"));
 	}
 	
 	/**
@@ -148,7 +139,7 @@ public class ProductsFacadeImplTest {
 		
 		
 		assertNotNull(result);
-		assertEquals(EMPTY_STRING, getContentAsString(result, "addProductsEmptyListTest"));
+		assertEquals(MocksUtils.EMPTY_STRING,  MocksUtils.getContentAsString(result, "addProductsEmptyListTest"));
 	}
 	
 	
@@ -173,7 +164,7 @@ public class ProductsFacadeImplTest {
 		verify(productsMapper, atLeastOnce()).toOuter(Mockito.any());
 		
 		assertNotNull(result);
-		assertEquals(productsOutString, getContentAsString(result, "retrieveAllProductsTest"));
+		assertEquals(productsOutString,  MocksUtils.getContentAsString(result, "retrieveAllProductsTest"));
 	}
 	
 	/**
@@ -197,7 +188,7 @@ public class ProductsFacadeImplTest {
 		verify(productMapper, atLeastOnce()).toOuter(Mockito.any());
 		
 		assertNotNull(result);
-		assertEquals(productString, getContentAsString(result, "retrieveProductTest"));
+		assertEquals(productString,  MocksUtils.getContentAsString(result, "retrieveProductTest"));
 	}
 	
 	/**
@@ -211,7 +202,7 @@ public class ProductsFacadeImplTest {
             .andExpect(status().isBadRequest())
             .andReturn();
 		
-		assertEquals(EMPTY_STRING, getContentAsString(result, "retrieveProductTest"));
+		assertEquals(MocksUtils.EMPTY_STRING,  MocksUtils.getContentAsString(result, "retrieveProductTest"));
 	}
 	
 	/**
@@ -239,7 +230,7 @@ public class ProductsFacadeImplTest {
 		verify(productMapper, atLeastOnce()).toOuter(Mockito.any());
 		
 		assertNotNull(result);
-		assertEquals(productToUpdateAsString, getContentAsString(result, "updateProductById"));
+		assertEquals(productToUpdateAsString,  MocksUtils.getContentAsString(result, "updateProductById"));
 	}
 	
 	/**
@@ -259,7 +250,7 @@ public class ProductsFacadeImplTest {
             .andReturn();
 		
 		assertNotNull(result);
-		assertEquals(EMPTY_STRING, getContentAsString(result, "updateProductByIdNotId"));
+		assertEquals(MocksUtils.EMPTY_STRING,  MocksUtils.getContentAsString(result, "updateProductByIdNotId"));
 	}
 	
 	/**
@@ -279,7 +270,7 @@ public class ProductsFacadeImplTest {
             .andReturn();
 		
 		assertNotNull(result);
-		assertEquals(EMPTY_STRING, getContentAsString(result, "updateProductByIdUndefined"));
+		assertEquals(MocksUtils.EMPTY_STRING,  MocksUtils.getContentAsString(result, "updateProductByIdUndefined"));
 	}
 	
 	/**
@@ -298,19 +289,7 @@ public class ProductsFacadeImplTest {
             .andReturn();
 		
 		assertNotNull(result);
-		assertEquals(EMPTY_STRING, getContentAsString(result, "updateProductByIdNotBody"));
+		assertEquals(MocksUtils.EMPTY_STRING, MocksUtils.getContentAsString(result, "updateProductByIdNotBody"));
 	}
 	
-	private String getContentAsString(MvcResult result, String fromMethod) throws UnsupportedEncodingException {
-		if (result == null) {
-			throw new UnsupportedEncodingException("[" + fromMethod + "]result is null");
-		}
-		var contentString = result.getResponse().getContentAsString();
-		if (StringUtils.isBlank(contentString)) {
-			System.err.println("[" + fromMethod + "] contentString is empty");
-			return EMPTY_STRING;
-		}
-		System.out.println("[" + fromMethod + "] " + contentString);
-		return contentString;
-	}
 }

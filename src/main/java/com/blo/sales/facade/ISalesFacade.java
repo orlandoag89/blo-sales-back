@@ -27,6 +27,6 @@ public interface ISalesFacade {
 	@GetMapping("/{id}")
 	ResponseEntity<DtoSale> retrieveSaleById(@PathVariable String id);
 	
-	@PostMapping("/debtors/{totalDebtor}")
-	ResponseEntity<DtoWrapperSale> registerSaleAndDebtor(@RequestBody DtoWrapperSale sale, @PathVariable BigDecimal totalDebtor);
+	@PostMapping("/debtors")
+	ResponseEntity<DtoWrapperSale> registerSaleAndDebtor(@RequestBody DtoWrapperSale sale, @RequestParam BigDecimal partialPyment);
 }

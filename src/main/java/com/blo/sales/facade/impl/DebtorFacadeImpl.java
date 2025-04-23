@@ -98,7 +98,7 @@ public class DebtorFacadeImpl implements IDebtorFacade {
 				var money = currentCashbox.getMoney().add(partialPymentMapped.getPartial_pyment());
 				currentCashbox.setMoney(money);
 				cashboxes.updateCashbox(currentCashbox.getId(), currentCashbox);
-				LOGGER.info(String.format("cashbox updated", String.valueOf(cashboxes)));
+				LOGGER.info(String.format("cashbox updated %s", String.valueOf(currentCashbox)));
 			}
 			
 			// si la cuenta actual es menor o igual a cero entonces se va a eliminar el deudor y cerrar sus ventas
@@ -110,7 +110,7 @@ public class DebtorFacadeImpl implements IDebtorFacade {
 					LOGGER.info("Sale found");
 					saleFound.setClose_sale(time);
 					var saleUpdated = sales.updateSale(sale.getId(), saleFound);
-					LOGGER.info(String.format("sale updated", String.valueOf(saleUpdated)));
+					LOGGER.info(String.format("sale updated %s", String.valueOf(saleUpdated)));
 				}
 				// elimina deudor
 				business.deleteDebtorById(id);

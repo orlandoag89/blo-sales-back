@@ -12,7 +12,7 @@ import com.blo.sales.dao.docs.Sale;
 public interface SalesRepository extends MongoRepository<Sale, String> {
 	
 	@Query("{ 'close_sale' : 0 }")
-	List<Sale> findSalesNotClosed();
+	List<Sale> findSalesOpen();
 
 	@Query("{ 'close_sale' : { $ne: 0 } }")
 	List<Sale> findSalesClosed();

@@ -78,7 +78,7 @@ public class CashboxFacadeImpl implements ICashboxFacade {
 				var saved = business.saveCashbox(innerCashbox);
 				var out = cashboxMapper.toOuter(saved);
 				LOGGER.info(String.format("save format %s", String.valueOf(out)));
-				return new ResponseEntity<>(out, HttpStatus.CREATED);
+				return new ResponseEntity<>(out, HttpStatus.OK);
 			}
 			
 			var updated = business.updateCashbox(innerCashbox.getId(), innerCashbox);

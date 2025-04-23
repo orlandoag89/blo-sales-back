@@ -11,7 +11,7 @@ public @Data class DtoWrapperSale implements Serializable {
 
 	private DtoSale sale;
 	
-	private DtoDebtor detor;
+	private DtoDebtor debtor;
 	
 	private List<DtoProduct> productsWithAlerts;
 }

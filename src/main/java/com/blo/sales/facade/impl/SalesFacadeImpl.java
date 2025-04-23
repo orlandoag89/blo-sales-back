@@ -128,25 +128,17 @@ public class SalesFacadeImpl implements ISalesFacade {
 	@Override
 	public ResponseEntity<DtoWrapperSale> registerSaleAndDebtor(DtoWrapperSale sale, BigDecimal partialPyment) {
 		try {
-			/*LOGGER.info(String.format("sale data %s and total %s", Encode.forJava(String.valueOf(sale)), String.valueOf(totalDebtor)));
-			var saleMapped = modelMapper.map(sale.getSale(), DtoIntSale.class);
-			var debtorMapped = modelMapper.map(sale.getDetor(), DtoIntDebtor.class);
-			var wrapperSaleSaved = business.saveSaleAndDebtor(saleMapped, debtorMapped, totalDebtor);
-			var out = modelMapper.map(wrapperSaleSaved, DtoWrapperSale.class);
-			LOGGER.info(String.format("sale has been saved %s", String.valueOf(out)));
-			return new ResponseEntity<>(out, HttpStatus.CREATED);*/
-			
-			LOGGER.info(String.format("saving debtor %s", Encode.forJava(String.valueOf(sale.getDetor()))));
-			if (sale.getDetor() == null) {
+			LOGGER.info(String.format("saving debtor %s", Encode.forJava(String.valueOf(sale.getDebtor()))));
+			if (sale.getDebtor() == null) {
 				LOGGER.error("debtor is required");
 				return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
 			}
 			
-			var isNewDebtor = StringUtils.isBlank(sale.getDetor().getId());
+			var isNewDebtor = StringUtils.isBlank(sale.getDebtor().getId());
 			DtoIntDebtor debtorInDb = null;
 			if (!isNewDebtor) {
 				// valida existencia de deudor por id
-				debtorInDb = debtorBusiness.getDebtorById(sale.getDetor().getId());
+				debtorInDb = debtorBusiness.getDebtorById(sale.getDebtor().getId());
 				LOGGER.info(String.format("debtor found %s", String.valueOf(debtorInDb)));
 			}
 			
@@ -161,16 +153,16 @@ public class SalesFacadeImpl implements ISalesFacade {
 			output.setSale(saleSavedOut);
 			
 			// nuevo deudor flujo
-			if (StringUtils.isBlank(sale.getDetor().getId())) {
-				LOGGER.info(String.format("New debor %s", Encode.forJava(String.valueOf(sale.getDetor()))));
+			if (isNewDebtor) {
+				LOGGER.info(String.format("New debor %s", Encode.forJava(String.valueOf(sale.getDebtor()))));
 				List<DtoSale> sales = new ArrayList<>();
 				sales.add(saleSavedOut);
-				sale.getDetor().setSales(sales);
-				var debtorToSave = debtorMapper.toInner(sale.getDetor());
+				sale.getDebtor().setSales(sales);
+				var debtorToSave = debtorMapper.toInner(sale.getDebtor());
 				var debtorSaved = debtorBusiness.addDebtor(debtorToSave);
 				var out = debtorMapper.toOuter(debtorSaved);
 				LOGGER.info(String.format("Debtor saved %s", String.valueOf(out)));
-				output.setDetor(out);
+				output.setDebtor(out);
 				return new ResponseEntity<DtoWrapperSale>(output, HttpStatus.CREATED);
 			}
 			
@@ -182,24 +174,23 @@ public class SalesFacadeImpl implements ISalesFacade {
 			
 			// actualiza su lista compras
 			debtorInDb.getSales().add(saleSaved);
-			var newAmount = new BigDecimal("0");
 			// actualiza montos
-			
+			var newAmount = debtorInDb.getTotal().add(sale.getDebtor().getTotal());
+			LOGGER.info(String.format("new account from payment %s", newAmount));
 			// no dejó algún pago
 			if (partialPyment.compareTo(BigDecimal.ZERO) == 0) {
 				LOGGER.info("not partial pyment flow");
-				newAmount = debtorInDb.getTotal().add(sale.getDetor().getTotal());
 				debtorInDb.setTotal(newAmount);
 			}
 			//dejó pago
 			if (partialPyment.compareTo(BigDecimal.ZERO) > 0) {
 				LOGGER.info("partial pyment flow");
-				newAmount = debtorInDb.getTotal().subtract(partialPyment);
+				newAmount = newAmount.subtract(partialPyment);
 				// pago todo
 				if (newAmount.compareTo(BigDecimal.ZERO) <= 0) {
 					LOGGER.info("partial pyment is more that debt");
 					debtorBusiness.deleteDebtorById(debtorInDb.getId());
-					output.setDetor(new DtoDebtor());
+					output.setDebtor(new DtoDebtor());
 					return new ResponseEntity<>(output, HttpStatus.CREATED);
 				}
 				LOGGER.info("update partial pyment");
@@ -209,7 +200,7 @@ public class SalesFacadeImpl implements ISalesFacade {
 			var debtorUpdated = debtorBusiness.updateDebtor(debtorInDb.getId(), debtorInDb);
 			LOGGER.info(String.format("debtor updated %s", String.valueOf(debtorUpdated)));
 			var mappedDebtor = debtorMapper.toOuter(debtorUpdated);
-			output.setDetor(mappedDebtor);
+			output.setDebtor(mappedDebtor);
 			return new ResponseEntity<>(output, HttpStatus.CREATED);
 		} catch (BloSalesBusinessException e) {
 			LOGGER.info(e.getExceptionMessage());

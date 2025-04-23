@@ -55,7 +55,7 @@ public class SalesDaoImpl implements ISalesDao {
 	
 	@Override
 	public DtoIntSales getSalesOpen() throws BloSalesBusinessException {
-		var openSales = repository.findSalesNotClosed();
+		var openSales = repository.findSalesOpen();
 		
 		return toDtoIntSales(openSales);
 	}

@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.blo.sales.facade.dto.DtoDebtor;
 import com.blo.sales.facade.dto.DtoDebtors;
@@ -20,7 +21,7 @@ public interface IDebtorFacade {
 	@GetMapping
 	ResponseEntity<DtoDebtors> retrieveAllDebtors();
 	
-	@PutMapping("/{id}/{time}")
-	ResponseEntity<DtoDebtor> addPay(@PathVariable String id, @PathVariable long time, @RequestBody DtoPartialPyment partialPyment);
+	@PutMapping("/{id}")
+	ResponseEntity<DtoDebtor> addPay(@PathVariable String id, @RequestParam long time, @RequestBody DtoPartialPyment partialPyment);
 	
 }

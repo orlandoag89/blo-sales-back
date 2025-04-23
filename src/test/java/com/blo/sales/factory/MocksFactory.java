@@ -25,6 +25,7 @@ import com.blo.sales.facade.dto.DtoProducts;
 import com.blo.sales.facade.dto.DtoSale;
 import com.blo.sales.facade.dto.DtoSaleProduct;
 import com.blo.sales.facade.dto.DtoSales;
+import com.blo.sales.facade.dto.DtoWrapperSale;
 import com.blo.sales.facade.enums.StatusCashboxEnum;
 import com.blo.sales.utils.Utils;
 
@@ -146,7 +147,7 @@ public final class MocksFactory {
 		out.setStatus(StatusCashboxIntEnum.OPEN);
 		return out;
 	}
-
+	
 	public static DtoIntCashbox createDtoIntCashboxClose() {
 		var out = createDtoIntCashboxOpen();
 		out.setStatus(StatusCashboxIntEnum.CLOSE);
@@ -202,6 +203,13 @@ public final class MocksFactory {
 		out.setSales(null);
 
 		out.setTotal(BIG_DECIMAL_50);
+		return out;
+	}
+	
+	public static DtoWrapperSale createDtoWrapperSaleWithNewDebtor() {
+		var out = new DtoWrapperSale();
+		out.setDebtor(createNewDtoDebtor());
+		out.setSale(createDtoNewSaleNoCashbox());
 		return out;
 	}
 
@@ -271,7 +279,7 @@ public final class MocksFactory {
 		out.setProducts(products);
 		return out;
 	}
-
+	
 	public static DtoSale createDtoSaleNoCashbox() {
 		var out = new DtoSale();
 		out.set_on_cashbox(false);
@@ -287,9 +295,67 @@ public final class MocksFactory {
 		return out;
 	}
 	
+	public static DtoSale createDtoSaleNoCashboxAndOpen() {
+		var out = new DtoSale();
+		out.set_on_cashbox(false);
+		out.setClose_sale(0L);
+		out.setOpen_date(NOW);
+
+		List<DtoSaleProduct> products = new ArrayList<>();
+		products.add(createDtoSaleProduct());
+		out.setProducts(products);
+
+		out.setTotal(BIG_DECIMAL_50);
+		return out;
+	}
+	
+	public static DtoIntSale createDtoIntSaleNoCashboxAndOpen() {
+		var out = new DtoIntSale();
+		out.set_on_cashbox(false);
+		out.setClose_sale(0L);
+		out.setOpen_date(NOW);
+
+		List<DtoIntSaleProduct> products = new ArrayList<>();
+		products.add(createDtoIntSaleProduct());
+		out.setProducts(products);
+
+		out.setTotal(BIG_DECIMAL_50);
+		return out;
+	}
+	
+	public static DtoSale createDtoNewSaleNoCashbox() {
+		var out = new DtoSale();
+		out.set_on_cashbox(false);
+		out.setClose_sale(NOW);
+		out.setOpen_date(NOW);
+
+		List<DtoSaleProduct> products = new ArrayList<>();
+		products.add(createDtoSaleProduct());
+		out.setProducts(products);
+
+		out.setTotal(BIG_DECIMAL_50);
+		return out;
+	}
+	
 	public static DtoIntSale createDtoIntSaleNoCashbox() {
 		var out = new DtoIntSale();
 		out.set_on_cashbox(false);
+		out.setClose_sale(NOW);
+		out.setId(ANY_ID);
+		out.setOpen_date(NOW);
+
+		List<DtoIntSaleProduct> products = new ArrayList<>();
+		products.add(createDtoIntSaleProduct());
+		out.setProducts(products);
+
+		out.setTotal(BIG_DECIMAL_50);
+		return out;
+	}
+	
+	public static DtoIntSale createSavedDtoIntSaleNoCashbox() {
+		var out = new DtoIntSale();
+		out.set_on_cashbox(false);
+		out.setId(ANY_ID);
 		out.setClose_sale(NOW);
 		out.setId(ANY_ID);
 		out.setOpen_date(NOW);
@@ -365,6 +431,42 @@ public final class MocksFactory {
 		return out;
 	}
 	
+	public static DtoIntSales createOpenDtoIntSales() {
+		var out = new DtoIntSales();
+
+		List<DtoIntSale> sales = new ArrayList<>();
+		
+		var item1 = createDtoIntSaleNoCashbox();
+		item1.setClose_sale(0L);
+		sales.add(item1);
+		
+		var item2 = createDtoIntSaleNoCashbox();
+		item2.setClose_sale(0L);
+		sales.add(item2);
+		
+		out.setSales(sales);
+
+		return out;
+	}
+	
+	public static DtoSales createOpenDtoSales() {
+		var out = new DtoSales();
+
+		List<DtoSale> sales = new ArrayList<>();
+		
+		var item1 = createDtoSaleNoCashbox();
+		item1.setClose_sale(0L);
+		sales.add(item1);
+		
+		var item2 = createDtoSaleNoCashbox();
+		item2.setClose_sale(0L);
+		sales.add(item2);
+		
+		out.setSales(sales);
+
+		return out;
+	}
+	
 	public static DtoIntSales createDtoIntSalesListEmpty() {
 		var out = new DtoIntSales();
 
@@ -411,5 +513,9 @@ public final class MocksFactory {
 		debtors.add(createExistsDtoIntDebtor());
 		out.setDebtors(debtors);
 		return out;
+	}
+	
+	public static long getNowDate() {
+		return NOW;
 	}
 }
