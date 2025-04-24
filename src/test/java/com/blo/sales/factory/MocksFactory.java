@@ -382,6 +382,20 @@ public final class MocksFactory {
 		out.setTotal(BIG_DECIMAL_50);
 		return out;
 	}
+	
+	public static DtoIntSale createNewDtoIntSaleOnCashbox() {
+		var out = new DtoIntSale();
+		out.set_on_cashbox(true);
+		out.setClose_sale(NOW);
+		out.setOpen_date(NOW);
+
+		List<DtoIntSaleProduct> products = new ArrayList<>();
+		products.add(createDtoIntSaleProduct());
+		out.setProducts(products);
+
+		out.setTotal(BIG_DECIMAL_50);
+		return out;
+	}
 
 	public static DtoSaleProduct createDtoSaleProduct() {
 		var out = new DtoSaleProduct();
@@ -517,5 +531,9 @@ public final class MocksFactory {
 	
 	public static long getNowDate() {
 		return NOW;
+	}
+	
+	public static String getId() {
+		return ANY_ID;
 	}
 }

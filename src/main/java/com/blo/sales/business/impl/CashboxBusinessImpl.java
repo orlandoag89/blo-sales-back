@@ -1,11 +1,9 @@
 package com.blo.sales.business.impl;
 
-import org.modelmapper.ModelMapper;
 import org.owasp.encoder.Encode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.blo.sales.business.ICashboxBusiness;
@@ -22,25 +20,13 @@ public class CashboxBusinessImpl implements ICashboxBusiness {
 	
 	@Autowired
 	private ICashboxesDao dao;
-		
-	@Autowired
-	private ModelMapper modelMapper;
 	
-	@Value("${exceptions.messages.cashbox-not-exists}")
-	private String cashboxDoesNotExistsCode;
-	
-	@Value("${exceptions.codes.cashbox-not-exists}")
-	private String cashboxDoesNotExistsMessage;
-
 	/** se agrega una nueva caja */
 	@Override
 	public DtoIntCashbox saveCashbox(DtoIntCashbox cashbox) {
 		LOGGER.info(String.format("cashbox data %s", Encode.forJava(String.valueOf(cashbox))));
 		cashbox.setStatus(StatusCashboxIntEnum.valueOf(StatusCashboxIntEnum.OPEN.name()));
-		var saved = dao.addCashbox(cashbox);
-		var out = modelMapper.map(saved, DtoIntCashbox.class);
-		LOGGER.info(String.format("cashbox saved %s", Encode.forJava(String.valueOf(out))));
-		return out;
+		return dao.addCashbox(cashbox);
 	}
 
 	@Override
