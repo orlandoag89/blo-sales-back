@@ -3,6 +3,7 @@ package com.blo.sales.factory;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import com.blo.sales.business.dto.DtoIntCashbox;
 import com.blo.sales.business.dto.DtoIntCashboxes;
@@ -15,6 +16,9 @@ import com.blo.sales.business.dto.DtoIntSale;
 import com.blo.sales.business.dto.DtoIntSaleProduct;
 import com.blo.sales.business.dto.DtoIntSales;
 import com.blo.sales.business.enums.StatusCashboxIntEnum;
+import com.blo.sales.dao.docs.Cashbox;
+import com.blo.sales.dao.docs.Cashboxes;
+import com.blo.sales.dao.enums.DocStatusCashboxEnum;
 import com.blo.sales.facade.dto.DtoCashbox;
 import com.blo.sales.facade.dto.DtoCashboxes;
 import com.blo.sales.facade.dto.DtoDebtor;
@@ -143,6 +147,14 @@ public final class MocksFactory {
 		var out = new DtoIntCashbox();
 		out.setDate(NOW);
 		out.setId(ANY_ID);
+		out.setMoney(BIG_DECIMAL_50);
+		out.setStatus(StatusCashboxIntEnum.OPEN);
+		return out;
+	}
+	
+	public static DtoIntCashbox createDtoIntNewCashbox() {
+		var out = new DtoIntCashbox();
+		out.setDate(NOW);
 		out.setMoney(BIG_DECIMAL_50);
 		out.setStatus(StatusCashboxIntEnum.OPEN);
 		return out;
@@ -527,6 +539,45 @@ public final class MocksFactory {
 		debtors.add(createExistsDtoIntDebtor());
 		out.setDebtors(debtors);
 		return out;
+	}
+	
+	public static Cashbox createCloseCashbox() {
+		var out = new Cashbox();
+		out.setDate(NOW);
+		out.setId(ANY_ID);
+		out.setMoney(BIG_DECIMAL_50);
+		out.setStatus(DocStatusCashboxEnum.CLOSE);
+		return out;
+	}
+	
+	public static Cashbox createOpenCashbox() {
+		var out = new Cashbox();
+		out.setDate(NOW);
+		out.setId(ANY_ID);
+		out.setMoney(BIG_DECIMAL_50);
+		out.setStatus(DocStatusCashboxEnum.OPEN);
+		return out;
+	}
+	
+	public static Cashboxes createCashboxes() {
+		var out = new Cashboxes();
+		
+		out.setBoxes(createCashboxesList());
+		
+		return out;
+	}
+	
+	public static List<Cashbox> createCashboxesList() {
+		List<Cashbox> boxes = new ArrayList<>();
+		
+		boxes.add(createOpenCashbox());
+		boxes.add(createCloseCashbox());
+		boxes.add(createCloseCashbox());
+		return boxes;
+	}
+		
+	public static Optional<Cashbox> createOptionalCashbox() {
+		return Optional.of(createOpenCashbox());
 	}
 	
 	public static long getNowDate() {

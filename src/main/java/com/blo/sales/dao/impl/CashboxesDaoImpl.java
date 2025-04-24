@@ -1,9 +1,5 @@
 package com.blo.sales.dao.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.modelmapper.ModelMapper;
 import org.owasp.encoder.Encode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,8 +11,10 @@ import org.springframework.stereotype.Service;
 import com.blo.sales.business.dto.DtoIntCashbox;
 import com.blo.sales.business.dto.DtoIntCashboxes;
 import com.blo.sales.dao.ICashboxesDao;
-import com.blo.sales.dao.docs.Cashbox;
+import com.blo.sales.dao.docs.Cashboxes;
 import com.blo.sales.dao.enums.DocStatusCashboxEnum;
+import com.blo.sales.dao.mapper.CashboxMapper;
+import com.blo.sales.dao.mapper.CashboxesMapper;
 import com.blo.sales.dao.repository.CashboxesRepository;
 import com.blo.sales.exceptions.BloSalesBusinessException;
 
@@ -29,7 +27,10 @@ public class CashboxesDaoImpl implements ICashboxesDao {
 	private CashboxesRepository repository;
 	
 	@Autowired
-	private ModelMapper modelMapper;
+	private CashboxMapper cashboxMapper;
+	
+	@Autowired
+	private CashboxesMapper cashboxesMapper;
 	
 	@Value("${exceptions.codes.not-found}")
 	private String notFoundCode;
@@ -39,28 +40,22 @@ public class CashboxesDaoImpl implements ICashboxesDao {
 
 	@Override
 	public DtoIntCashbox addCashbox(DtoIntCashbox cashbox) {
-		var toSave = modelMapper.map(cashbox, Cashbox.class);
+		var toSave = cashboxMapper.toInner(cashbox);
 		LOGGER.info(String.format("new cashbox %s", Encode.forJava(String.valueOf(cashbox))));
 		var saved = repository.save(toSave);
-		var out = modelMapper.map(saved, DtoIntCashbox.class);
+		var out = cashboxMapper.toOuter(saved);
 		LOGGER.info(String.format("new cashbox saved %s", String.valueOf(out)));
 		return out;
 	}
 
 	@Override
 	public DtoIntCashboxes getAllCashboxes() {
-		DtoIntCashboxes cashboxes = new DtoIntCashboxes();
-		List<DtoIntCashbox> boxes = new ArrayList<>();
-		
-		repository.findAll().forEach(c -> {
-			LOGGER.info(String.format("parsing %s", String.valueOf(c)));
-			var item = modelMapper.map(c, DtoIntCashbox.class);
-			boxes.add(item);
-		});
-		
-		LOGGER.info(String.format("boxes %s", String.valueOf(boxes)));
-		cashboxes.setBoxes(boxes);
-		return cashboxes;
+		var cashboxes = new Cashboxes();
+		var allCashboxes = repository.findAll();
+		cashboxes.setBoxes(allCashboxes);
+		var out = cashboxesMapper.toOuter(cashboxes);
+		LOGGER.info(String.format("cashboxes found %s", String.valueOf(out)));
+		return out;
 	}
 
 	@Override
@@ -70,7 +65,7 @@ public class CashboxesDaoImpl implements ICashboxesDao {
 		LOGGER.info(String.format("open cashboxes %s", String.valueOf(openCashbox)));
 		var cashbox = openCashbox.getBoxes().stream().findFirst().orElse(null);
 		LOGGER.info(String.format("cashbox data %s", String.valueOf(cashbox)));
-		var outCashbox = modelMapper.map(cashbox, DtoIntCashbox.class);
+		var outCashbox = cashboxMapper.toOuter(cashbox);
 		return outCashbox;
 		
 	}
@@ -83,18 +78,11 @@ public class CashboxesDaoImpl implements ICashboxesDao {
 		var cashbox = closeCashboxes.getBoxes();
 		LOGGER.info(String.format("close cashbox data %s", String.valueOf(cashbox)));
 		
-		var cashboxes = new DtoIntCashboxes();
-		List<DtoIntCashbox> boxes = new ArrayList<>();
+		var cashboxes = new Cashboxes();
+		cashboxes.setBoxes(cashbox);
 		
-		cashbox.forEach(c -> {
-			var item = modelMapper.map(c, DtoIntCashbox.class);
-			LOGGER.info(String.format("cashbox %s", String.valueOf(item)));
-			boxes.add(item);
-		});
-		
-		cashboxes.setBoxes(boxes);
-		LOGGER.info(String.format("close cashbox %s", String.valueOf(cashboxes)));
-		return cashboxes;
+		var out = cashboxesMapper.toOuter(cashboxes);
+		return out;
 	}
 
 	@Override
@@ -110,7 +98,7 @@ public class CashboxesDaoImpl implements ICashboxesDao {
 		cashboxData.setStatus(DocStatusCashboxEnum.valueOf(cashbox.getStatus().name()));
 		cashboxData.setDate(cashbox.getDate());
 		var saved = repository.save(cashboxData);
-		var out = modelMapper.map(saved, DtoIntCashbox.class);
+		var out = cashboxMapper.toOuter(saved);
 		LOGGER.info(String.format("cashbox updated %s", String.valueOf(out)));
 		return out;
 		
