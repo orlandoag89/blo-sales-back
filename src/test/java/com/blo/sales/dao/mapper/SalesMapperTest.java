@@ -1,6 +1,5 @@
 package com.blo.sales.dao.mapper;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -13,20 +12,16 @@ import org.springframework.boot.test.context.SpringBootTest;
 import com.blo.sales.factory.MocksFactory;
 
 @SpringBootTest
-public class DebtorMapperTest {
+public class SalesMapperTest {
 	
 	@Autowired
-	private DebtorMapper mapper;
+	private SalesMapper mapper;
 
 	@Test
 	public void toInnerTest() {
-		var outer = MocksFactory.createExistsDtoIntDebtor();
-		
-		var inner = mapper.toInner(outer);
+		var inner = mapper.toInner(MocksFactory.createDtoIntSales());
 		
 		assertNotNull(inner);
-		assertEquals(inner.getId(), outer.getId());
-		assertFalse(inner.getPartial_pyments().isEmpty());
 		assertFalse(inner.getSales().isEmpty());
 	}
 	
@@ -36,42 +31,34 @@ public class DebtorMapperTest {
 	}
 	
 	@Test
-	public void toInnerPartialPymentsSalesNullTest() {
-		var outer = MocksFactory.createExistsDtoIntDebtor();
-		outer.setPartial_pyments(null);
+	public void toInnerNullListTest() {
+		var outer = MocksFactory.createDtoIntSales();
 		outer.setSales(null);
 		
 		var inner = mapper.toInner(outer);
 		
 		assertNotNull(inner);
-		assertEquals(inner.getId(), outer.getId());
-		assertTrue(inner.getPartial_pyments().isEmpty());
 		assertTrue(inner.getSales().isEmpty());
 	}
 	
 	@Test
-	public void toInnerPartialPymentsSalesEmptiesTest() {
-		var outer = MocksFactory.createExistsDtoIntDebtor();
-		outer.getPartial_pyments().clear();
+	public void toInnerEmptyListTest() {
+		var outer = MocksFactory.createDtoIntSales();
 		outer.getSales().clear();
 		
 		var inner = mapper.toInner(outer);
 		
 		assertNotNull(inner);
-		assertEquals(inner.getId(), outer.getId());
-		assertTrue(inner.getPartial_pyments().isEmpty());
 		assertTrue(inner.getSales().isEmpty());
 	}
 	
 	@Test
 	public void toOuterTest() {
-		var inner = MocksFactory.createExistsDebtor();
+		var inner = MocksFactory.createSales();
 		
 		var outer = mapper.toOuter(inner);
 		
 		assertNotNull(outer);
-		assertEquals(inner.getId(), outer.getId());
-		assertFalse(outer.getPartial_pyments().isEmpty());
 		assertFalse(outer.getSales().isEmpty());
 	}
 	
@@ -81,30 +68,24 @@ public class DebtorMapperTest {
 	}
 	
 	@Test
-	public void toOuterPartialPymentsSalesNullTest() {
-		var inner = MocksFactory.createExistsDebtor();
-		inner.setPartial_pyments(null);
+	public void toOuterListNullTest() {
+		var inner = MocksFactory.createSales();
 		inner.setSales(null);
 		
 		var outer = mapper.toOuter(inner);
 		
 		assertNotNull(outer);
-		assertEquals(inner.getId(), outer.getId());
-		assertTrue(outer.getPartial_pyments().isEmpty());
 		assertTrue(outer.getSales().isEmpty());
 	}
 	
 	@Test
-	public void toOuterPartialPymentsSalesEmptyTest() {
-		var inner = MocksFactory.createExistsDebtor();
-		inner.getPartial_pyments().clear();
+	public void toOuterListEmptyTest() {
+		var inner = MocksFactory.createSales();
 		inner.getSales().clear();
 		
 		var outer = mapper.toOuter(inner);
 		
 		assertNotNull(outer);
-		assertEquals(inner.getId(), outer.getId());
-		assertTrue(outer.getPartial_pyments().isEmpty());
 		assertTrue(outer.getSales().isEmpty());
 	}
 }

@@ -24,6 +24,7 @@ import com.blo.sales.dao.docs.PartialPyment;
 import com.blo.sales.dao.docs.Product;
 import com.blo.sales.dao.docs.Sale;
 import com.blo.sales.dao.docs.SaleProduct;
+import com.blo.sales.dao.docs.Sales;
 import com.blo.sales.dao.enums.DocStatusCashboxEnum;
 import com.blo.sales.facade.dto.DtoCashbox;
 import com.blo.sales.facade.dto.DtoCashboxes;
@@ -533,6 +534,21 @@ public final class MocksFactory {
 		out.setTotal(BIG_DECIMAL_50);
 		return out;
 	}
+	
+	public static Sale createSaleOnCashbox() {
+		var out = new Sale();
+		out.set_on_cashbox(true);
+		out.setClose_sale(NOW);
+		out.setId(ANY_ID);
+		out.setOpen_date(NOW);
+		
+		List<SaleProduct> products = new ArrayList<>();
+		products.add(createSaleProduct());
+		
+		out.setProducts(products);
+		out.setTotal(BIG_DECIMAL_50);
+		return out;
+	}
 
 	public static DtoSales createDtoSales() {
 		var out = new DtoSales();
@@ -551,6 +567,17 @@ public final class MocksFactory {
 		List<DtoIntSale> sales = new ArrayList<>();
 		sales.add(createDtoIntSaleNoCashbox());
 		sales.add(createDtoIntSaleOnCashbox());
+		out.setSales(sales);
+
+		return out;
+	}
+	
+	public static Sales createSales() {
+		var out = new Sales();
+
+		List<Sale> sales = new ArrayList<>();
+		sales.add(createSaleNoCashbox());
+		sales.add(createSaleNoCashbox());
 		out.setSales(sales);
 
 		return out;
@@ -681,6 +708,10 @@ public final class MocksFactory {
 	
 	public static Optional<Debtor> createOptionaDebtor() {
 		return Optional.of(createExistsDebtor());
+	}
+	
+	public static Optional<Sale> createOptionalSale() {
+		return Optional.of(createSaleNoCashbox());
 	}
 	
 	public static long getNowDate() {
