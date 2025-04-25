@@ -23,6 +23,6 @@ public @Data class Debtor implements Serializable {
 
 	private List<PartialPyment> partial_pyments;
 
-	private List<String> sales_id;
+	private List<Sale> sales;
 
 }

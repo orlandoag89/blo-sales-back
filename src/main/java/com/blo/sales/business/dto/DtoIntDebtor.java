@@ -30,4 +30,10 @@ public @Data class DtoIntDebtor implements Serializable {
 		return partial_pyments;
 	}
 
+	public List<DtoIntSale> getSales() {
+		if (sales == null) {
+			return new ArrayList<>();
+		}
+		return sales;
+	}
 }

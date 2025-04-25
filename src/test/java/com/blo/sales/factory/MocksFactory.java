@@ -18,6 +18,12 @@ import com.blo.sales.business.dto.DtoIntSales;
 import com.blo.sales.business.enums.StatusCashboxIntEnum;
 import com.blo.sales.dao.docs.Cashbox;
 import com.blo.sales.dao.docs.Cashboxes;
+import com.blo.sales.dao.docs.Debtor;
+import com.blo.sales.dao.docs.Debtors;
+import com.blo.sales.dao.docs.PartialPyment;
+import com.blo.sales.dao.docs.Product;
+import com.blo.sales.dao.docs.Sale;
+import com.blo.sales.dao.docs.SaleProduct;
 import com.blo.sales.dao.enums.DocStatusCashboxEnum;
 import com.blo.sales.facade.dto.DtoCashbox;
 import com.blo.sales.facade.dto.DtoCashboxes;
@@ -59,6 +65,17 @@ public final class MocksFactory {
 
 	public static DtoIntProduct createDtoIntProduct() {
 		var out = new DtoIntProduct();
+		out.setId(ANY_ID);
+		out.setDesc(ANY_STRING);
+		out.setIts_kg(false);
+		out.setName(ANY_STRING);
+		out.setQuantity(BIG_DECIMAL_5);
+		out.setTotal_price(BIG_DECIMAL_50);
+		return out;
+	}
+	
+	public static Product createProduct() {
+		var out = new Product();
 		out.setId(ANY_ID);
 		out.setDesc(ANY_STRING);
 		out.setIts_kg(false);
@@ -262,6 +279,53 @@ public final class MocksFactory {
 		out.setTotal(BIG_DECIMAL_50);
 		return out;
 	}
+	
+	public static Debtor createExistsDebtor() {
+		var out = new Debtor();
+		out.setId(ANY_ID);
+		out.setName(ANY_NAME);
+		out.setOpen_date(NOW);
+
+		List<PartialPyment> partial_pyments = new ArrayList<>();
+		partial_pyments.add(createPartialPyment());
+		out.setPartial_pyments(partial_pyments);
+
+		List<Sale> products = new ArrayList<>();
+		products.add(createSaleNoCashbox());
+		products.add(createSaleNoCashbox());
+		out.setSales(products);
+
+		out.setTotal(BIG_DECIMAL_50);
+		return out;
+	}
+	
+	public static Debtor createNewDebtor() {
+		var out = new Debtor();
+		out.setName(ANY_NAME);
+		out.setOpen_date(NOW);
+
+		List<PartialPyment> partial_pyments = new ArrayList<>();
+		partial_pyments.add(createPartialPyment());
+		out.setPartial_pyments(partial_pyments);
+
+		List<Sale> products = new ArrayList<>();
+		products.add(createSaleNoCashbox());
+		products.add(createSaleNoCashbox());
+		out.setSales(products);
+
+		out.setTotal(BIG_DECIMAL_50);
+		return out;
+	}
+	
+	public static Debtors createDebtors() {
+		var out = new Debtors();
+		
+		List<Debtor> debtors = new ArrayList<>();
+		debtors.add(createExistsDebtor());
+		out.setDebtors(debtors);
+		
+		return out;
+	}
 
 	public static DtoPartialPyment createDtoPartialPyment() {
 		var out = new DtoPartialPyment();
@@ -272,6 +336,13 @@ public final class MocksFactory {
 	
 	public static DtoIntPartialPyment createDtoIntPartialPyment() {
 		var out = new DtoIntPartialPyment();
+		out.setDate(NOW);
+		out.setPartial_pyment(BIG_DECIMAL_5);
+		return out;
+	}
+	
+	public static PartialPyment createPartialPyment() {
+		var out = new PartialPyment();
 		out.setDate(NOW);
 		out.setPartial_pyment(BIG_DECIMAL_5);
 		return out;
@@ -434,6 +505,34 @@ public final class MocksFactory {
 		out.setQuantity_on_sale(BIG_DECIMAL_1);
 		return out;
 	}
+	
+	public static SaleProduct createSaleProduct() {
+		var out = new SaleProduct();
+		var product = createProduct();
+		out.setDesc(product.getDesc());
+		out.setId(product.getId());
+		out.setIts_kg(product.isIts_kg());
+		out.setName(product.getName());
+		out.setQuantity(product.getQuantity());
+		out.setTotal_price(product.getTotal_price());
+		out.setQuantity_on_sale(BIG_DECIMAL_1);
+		return out;
+	}
+	
+	public static Sale createSaleNoCashbox() {
+		var out = new Sale();
+		out.set_on_cashbox(false);
+		out.setClose_sale(NOW);
+		out.setId(ANY_ID);
+		out.setOpen_date(NOW);
+		
+		List<SaleProduct> products = new ArrayList<>();
+		products.add(createSaleProduct());
+		
+		out.setProducts(products);
+		out.setTotal(BIG_DECIMAL_50);
+		return out;
+	}
 
 	public static DtoSales createDtoSales() {
 		var out = new DtoSales();
@@ -578,6 +677,10 @@ public final class MocksFactory {
 		
 	public static Optional<Cashbox> createOptionalCashbox() {
 		return Optional.of(createOpenCashbox());
+	}
+	
+	public static Optional<Debtor> createOptionaDebtor() {
+		return Optional.of(createExistsDebtor());
 	}
 	
 	public static long getNowDate() {

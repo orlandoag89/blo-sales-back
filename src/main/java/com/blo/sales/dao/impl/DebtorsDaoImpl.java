@@ -1,8 +1,5 @@
 package com.blo.sales.dao.impl;
 
-import java.util.stream.Collectors;
-
-import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +10,9 @@ import org.springframework.stereotype.Service;
 import com.blo.sales.business.dto.DtoIntDebtor;
 import com.blo.sales.business.dto.DtoIntDebtors;
 import com.blo.sales.dao.IDebtorsDao;
-import com.blo.sales.dao.docs.Debtor;
+import com.blo.sales.dao.docs.Debtors;
+import com.blo.sales.dao.mapper.DebtorMapper;
+import com.blo.sales.dao.mapper.DebtorsMapper;
 import com.blo.sales.dao.repository.DebtorsRepository;
 import com.blo.sales.exceptions.BloSalesBusinessException;
 
@@ -26,7 +25,10 @@ public class DebtorsDaoImpl implements IDebtorsDao {
 	private DebtorsRepository repository;
 	
 	@Autowired
-	private ModelMapper modelMapper;
+	private DebtorMapper mapper;
+	
+	@Autowired
+	private DebtorsMapper debtorsMapper;
 	
 	@Value("${exceptions.codes.not-found}")
 	private String notFoundCode;
@@ -36,23 +38,22 @@ public class DebtorsDaoImpl implements IDebtorsDao {
 
 	@Override
 	public DtoIntDebtor addDebtor(DtoIntDebtor debtor) throws BloSalesBusinessException {
-		var debtorDoc = modelMapper.map(debtor, Debtor.class);
+		var debtorDoc = mapper.toInner(debtor);
 		LOGGER.info(String.format("Debtor parsed: %s", String.valueOf(debtor)));
 		
 		var saved = repository.save(debtorDoc);
 		LOGGER.info(String.format("Debtor saved: %s", String.valueOf(saved)));
 		
-		var out = modelMapper.map(saved, DtoIntDebtor.class);
-		return out;
+		return mapper.toOuter(saved);
 	}
 
 	@Override
 	public DtoIntDebtors getDebtors() throws BloSalesBusinessException {
 		var debtors = repository.findAll();
+		var wrapperDebtors = new Debtors();
+		wrapperDebtors.setDebtors(debtors);
 		
-		var out = new DtoIntDebtors();		
-		var debtorsmapped = debtors.stream().map(d -> modelMapper.map(d, DtoIntDebtor.class)).collect(Collectors.toList());
-		out.setDebtors(debtorsmapped);
+		var out = debtorsMapper.toOuter(wrapperDebtors);
 		LOGGER.info(String.format("Debtors: %s", String.valueOf(out)));
 		
 		return out;
@@ -66,7 +67,7 @@ public class DebtorsDaoImpl implements IDebtorsDao {
 			throw new BloSalesBusinessException(notFoundMessage, notFoundCode, HttpStatus.NOT_FOUND);
 		}
 		var debtor = debtorFound.get();
-		var out = modelMapper.map(debtor, DtoIntDebtor.class);
+		var out = mapper.toOuter(debtor);
 		LOGGER.info(String.format("debtor found %s", String.valueOf(out)));
 		return out;
 	}
@@ -74,7 +75,7 @@ public class DebtorsDaoImpl implements IDebtorsDao {
 	@Override
 	public void deleteDebtorById(String id) throws BloSalesBusinessException {
 		var debtor = getDebtorById(id);
-		var toDel = modelMapper.map(debtor, Debtor.class);
+		var toDel = mapper.toInner(debtor);
 		LOGGER.info(String.format("Debtor delete: %s", id));
 		repository.delete(toDel);
 	}
@@ -87,13 +88,13 @@ public class DebtorsDaoImpl implements IDebtorsDao {
 		debtorFound.setSales(debtor.getSales());
 		debtorFound.setTotal(debtor.getTotal());
 		
-		var parsedDebtor = modelMapper.map(debtorFound, Debtor.class);
+		var parsedDebtor = mapper.toInner(debtorFound);
 		LOGGER.info(String.format("Debtor updated: %s", String.valueOf(parsedDebtor)));
 		
 		var saved = repository.save(parsedDebtor);
 		LOGGER.info(String.format("Saved: %s", id));
 		
-		return modelMapper.map(saved, DtoIntDebtor.class);
+		return mapper.toOuter(saved);
 	}
 
 	@Override
@@ -104,7 +105,7 @@ public class DebtorsDaoImpl implements IDebtorsDao {
 			return null;
 		}
 		var debtor = debtorFound.get();
-		var out = modelMapper.map(debtor, DtoIntDebtor.class);
+		var out = mapper.toOuter(debtor);
 		LOGGER.info(String.format("debtor found %s", String.valueOf(out)));
 		return out;
 	}
