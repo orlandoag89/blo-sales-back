@@ -22,6 +22,7 @@ import com.blo.sales.dao.docs.Debtor;
 import com.blo.sales.dao.docs.Debtors;
 import com.blo.sales.dao.docs.PartialPyment;
 import com.blo.sales.dao.docs.Product;
+import com.blo.sales.dao.docs.Products;
 import com.blo.sales.dao.docs.Sale;
 import com.blo.sales.dao.docs.SaleProduct;
 import com.blo.sales.dao.docs.Sales;
@@ -111,6 +112,14 @@ public final class MocksFactory {
 		var out = new DtoIntProducts();
 		List<DtoIntProduct> products = new ArrayList<>();
 		products.add(createDtoIntProduct());
+		out.setProducts(products);
+		return out;
+	}
+	
+	public static Products createProducts() {
+		var out = new Products();
+		List<Product> products = new ArrayList<>();
+		products.add(createProduct());
 		out.setProducts(products);
 		return out;
 	}
@@ -712,6 +721,10 @@ public final class MocksFactory {
 	
 	public static Optional<Sale> createOptionalSale() {
 		return Optional.of(createSaleNoCashbox());
+	}
+	
+	public static Optional<Product> createOptionalProduct() {
+		return Optional.of(createProduct());
 	}
 	
 	public static long getNowDate() {

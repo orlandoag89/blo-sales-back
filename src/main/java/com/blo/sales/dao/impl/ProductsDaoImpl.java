@@ -3,7 +3,6 @@ package com.blo.sales.dao.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,8 +13,9 @@ import org.springframework.stereotype.Service;
 import com.blo.sales.business.dto.DtoIntProduct;
 import com.blo.sales.business.dto.DtoIntProducts;
 import com.blo.sales.dao.IProductsDao;
-import com.blo.sales.dao.docs.Product;
 import com.blo.sales.dao.docs.Products;
+import com.blo.sales.dao.mapper.ProductMapper;
+import com.blo.sales.dao.mapper.ProductsMapper;
 import com.blo.sales.dao.repository.ProductsRepository;
 import com.blo.sales.exceptions.BloSalesBusinessException;
 
@@ -28,7 +28,10 @@ public class ProductsDaoImpl implements IProductsDao {
 	private ProductsRepository repository;
 	
 	@Autowired
-	private ModelMapper modelMapper;
+	private ProductMapper productMapper;
+	
+	@Autowired
+	private ProductsMapper productsMapper;
 	
 	@Value("${exceptions.codes.not-found}")
 	private String notFoundCode;
@@ -38,16 +41,22 @@ public class ProductsDaoImpl implements IProductsDao {
 
 	@Override
 	public DtoIntProducts addProducts(DtoIntProducts products) throws BloSalesBusinessException {
-		var productsToSave = modelMapper.map(products, Products.class);
+		var productsToSave = productsMapper.toInner(products);
 		LOGGER.info(String.format("dao products %s", String.valueOf(productsToSave)));
 		
 		DtoIntProducts toOut = new DtoIntProducts();
 		List<DtoIntProduct> productsList = new ArrayList<>();
 		
+		if (productsToSave.getProducts().isEmpty()) {
+			LOGGER.info("products is empty");
+			toOut.setProducts(productsList);
+			return toOut;
+		}
+		
 		productsToSave.getProducts().forEach(p -> {
 			var saved = repository.save(p);
 			LOGGER.info(String.format("product saved %s", String.valueOf(saved)));
-			productsList.add(modelMapper.map(saved, DtoIntProduct.class));
+			productsList.add(productMapper.toOuter(saved));
 		});
 		
 		LOGGER.info(String.format("Porducts list %s", String.valueOf(productsList)));
@@ -58,19 +67,10 @@ public class ProductsDaoImpl implements IProductsDao {
 	@Override
 	public DtoIntProducts getProducts() throws BloSalesBusinessException {
 		var allProducts = repository.findAll();
-		LOGGER.info(String.format("Products found: %s", String.valueOf(allProducts)));
-		
-		DtoIntProducts toOut = new DtoIntProducts();
-		List<DtoIntProduct> productsList = new ArrayList<>();
-		
-		allProducts.forEach(p -> {
-			var product = modelMapper.map(p, DtoIntProduct.class);
-			LOGGER.info(String.format("product mapped: %s", String.valueOf(product)));
-			productsList.add(product);
-		});
-		
-		toOut.setProducts(productsList);
-		return toOut;
+		var wrapperProducts = new Products();
+		wrapperProducts.setProducts(allProducts);
+		LOGGER.info(String.format("Products found: %s", String.valueOf(wrapperProducts)));
+		return productsMapper.toOuter(wrapperProducts);
 	}
 
 	@Override
@@ -80,8 +80,8 @@ public class ProductsDaoImpl implements IProductsDao {
 			LOGGER.error(String.format("id %s not found", productId));
 			throw new BloSalesBusinessException(notFoundMessage, notFoundCode, HttpStatus.NOT_FOUND);
 		}
-		
-		var product = modelMapper.map(productFound.get(), DtoIntProduct.class);
+		var product = productMapper.toOuter(productFound.get());
+		LOGGER.info(String.format("product found: %s", String.valueOf(product)));
 		return product;
 	}
 
@@ -95,10 +95,10 @@ public class ProductsDaoImpl implements IProductsDao {
 		productFound.setQuantity(data.getQuantity());
 		productFound.setTotal_price(data.getTotal_price());
 		
-		var product = modelMapper.map(productFound, Product.class);
+		var product = productMapper.toInner(productFound);
 		
 		var saved = repository.save(product);
-		var out = modelMapper.map(saved, DtoIntProduct.class);
+		var out = productMapper.toOuter(saved);
 		LOGGER.info(String.format("product updated: %s", String.valueOf(out)));
 		return out;
 		
