@@ -18,8 +18,6 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.blo.sales.business.ICashboxBusiness;
 import com.blo.sales.business.ISalesBusiness;
-import com.blo.sales.facade.dto.DtoCashbox;
-import com.blo.sales.facade.dto.DtoCashboxes;
 import com.blo.sales.facade.enums.StatusCashboxEnum;
 import com.blo.sales.facade.mapper.DtoCashboxMapper;
 import com.blo.sales.facade.mapper.DtoCashboxesMapper;
@@ -59,11 +57,11 @@ public class CashboxFacadeImplTest {
 		Mockito.verify(cashboxesMapper, Mockito.atLeastOnce()).toOuter(Mockito.any());
 		
 		var resultAsString = MocksUtils.getContentAsString(result, "getAllCashboxesTest");
-		var obj = MocksUtils.parserStringTo(resultAsString, DtoCashboxes.class);
+		var obj = MocksUtils.parserToCommonWrapper(resultAsString, MocksFactory.getReferenceFromDtoCashboxes());
 		
 		assertNotNull(obj);
-		assertNotNull(obj.getBoxes());
-		assertFalse(obj.getBoxes().isEmpty());
+		assertNotNull(obj.getData().getBoxes());
+		assertFalse(obj.getData().getBoxes().isEmpty());
 	}
 	
 	/**
@@ -92,10 +90,10 @@ public class CashboxFacadeImplTest {
 		Mockito.verify(cashboxMapper, Mockito.atLeastOnce()).toOuter(Mockito.any());
 		
 		var resultAsString = MocksUtils.getContentAsString(result, "closeCashboxNotCashboxOpen");
-		var obj = MocksUtils.parserStringTo(resultAsString, DtoCashbox.class);
+		var obj = MocksUtils.parserToCommonWrapper(resultAsString, MocksFactory.getReferenceFromDtoCashbox());
 		
 		assertNotNull(obj);
-		assertEquals(StatusCashboxEnum.CLOSE.name(), obj.getStatus().name());
+		assertEquals(StatusCashboxEnum.CLOSE.name(), obj.getData().getStatus().name());
 	}
 	
 	/**
@@ -126,9 +124,9 @@ public class CashboxFacadeImplTest {
 		Mockito.verify(cashboxMapper, Mockito.atLeastOnce()).toOuter(Mockito.any());
 		
 		var resultAsString = MocksUtils.getContentAsString(result, "closeCashboxNotCashboxOpen");
-		var obj = MocksUtils.parserStringTo(resultAsString, DtoCashbox.class);
+		var obj = MocksUtils.parserToCommonWrapper(resultAsString, MocksFactory.getReferenceFromDtoCashbox());
 		
 		assertNotNull(obj);
-		assertEquals(StatusCashboxEnum.CLOSE.name(), obj.getStatus().name());
+		assertEquals(StatusCashboxEnum.CLOSE.name(), obj.getData().getStatus().name());
 	}
 }

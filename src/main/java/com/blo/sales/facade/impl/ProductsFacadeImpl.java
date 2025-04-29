@@ -15,6 +15,8 @@ import com.blo.sales.exceptions.BloSalesBusinessException;
 import com.blo.sales.facade.IProductsFacade;
 import com.blo.sales.facade.dto.DtoProduct;
 import com.blo.sales.facade.dto.DtoProducts;
+import com.blo.sales.facade.dto.commons.DtoCommonWrapper;
+import com.blo.sales.facade.dto.commons.DtoError;
 import com.blo.sales.facade.mapper.DtoProductMapper;
 import com.blo.sales.facade.mapper.DtoProductsMapper;
 import com.blo.sales.utils.Utils;
@@ -46,8 +48,9 @@ public class ProductsFacadeImpl implements IProductsFacade {
     private String noIdCode;
 
     @Override
-    public ResponseEntity<DtoProducts> addProduct(final DtoProducts products) {
+    public ResponseEntity<DtoCommonWrapper<DtoProducts>> addProduct(final DtoProducts products) {
     	LOGGER.info(String.format("products %s", Encode.forJava(String.valueOf(products))));
+    	var output = new DtoCommonWrapper<DtoProducts>();
 		try {
 			if (products == null || products.getProducts() == null || products.getProducts().isEmpty()) {
 				throw new BloSalesBusinessException(productsEmptyMessage, productsEmptyCode, HttpStatus.BAD_REQUEST);
@@ -55,45 +58,57 @@ public class ProductsFacadeImpl implements IProductsFacade {
 			var innerProducts = productsMapper.toInner(products);
 			var saved = service.addProducts(innerProducts);
 			var productsOut = productsMapper.toOuter(saved);
-			return new ResponseEntity<>(productsOut, HttpStatus.CREATED);
+			output.setData(productsOut);
+			return new ResponseEntity<>(output, HttpStatus.CREATED);
 		} catch (BloSalesBusinessException e) {
 			LOGGER.error(e.getExceptionMessage());
-			return new ResponseEntity<>(null, e.getExceptHttpStatus());
+			var error = new DtoError(e.getErrorCode(), e.getExceptionMessage());
+			output.setError(error);
+			return new ResponseEntity<>(output, e.getExceptHttpStatus());
 		}
     }
 
 	@Override
-	public ResponseEntity<DtoProducts> retrieveAllProducts() {
+	public ResponseEntity<DtoCommonWrapper<DtoProducts>> retrieveAllProducts() {
 		LOGGER.info("Retrieving all products");
+		var output = new DtoCommonWrapper<DtoProducts>();
 		try {
 			var products = service.getProducts();
 			var mapped = productsMapper.toOuter(products);
-			return new ResponseEntity<>(mapped, HttpStatus.OK);
+			output.setData(mapped);
+			return new ResponseEntity<>(output, HttpStatus.OK);
 		} catch (BloSalesBusinessException e) {
 			LOGGER.error(e.getExceptionMessage());
-			return new ResponseEntity<>(null, e.getExceptHttpStatus());
+			var error = new DtoError(e.getErrorCode(), e.getExceptionMessage());
+			output.setError(error);
+			return new ResponseEntity<>(output, e.getExceptHttpStatus());
 		}
 	}
 
 	@Override
-	public ResponseEntity<DtoProduct> retrieveProduct(String productId) {
+	public ResponseEntity<DtoCommonWrapper<DtoProduct>> retrieveProduct(String productId) {
 		LOGGER.info(String.format("Retrieving product %s", productId));
+		var output = new DtoCommonWrapper<DtoProduct>();
 		try {
 			if (StringUtils.isBlank(productId)) {
 				throw new BloSalesBusinessException(noIdMessage, noIdCode, HttpStatus.BAD_REQUEST);
 			}
 			var product = service.getProduct(productId);
 			var mappedProduct = productMapper.toOuter(product);
-			return new ResponseEntity<DtoProduct>(mappedProduct, HttpStatus.OK);
+			output.setData(mappedProduct);
+			return new ResponseEntity<>(output, HttpStatus.OK);
 		} catch (BloSalesBusinessException e) {
 			LOGGER.error(e.getExceptionMessage());
-			return new ResponseEntity<>(null, e.getExceptHttpStatus());
+			var error = new DtoError(e.getErrorCode(), e.getExceptionMessage());
+			output.setError(error);
+			return new ResponseEntity<>(output, e.getExceptHttpStatus());
 		}
 	}
 
 	@Override
-	public ResponseEntity<DtoProduct> updateProduct(String productId, DtoProduct product) {
+	public ResponseEntity<DtoCommonWrapper<DtoProduct>> updateProduct(String productId, DtoProduct product) {
 		LOGGER.info(String.format("Update info by id: %s, data %s", productId,  Encode.forJava(String.valueOf(product))));
+		var output = new DtoCommonWrapper<DtoProduct>();
 		try {
 			if (StringUtils.isBlank(productId) || Utils.includesUndefined(productId)) {
 				throw new BloSalesBusinessException(noIdMessage, noIdCode, HttpStatus.BAD_REQUEST);
@@ -104,10 +119,14 @@ public class ProductsFacadeImpl implements IProductsFacade {
 			var productInner = productMapper.toInner(product);
 			var productUpdated = service.updateProduct(productId, productInner);
 			var productToOuter = productMapper.toOuter(productUpdated);
-			return new ResponseEntity<>(productToOuter, HttpStatus.OK);
+			LOGGER.info(String.format("updated data: %s", String.valueOf(productToOuter)));
+			output.setData(productToOuter);
+			return new ResponseEntity<>(output, HttpStatus.OK);
 		} catch (BloSalesBusinessException e) {
 			LOGGER.error(e.getExceptionMessage());
-			return new ResponseEntity<>(null, e.getExceptHttpStatus());
+			var error = new DtoError(e.getErrorCode(), e.getExceptionMessage());
+			output.setError(error);
+			return new ResponseEntity<>(output, e.getExceptHttpStatus());
 		}
 	}
 }

@@ -15,6 +15,8 @@ import com.blo.sales.exceptions.BloSalesBusinessException;
 import com.blo.sales.facade.ICashboxFacade;
 import com.blo.sales.facade.dto.DtoCashbox;
 import com.blo.sales.facade.dto.DtoCashboxes;
+import com.blo.sales.facade.dto.commons.DtoCommonWrapper;
+import com.blo.sales.facade.dto.commons.DtoError;
 import com.blo.sales.facade.enums.StatusCashboxEnum;
 import com.blo.sales.facade.mapper.DtoCashboxMapper;
 import com.blo.sales.facade.mapper.DtoCashboxesMapper;
@@ -38,15 +40,16 @@ public class CashboxFacadeImpl implements ICashboxFacade {
 	private ISalesBusiness sales;
 	
 	@Override
-	public ResponseEntity<DtoCashbox> closeCashbox() {
+	public ResponseEntity<DtoCommonWrapper<DtoCashbox>> closeCashbox() {
 		LOGGER.info("closing cashbox");
-		
+		var output = new DtoCommonWrapper<DtoCashbox>();
 		try {
 			var busCashbox = business.getCashboxOpen();
 			LOGGER.info(String.format("open cashbox %s", String.valueOf(busCashbox)));
 			
 			var isNewCashbox = busCashbox == null;
 			DtoCashbox openCashbox = null;
+			// valida existencia de una caja de dinero abierta
 			if (isNewCashbox) {
 				LOGGER.info("new cashbox");
 				openCashbox = new DtoCashbox();
@@ -60,6 +63,7 @@ public class CashboxFacadeImpl implements ICashboxFacade {
 			var salesNotCashbox = sales.getSalesNotCashbox().getSales();
 			LOGGER.info(String.format("sales not cashbox %s", String.valueOf(salesNotCashbox)));
 			
+			// cierra todas las ventas de una fecha
 			for (var sale: salesNotCashbox) {
 				totalSalesOnDay = totalSalesOnDay.add(sale.getTotal());
 				sale.set_on_cashbox(true);
@@ -78,25 +82,31 @@ public class CashboxFacadeImpl implements ICashboxFacade {
 				var saved = business.saveCashbox(innerCashbox);
 				var out = cashboxMapper.toOuter(saved);
 				LOGGER.info(String.format("save format %s", String.valueOf(out)));
-				return new ResponseEntity<>(out, HttpStatus.OK);
+				output.setData(out);
+				return new ResponseEntity<>(output, HttpStatus.OK);
 			}
 			
 			var updated = business.updateCashbox(innerCashbox.getId(), innerCashbox);
 			var out =  cashboxMapper.toOuter(updated);
 			LOGGER.info(String.format("cashbox has been updated %s", String.valueOf(updated)));
-			return new ResponseEntity<>(out, HttpStatus.OK);
+			output.setData(out);
+			return new ResponseEntity<>(output, HttpStatus.OK);
 		} catch (BloSalesBusinessException e) {
 			LOGGER.error(e.getExceptionMessage());
-			return new ResponseEntity<>(null, e.getExceptHttpStatus());
+			var error = new DtoError(e.getErrorCode(), e.getExceptionMessage());
+			output.setError(error);
+			return new ResponseEntity<>(output, e.getExceptHttpStatus());
 		}
 	}
 
 	@Override
-	public ResponseEntity<DtoCashboxes> getAllCashboxes() {
+	public ResponseEntity<DtoCommonWrapper<DtoCashboxes>> getAllCashboxes() {
 		var cashboxes = business.getAllCashboxes();
 		var out = cashboxesMapper.toOuter(cashboxes);
 		LOGGER.info(String.format("cashboxes %s", String.valueOf(out)));
-		return new ResponseEntity<DtoCashboxes>(out, HttpStatus.OK);
+		var output = new DtoCommonWrapper<DtoCashboxes>();
+		output.setData(out);
+		return new ResponseEntity<>(output, HttpStatus.OK);
 	}
 
 }

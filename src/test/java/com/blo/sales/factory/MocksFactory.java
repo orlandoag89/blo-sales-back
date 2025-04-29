@@ -38,8 +38,10 @@ import com.blo.sales.facade.dto.DtoSale;
 import com.blo.sales.facade.dto.DtoSaleProduct;
 import com.blo.sales.facade.dto.DtoSales;
 import com.blo.sales.facade.dto.DtoWrapperSale;
+import com.blo.sales.facade.dto.commons.DtoCommonWrapper;
 import com.blo.sales.facade.enums.StatusCashboxEnum;
 import com.blo.sales.utils.Utils;
+import com.fasterxml.jackson.core.type.TypeReference;
 
 public final class MocksFactory {
 
@@ -733,5 +735,41 @@ public final class MocksFactory {
 	
 	public static String getId() {
 		return ANY_ID;
+	}
+	
+	public static TypeReference<DtoCommonWrapper<DtoWrapperSale>> getReferenceFromWrapperSale() {
+		return new TypeReference<DtoCommonWrapper<DtoWrapperSale>>() { };
+	}
+	
+	public static TypeReference<DtoCommonWrapper<DtoSales>> getReferenceFromDtoSales() {
+		return new TypeReference<DtoCommonWrapper<DtoSales>>() { };
+	}
+	
+	public static TypeReference<DtoCommonWrapper<DtoSale>> getReferenceFromDtoSale() {
+		return new TypeReference<DtoCommonWrapper<DtoSale>>() { };
+	}
+	
+	public static TypeReference<DtoCommonWrapper<DtoProducts>> getReferenceFromDtoProducts() {
+		return new TypeReference<DtoCommonWrapper<DtoProducts>>() { };
+	}
+	
+	public static TypeReference<DtoCommonWrapper<DtoProduct>> getReferenceFromDtoProduct() {
+		return new TypeReference<DtoCommonWrapper<DtoProduct>>() { };
+	}
+	
+	public static TypeReference<DtoCommonWrapper<DtoDebtor>> getReferenceFromDtoDebtor() {
+		return new TypeReference<DtoCommonWrapper<DtoDebtor>>() { };
+	}
+	
+	public static TypeReference<DtoCommonWrapper<DtoDebtors>> getReferenceFromDtoDebtors() {
+		return new TypeReference<DtoCommonWrapper<DtoDebtors>>() { };
+	}
+	
+	public static TypeReference<DtoCommonWrapper<DtoCashbox>> getReferenceFromDtoCashbox() {
+		return new TypeReference<DtoCommonWrapper<DtoCashbox>>() { };
+	}
+	
+	public static TypeReference<DtoCommonWrapper<DtoCashboxes>> getReferenceFromDtoCashboxes() {
+		return new TypeReference<DtoCommonWrapper<DtoCashboxes>>() { };
 	}
 }

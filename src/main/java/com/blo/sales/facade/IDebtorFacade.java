@@ -11,17 +11,18 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.blo.sales.facade.dto.DtoDebtor;
 import com.blo.sales.facade.dto.DtoDebtors;
 import com.blo.sales.facade.dto.DtoPartialPyment;
+import com.blo.sales.facade.dto.commons.DtoCommonWrapper;
 
 @RequestMapping("/api/v1/debtors")
 public interface IDebtorFacade {
 		
 	@GetMapping("/{id}")
-	ResponseEntity<DtoDebtor> retrieveDebtorById(@PathVariable String id);
+	ResponseEntity<DtoCommonWrapper<DtoDebtor>> retrieveDebtorById(@PathVariable String id);
 	
 	@GetMapping
-	ResponseEntity<DtoDebtors> retrieveAllDebtors();
+	ResponseEntity<DtoCommonWrapper<DtoDebtors>> retrieveAllDebtors();
 	
 	@PutMapping("/{id}")
-	ResponseEntity<DtoDebtor> addPay(@PathVariable String id, @RequestParam long time, @RequestBody DtoPartialPyment partialPyment);
+	ResponseEntity<DtoCommonWrapper<DtoDebtor>> addPay(@PathVariable String id, @RequestParam long time, @RequestBody DtoPartialPyment partialPyment);
 	
 }

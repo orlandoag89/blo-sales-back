@@ -1,6 +1,7 @@
 package com.blo.sales.facade.impl;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -64,7 +65,6 @@ public class ProductsFacadeImplTest {
 	public void addProductsTest() throws JsonProcessingException, Exception {
 	    var products = MocksFactory.createDtoProducts();
 	    var allProducts = MocksFactory.createDtoIntProductsSaved();
-	    var allProductsAsString = objectMapper.writeValueAsString(allProducts);
 
 	    when(productsMapper.toInner(Mockito.any())).thenReturn(MocksFactory.createDtoIntProducts());
 	    when(productsMapper.toOuter(Mockito.any())).thenReturn(MocksFactory.createDtoProductsSaved());
@@ -76,10 +76,17 @@ public class ProductsFacadeImplTest {
 	            .andExpect(status().isCreated())
 	            .andReturn();
 
+	    var registerSale = MocksUtils.getContentAsString(result, "addProductsTest");
+		var objtSale = MocksUtils.parserToCommonWrapper(registerSale,  MocksFactory.getReferenceFromDtoProducts());
+		
 	   verify(productsMapper, atLeastOnce()).toInner(Mockito.any());
 	   verify(productsMapper, atLeastOnce()).toOuter(Mockito.any());
+	   
 	   assertNotNull(result);
-	   assertEquals(allProductsAsString,  MocksUtils.getContentAsString(result, "addProductsTest"));
+	   assertNotNull(objtSale);
+	   assertNotNull(objtSale.getData());
+	   assertNotNull(objtSale.getData().getProducts());
+	   assertFalse(objtSale.getData().getProducts().isEmpty());
 	}
 	
 	/**
@@ -95,9 +102,7 @@ public class ProductsFacadeImplTest {
             .andExpect(status().isBadRequest())
             .andReturn();
 		
-		
-		assertNotNull(result);
-		assertEquals(MocksUtils.EMPTY_STRING,  MocksUtils.getContentAsString(result, "addProductsEmptyListTest"));
+		assertEquals(MocksUtils.EMPTY_STRING, MocksUtils.getContentAsString(result, "addProductsNullProductsTest"));
 	}
 	
 	/**
@@ -116,9 +121,11 @@ public class ProductsFacadeImplTest {
             .andExpect(status().isBadRequest())
             .andReturn();
 		
+		var registerSale = MocksUtils.getContentAsString(result, "retrieveAllProductsTest");
+		var objtSale = MocksUtils.parserToCommonWrapper(registerSale,  MocksFactory.getReferenceFromDtoProducts());
 		
 		assertNotNull(result);
-		assertEquals(MocksUtils.EMPTY_STRING,  MocksUtils.getContentAsString(result, "addProductsEmptyListTest"));
+		assertNotNull(objtSale.getError());
 	}
 	
 	/**
@@ -137,9 +144,11 @@ public class ProductsFacadeImplTest {
             .andExpect(status().isBadRequest())
             .andReturn();
 		
+		var registerSale = MocksUtils.getContentAsString(result, "addProductsEmptyListTest");
+		var objtSale = MocksUtils.parserToCommonWrapper(registerSale,  MocksFactory.getReferenceFromDtoProducts());
 		
 		assertNotNull(result);
-		assertEquals(MocksUtils.EMPTY_STRING,  MocksUtils.getContentAsString(result, "addProductsEmptyListTest"));
+		assertNotNull(objtSale.getError());
 	}
 	
 	
@@ -150,7 +159,6 @@ public class ProductsFacadeImplTest {
 	@Test
 	public void retrieveAllProductsTest() throws Exception {
 		var productsOut = MocksFactory.createDtoProducts();
-		var productsOutString = objectMapper.writeValueAsString(productsOut);
 		
 		when(service.getProducts()).thenReturn(MocksFactory.createDtoIntProducts());
 		when(productsMapper.toOuter(Mockito.any())).thenReturn(productsOut);
@@ -160,11 +168,16 @@ public class ProductsFacadeImplTest {
             .andExpect(status().isOk())
             .andReturn();
 		
+		var registerSale = MocksUtils.getContentAsString(result, "retrieveAllProductsTest");
+		var objtSale = MocksUtils.parserToCommonWrapper(registerSale,  MocksFactory.getReferenceFromDtoProducts());
+		
 		verify(service, atLeastOnce()).getProducts();
 		verify(productsMapper, atLeastOnce()).toOuter(Mockito.any());
 		
 		assertNotNull(result);
-		assertEquals(productsOutString,  MocksUtils.getContentAsString(result, "retrieveAllProductsTest"));
+		assertNotNull(objtSale);
+		assertNotNull(objtSale.getData());
+		assertFalse(objtSale.getData().getProducts().isEmpty());
 	}
 	
 	/**
@@ -174,7 +187,7 @@ public class ProductsFacadeImplTest {
 	@Test
 	public void retrieveProductTest() throws Exception {
 		var productFromService = MocksFactory.createDtoProduct();
-		var productString = objectMapper.writeValueAsString(productFromService);
+		
 		
 		when(service.getProduct(Mockito.anyString())).thenReturn(MocksFactory.createDtoIntProduct());
 		when(productMapper.toOuter(Mockito.any())).thenReturn(productFromService);
@@ -187,8 +200,11 @@ public class ProductsFacadeImplTest {
 		verify(service, atLeastOnce()).getProduct(anyString());
 		verify(productMapper, atLeastOnce()).toOuter(Mockito.any());
 		
+		var registerSale = MocksUtils.getContentAsString(result, "retrieveProductTest");
+		var objtSale = MocksUtils.parserToCommonWrapper(registerSale,  MocksFactory.getReferenceFromDtoProduct());
+		
 		assertNotNull(result);
-		assertEquals(productString,  MocksUtils.getContentAsString(result, "retrieveProductTest"));
+		assertNotNull(objtSale.getData());
 	}
 	
 	/**
@@ -197,12 +213,17 @@ public class ProductsFacadeImplTest {
 	 */
 	@Test
 	public void retrieveProductEmptyIdTest() throws Exception {
+		
 		var result = mockMvc.perform(get("/api/v1/products/ ")
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isBadRequest())
             .andReturn();
 		
-		assertEquals(MocksUtils.EMPTY_STRING,  MocksUtils.getContentAsString(result, "retrieveProductTest"));
+		var registerSale = MocksUtils.getContentAsString(result, "retrieveProductEmptyIdTest");
+		var objtSale = MocksUtils.parserToCommonWrapper(registerSale,  MocksFactory.getReferenceFromDtoProduct());
+		
+		assertNotNull(objtSale);
+		assertNotNull(objtSale.getError());
 	}
 	
 	/**
@@ -225,12 +246,16 @@ public class ProductsFacadeImplTest {
             .andExpect(status().isOk())
             .andReturn();
 		
+		var registerSale = MocksUtils.getContentAsString(result, "updateProductById");
+		var objtSale = MocksUtils.parserToCommonWrapper(registerSale,  MocksFactory.getReferenceFromDtoProduct());
+		
 		verify(productMapper, atLeastOnce()).toInner(Mockito.any());
 		verify(service, atLeastOnce()).updateProduct(anyString(), any());
 		verify(productMapper, atLeastOnce()).toOuter(Mockito.any());
 		
 		assertNotNull(result);
-		assertEquals(productToUpdateAsString,  MocksUtils.getContentAsString(result, "updateProductById"));
+		assertNotNull(objtSale);
+		assertNotNull(objtSale.getData());
 	}
 	
 	/**
@@ -249,8 +274,11 @@ public class ProductsFacadeImplTest {
             .andExpect(status().isBadRequest())
             .andReturn();
 		
+		var registerSale = MocksUtils.getContentAsString(result, "updateProductByIdNotId");
+		var objtSale = MocksUtils.parserToCommonWrapper(registerSale,  MocksFactory.getReferenceFromDtoProducts());
+		
 		assertNotNull(result);
-		assertEquals(MocksUtils.EMPTY_STRING,  MocksUtils.getContentAsString(result, "updateProductByIdNotId"));
+		assertNotNull(objtSale.getError());
 	}
 	
 	/**
@@ -269,8 +297,11 @@ public class ProductsFacadeImplTest {
             .andExpect(status().isBadRequest())
             .andReturn();
 		
+		var registerSale = MocksUtils.getContentAsString(result, "updateProductByIdUndefined");
+		var objtSale = MocksUtils.parserToCommonWrapper(registerSale,  MocksFactory.getReferenceFromDtoProducts());
+		
 		assertNotNull(result);
-		assertEquals(MocksUtils.EMPTY_STRING,  MocksUtils.getContentAsString(result, "updateProductByIdUndefined"));
+		assertNotNull(objtSale.getError());
 	}
 	
 	/**
@@ -288,8 +319,7 @@ public class ProductsFacadeImplTest {
             .andExpect(status().isBadRequest())
             .andReturn();
 		
-		assertNotNull(result);
-		assertEquals(MocksUtils.EMPTY_STRING, MocksUtils.getContentAsString(result, "updateProductByIdNotBody"));
+	 	assertEquals(MocksUtils.EMPTY_STRING, MocksUtils.getContentAsString(result, "updateProductByIdNotBody"));
 	}
 	
 }

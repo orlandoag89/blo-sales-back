@@ -6,7 +6,9 @@ import java.math.BigDecimal;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.test.web.servlet.MvcResult;
 
-import com.blo.sales.facade.dto.DtoPartialPyment;
+import com.blo.sales.facade.dto.commons.DtoCommonWrapper;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public final class MocksUtils {
@@ -23,7 +25,7 @@ public final class MocksUtils {
 	
 	public static String getContentAsString(MvcResult result, String fromMethod) throws UnsupportedEncodingException {
 		if (result == null) {
-			throw new UnsupportedEncodingException("[" + fromMethod + "]result is null");
+			throw new UnsupportedEncodingException("[" + fromMethod + "] result is null");
 		}
 		var contentString = result.getResponse().getContentAsString();
 		if (StringUtils.isBlank(contentString)) {
@@ -37,6 +39,11 @@ public final class MocksUtils {
 	public static <T> T parserStringTo(String content, Class<T> type) throws Exception {
 		System.out.println(content);
 		return objectMapper.readValue(content, type); 
+	}
+	
+	public static <T> DtoCommonWrapper<T> parserToCommonWrapper(String json, TypeReference<DtoCommonWrapper<T>> typeRef)
+	        throws JsonProcessingException {
+	    return objectMapper.readValue(json, typeRef);
 	}
 	
 	public static String parserToString(Object val) throws Exception {

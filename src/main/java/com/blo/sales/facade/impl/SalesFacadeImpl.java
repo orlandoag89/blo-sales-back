@@ -27,6 +27,8 @@ import com.blo.sales.facade.dto.DtoSale;
 import com.blo.sales.facade.dto.DtoSaleProduct;
 import com.blo.sales.facade.dto.DtoSales;
 import com.blo.sales.facade.dto.DtoWrapperSale;
+import com.blo.sales.facade.dto.commons.DtoCommonWrapper;
+import com.blo.sales.facade.dto.commons.DtoError;
 import com.blo.sales.facade.enums.StatusSaleEnum;
 import com.blo.sales.facade.mapper.DtoDebtorMapper;
 import com.blo.sales.facade.mapper.DtoProductMapper;
@@ -65,8 +67,21 @@ public class SalesFacadeImpl implements ISalesFacade {
 	@Value("${exceptions.codes.product-insufficient}")
 	private String productInsufficientCode;
 	
+	@Value("${exceptions.codes.not-found}")
+	private String exceptionsCodesNotFound;
+	
+	@Value("${exceptions.messages.not-found}")
+	private String exceptionsMessagesNotFound;
+	
+	@Value("${exceptions.codes.field-is-empty}")
+	private String exceptionsCodesFieldsIsEmpty;
+	
+	@Value("${exceptions.messages.field-is-empty}")
+	private String exceptionsMessagesFieldsIsEmpty;
+	
 	@Override
-	public ResponseEntity<DtoWrapperSale> registerSale(DtoSale sale) {
+	public ResponseEntity<DtoCommonWrapper<DtoWrapperSale>> registerSale(DtoSale sale) {
+		var output = new DtoCommonWrapper<DtoWrapperSale>();
 		LOGGER.info(String.format("registering sale %s", Encode.forJava(String.valueOf(sale))));
 		try {
 			var out = new DtoWrapperSale();
@@ -78,16 +93,20 @@ public class SalesFacadeImpl implements ISalesFacade {
 			LOGGER.info(String.format("sale registered %s", String.valueOf(saleSaved)));
 			out.setSale(saleMapper.toOuter(saleSaved));
 			out.setProductsWithAlerts(productsAlert);
-			return new ResponseEntity<DtoWrapperSale>(out, HttpStatus.CREATED);
+			output.setData(out);
+			return new ResponseEntity<>(output, HttpStatus.CREATED);
 		} catch (BloSalesBusinessException e) {
 			LOGGER.error(e.getExceptionMessage());
-			return new ResponseEntity<>(null, e.getExceptHttpStatus());
+			var error = new DtoError(e.getErrorCode(), e.getExceptionMessage());
+			output.setError(error);
+			return new ResponseEntity<>(output, e.getExceptionHttpStatus());
 		}
 	}
 
 	@Override
-	public ResponseEntity<DtoSales> retrieveSales(StatusSaleEnum status) {
+	public ResponseEntity<DtoCommonWrapper<DtoSales>> retrieveSales(StatusSaleEnum status) {
 		LOGGER.info(String.format("retrieving sales by flag %s", status));
+		var output = new DtoCommonWrapper<DtoSales>();
 		try {
 			var out = new DtoSales();
 			var sales = new DtoIntSales();
@@ -105,33 +124,44 @@ public class SalesFacadeImpl implements ISalesFacade {
 			}
 			out = salesMapper.toOuter(sales);
 			LOGGER.info(String.format("sales %s found %s", String.valueOf(out), status));
-			return new ResponseEntity<DtoSales>(out, HttpStatus.OK);
+			output.setData(out);
+			return new ResponseEntity<>(output, HttpStatus.OK);
 		} catch (BloSalesBusinessException e) {
 			LOGGER.error(e.getExceptionMessage());
-			return new ResponseEntity<>(null, e.getExceptHttpStatus());
+			var error = new DtoError(e.getErrorCode(), e.getExceptionMessage());
+			output.setError(error);
+			return new ResponseEntity<>(output, e.getExceptHttpStatus());
 		}
 	}
 
 	@Override
-	public ResponseEntity<DtoSale> retrieveSaleById(String id) {
+	public ResponseEntity<DtoCommonWrapper<DtoSale>> retrieveSaleById(String id) {
 		LOGGER.info(String.format("retrieving sales by flag %s", id));
+		var output = new DtoCommonWrapper<DtoSale>();
 		try {
+			if (StringUtils.isBlank(id)) {
+				throw new BloSalesBusinessException(exceptionsMessagesNotFound, exceptionsCodesNotFound, HttpStatus.NOT_FOUND);
+			}
 			var sale = business.getSaleById(id);
 			var out = saleMapper.toOuter(sale);
-			return new ResponseEntity<DtoSale>(out, HttpStatus.OK);
+			output.setData(out);
+			return new ResponseEntity<>(output, HttpStatus.OK);
 		} catch (BloSalesBusinessException e) {
 			LOGGER.error(e.getExceptionMessage());
-			return new ResponseEntity<>(null, e.getExceptHttpStatus());
+			var error = new DtoError(e.getErrorCode(), e.getExceptionMessage());
+			output.setError(error);
+			return new ResponseEntity<>(output, e.getExceptHttpStatus());
 		}
 	}
 
 	@Override
-	public ResponseEntity<DtoWrapperSale> registerSaleAndDebtor(DtoWrapperSale sale, BigDecimal partialPyment) {
+	public ResponseEntity<DtoCommonWrapper<DtoWrapperSale>> registerSaleAndDebtor(DtoWrapperSale sale, BigDecimal partialPyment) {
+		var wrapperResponse = new DtoCommonWrapper<DtoWrapperSale>();
 		try {
 			LOGGER.info(String.format("saving debtor %s", Encode.forJava(String.valueOf(sale.getDebtor()))));
 			if (sale.getDebtor() == null) {
 				LOGGER.error("debtor is required");
-				return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+				throw new BloSalesBusinessException(exceptionsCodesFieldsIsEmpty, exceptionsMessagesFieldsIsEmpty, HttpStatus.BAD_REQUEST);
 			}
 			
 			var isNewDebtor = StringUtils.isBlank(sale.getDebtor().getId());
@@ -163,7 +193,8 @@ public class SalesFacadeImpl implements ISalesFacade {
 				var out = debtorMapper.toOuter(debtorSaved);
 				LOGGER.info(String.format("Debtor saved %s", String.valueOf(out)));
 				output.setDebtor(out);
-				return new ResponseEntity<DtoWrapperSale>(output, HttpStatus.CREATED);
+				wrapperResponse.setData(output);
+				return new ResponseEntity<>(wrapperResponse, HttpStatus.CREATED);
 			}
 			
 			//actualizar deudor
@@ -191,7 +222,8 @@ public class SalesFacadeImpl implements ISalesFacade {
 					LOGGER.info("partial pyment is more that debt");
 					debtorBusiness.deleteDebtorById(debtorInDb.getId());
 					output.setDebtor(new DtoDebtor());
-					return new ResponseEntity<>(output, HttpStatus.CREATED);
+					wrapperResponse.setData(output);
+					return new ResponseEntity<>(wrapperResponse, HttpStatus.CREATED);
 				}
 				LOGGER.info("update partial pyment");
 				debtorInDb.setTotal(newAmount);
@@ -201,10 +233,13 @@ public class SalesFacadeImpl implements ISalesFacade {
 			LOGGER.info(String.format("debtor updated %s", String.valueOf(debtorUpdated)));
 			var mappedDebtor = debtorMapper.toOuter(debtorUpdated);
 			output.setDebtor(mappedDebtor);
-			return new ResponseEntity<>(output, HttpStatus.CREATED);
+			wrapperResponse.setData(output);
+			return new ResponseEntity<>(wrapperResponse, HttpStatus.CREATED);
 		} catch (BloSalesBusinessException e) {
 			LOGGER.info(e.getExceptionMessage());
-			return new ResponseEntity<>(null, e.getExceptHttpStatus());
+			var error = new DtoError(e.getErrorCode(), e.getExceptionMessage());
+			wrapperResponse.setError(error);
+			return new ResponseEntity<>(wrapperResponse, e.getExceptHttpStatus());
 		}
 	}
 	

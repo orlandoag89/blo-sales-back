@@ -10,19 +10,20 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.blo.sales.facade.dto.DtoProduct;
 import com.blo.sales.facade.dto.DtoProducts;
+import com.blo.sales.facade.dto.commons.DtoCommonWrapper;
 
 @RequestMapping("/api/v1/products")
 public interface IProductsFacade {
 
     @PostMapping()
-    ResponseEntity<DtoProducts> addProduct(@RequestBody DtoProducts prudct);
+    ResponseEntity<DtoCommonWrapper<DtoProducts>> addProduct(@RequestBody DtoProducts prudct);
     
     @GetMapping
-    ResponseEntity<DtoProducts> retrieveAllProducts();
+    ResponseEntity<DtoCommonWrapper<DtoProducts>> retrieveAllProducts();
     
     @GetMapping("/{productId}")
-    ResponseEntity<DtoProduct> retrieveProduct(@PathVariable String productId);
+    ResponseEntity<DtoCommonWrapper<DtoProduct>> retrieveProduct(@PathVariable String productId);
     
     @PutMapping("/{productId}")
-    ResponseEntity<DtoProduct> updateProduct(@PathVariable String productId, @RequestBody DtoProduct product);
+    ResponseEntity<DtoCommonWrapper<DtoProduct>> updateProduct(@PathVariable String productId, @RequestBody DtoProduct product);
 }

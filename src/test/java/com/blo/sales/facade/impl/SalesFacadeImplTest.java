@@ -22,8 +22,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import com.blo.sales.business.IDebtorsBusiness;
 import com.blo.sales.business.IProductsBusiness;
 import com.blo.sales.business.ISalesBusiness;
-import com.blo.sales.facade.dto.DtoSale;
-import com.blo.sales.facade.dto.DtoSales;
 import com.blo.sales.facade.dto.DtoWrapperSale;
 import com.blo.sales.facade.mapper.DtoDebtorMapper;
 import com.blo.sales.facade.mapper.DtoProductMapper;
@@ -91,7 +89,7 @@ public class SalesFacadeImplTest {
 	            .andReturn();
 		
 		var registerSale = MocksUtils.getContentAsString(result, "registerSaleTest");
-		var objtSale = objectMapper.readValue(registerSale, DtoWrapperSale.class);
+		var objtSale = MocksUtils.parserToCommonWrapper(registerSale,  MocksFactory.getReferenceFromWrapperSale());
 		
 		Mockito.verify(saleMapper, Mockito.atLeastOnce()).toInner(Mockito.any());
 		Mockito.verify(business, Mockito.atLeastOnce()).addSale(Mockito.any());
@@ -101,10 +99,11 @@ public class SalesFacadeImplTest {
 		
 		assertNotNull(result);
 		assertNotNull(registerSale);
-		assertNotNull(objtSale.getSale());
-		assertNotNull(objtSale.getSale().getId());
-		assertNull(objtSale.getDebtor());
-		assertTrue(objtSale.getProductsWithAlerts().isEmpty());
+		assertNotNull(objtSale.getData().getSale());
+		assertNotNull(objtSale.getData().getSale().getId());
+		assertNull(objtSale.getData().getDebtor());
+		assertNull(objtSale.getError());
+		assertTrue(objtSale.getData().getProductsWithAlerts().isEmpty());
 	}
 	
 	/**
@@ -127,10 +126,12 @@ public class SalesFacadeImplTest {
 	            .andReturn();
 		 
 		 var content = MocksUtils.getContentAsString(result, "registerSaleWithInsuficientProductsTest");
+		 var obj = MocksUtils.parserToCommonWrapper(content,  MocksFactory.getReferenceFromWrapperSale());
 		 
 		 Mockito.verify(productsBusiness, Mockito.atLeastOnce()).getProduct(Mockito.anyString());
 		 
-		 assertEquals(MocksUtils.EMPTY_STRING, content);
+		 assertNotNull(obj);
+		 assertNotNull(obj.getError());
 	}
 	
 	/**
@@ -166,13 +167,12 @@ public class SalesFacadeImplTest {
 		Mockito.verify(productsBusiness, Mockito.atLeastOnce()).updateProduct(Mockito.anyString(), Mockito.any());
 		 
 		 var product = MocksUtils.getContentAsString(result, "registerSaleWithAlertsProductsTest");
-		 var obj = objectMapper.readValue(product, DtoWrapperSale.class);
+		 var obj = MocksUtils.parserToCommonWrapper(product,  MocksFactory.getReferenceFromWrapperSale());
 		 
 		 assertNotNull(product);
 		 assertNotNull(obj);
-		 assertNotNull(obj.getSale());
-		 assertNotNull(obj.getSale().getId());
-		 assertFalse(obj.getProductsWithAlerts().isEmpty());
+		 assertNotNull(obj.getData());
+		 assertFalse(obj.getData().getProductsWithAlerts().isEmpty());
 	}
 	
 	/**
@@ -190,15 +190,15 @@ public class SalesFacadeImplTest {
             .andReturn();
 		
 		var product = MocksUtils.getContentAsString(result, "retrieveAllSalesTest");
-		var obj = objectMapper.readValue(product, DtoSales.class);
+		var obj = MocksUtils.parserToCommonWrapper(product, MocksFactory.getReferenceFromDtoSales());
 		
 		Mockito.verify(business, Mockito.atLeastOnce()).getSales();
 		Mockito.verify(salesMapper, Mockito.atLeastOnce()).toOuter(Mockito.any());
 		
 		assertNotNull(product);
-		assertNotNull(obj);
-		assertNotNull(obj.getSales());
-		assertFalse(obj.getSales().isEmpty());
+		assertNotNull(obj.getData());
+		assertFalse(obj.getData().getSales().isEmpty());
+		assertNull(obj.getError());
 	}
 	
 	/**
@@ -216,15 +216,16 @@ public class SalesFacadeImplTest {
             .andReturn();
 		
 		var product = MocksUtils.getContentAsString(result, "retrieveOpenSalesTest");
-		var obj = objectMapper.readValue(product, DtoSales.class);
+		var obj = MocksUtils.parserToCommonWrapper(product,  MocksFactory.getReferenceFromDtoSales());
 		
 		Mockito.verify(business, Mockito.atLeastOnce()).getSalesOpen();
 		Mockito.verify(salesMapper, Mockito.atLeastOnce()).toOuter(Mockito.any());
 		
 		assertNotNull(product);
 		assertNotNull(obj);
-		assertNotNull(obj.getSales());
-		assertFalse(obj.getSales().isEmpty());
+		assertNotNull(obj.getData());
+		assertFalse(obj.getData().getSales().isEmpty());
+		assertNull(obj.getError());
 	}
 	
 	/**
@@ -242,15 +243,16 @@ public class SalesFacadeImplTest {
             .andReturn();
 		
 		var product = MocksUtils.getContentAsString(result, "retrieveCloseTest");
-		var obj = objectMapper.readValue(product, DtoSales.class);
+		var obj = MocksUtils.parserToCommonWrapper(product,  MocksFactory.getReferenceFromDtoSales());
 		
 		Mockito.verify(business, Mockito.atLeastOnce()).getSalesClose();
 		Mockito.verify(salesMapper, Mockito.atLeastOnce()).toOuter(Mockito.any());
 		
 		assertNotNull(product);
 		assertNotNull(obj);
-		assertNotNull(obj.getSales());
-		assertFalse(obj.getSales().isEmpty());
+		assertNotNull(obj.getData().getSales());
+		assertFalse(obj.getData().getSales().isEmpty());
+		assertNull(obj.getError());
 	}
 	
 	/**
@@ -271,11 +273,30 @@ public class SalesFacadeImplTest {
 		Mockito.verify(saleMapper, Mockito.atLeastOnce()).toOuter(Mockito.any());
 		
 		var sale = MocksUtils.getContentAsString(result, "retrieveSaleByIdTest");
-		var obj = objectMapper.readValue(sale, DtoSale.class);
+		var obj = objectMapper.readValue(sale, MocksFactory.getReferenceFromDtoSale());
 		
 		assertNotNull(sale);
 		assertNotNull(obj);
-		assertNotNull(obj.getId());
+		assertNotNull(obj.getData());
+		assertNotNull(obj.getData().getId());
+	}
+	
+	/**
+	 * intenta recuperar los ids cuando el campo no es informado
+	 * @throws Exception
+	 */
+	public void retrieveSaleByIdEmpty() throws Exception {
+		var result = mockMvc.perform(get("/api/v1/sales/ ")
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isNotFound())
+            .andReturn();
+		
+		var sale = MocksUtils.getContentAsString(result, "retrieveSaleByIdEmpty");
+		var obj = objectMapper.readValue(sale, MocksFactory.getReferenceFromDtoSale());
+		
+		assertNotNull(sale);
+		assertNotNull(obj);
+		assertNotNull(obj.getError());
 	}
 	
 	/**
@@ -308,7 +329,7 @@ public class SalesFacadeImplTest {
 				.andExpect(status().isCreated()).andReturn();
 		
 		var data = MocksUtils.getContentAsString(response, "registerSaleAndNewDebtor");
-		var obj = objectMapper.readValue(data, DtoWrapperSale.class);
+		var obj = objectMapper.readValue(data, MocksFactory.getReferenceFromWrapperSale());
 		
 		Mockito.verify(productsBusiness, Mockito.atLeastOnce()).getProduct(Mockito.anyString());
 		Mockito.verify(productsBusiness, Mockito.atLeastOnce()).updateProduct(Mockito.anyString(), Mockito.any());
@@ -320,9 +341,9 @@ public class SalesFacadeImplTest {
 		Mockito.verify(debtorMapper, Mockito.atLeastOnce()).toOuter(Mockito.any());
 		
 		assertNotNull(obj);
-		assertNotNull(obj.getDebtor());
-		assertNotNull(obj.getDebtor().getId());
-		assertFalse(obj.getDebtor().getPartial_pyments().isEmpty());
+		assertNotNull(obj.getData().getDebtor());
+		assertNotNull(obj.getData().getDebtor().getId());
+		assertFalse(obj.getData().getDebtor().getPartial_pyments().isEmpty());
 	}
 	
 	/**
@@ -357,7 +378,7 @@ public class SalesFacadeImplTest {
 				.andExpect(status().isCreated()).andReturn();
 		
 		var data = MocksUtils.getContentAsString(response, "registerSaleAndNewDebtor");
-		var obj = objectMapper.readValue(data, DtoWrapperSale.class);
+		var obj = objectMapper.readValue(data, MocksFactory.getReferenceFromWrapperSale());
 		
 		Mockito.verify(productsBusiness, Mockito.atLeastOnce()).getProduct(Mockito.anyString());
 		Mockito.verify(productsBusiness, Mockito.atLeastOnce()).updateProduct(Mockito.anyString(), Mockito.any());
@@ -369,10 +390,10 @@ public class SalesFacadeImplTest {
 		Mockito.verify(debtorMapper, Mockito.atLeastOnce()).toOuter(Mockito.any());
 		
 		assertNotNull(obj);
-		assertNotNull(obj.getDebtor());
-		assertNotNull(obj.getDebtor().getId());
-		assertFalse(obj.getDebtor().getPartial_pyments().isEmpty());
-		assertFalse(obj.getProductsWithAlerts().isEmpty());
+		assertNotNull(obj.getData().getDebtor());
+		assertNotNull(obj.getData().getDebtor().getId());
+		assertNotNull(obj.getData().getDebtor().getPartial_pyments().isEmpty());
+		assertNotNull(obj.getData().getProductsWithAlerts().isEmpty());
 	}
 	
 	/**
@@ -413,7 +434,7 @@ public class SalesFacadeImplTest {
 				.andExpect(status().isCreated()).andReturn();
 		
 		var data = MocksUtils.getContentAsString(response, "registerSaleAndOldDebtor");
-		var obj = objectMapper.readValue(data, DtoWrapperSale.class);
+		var obj = objectMapper.readValue(data, MocksFactory.getReferenceFromWrapperSale());
 		
 		Mockito.verify(productsBusiness, Mockito.atLeastOnce()).getProduct(Mockito.anyString());
 		Mockito.verify(productsBusiness, Mockito.atLeastOnce()).updateProduct(Mockito.anyString(), Mockito.any());
@@ -427,11 +448,11 @@ public class SalesFacadeImplTest {
 		assertNotNull(data);
 		assertNotNull(obj);
 		assertNotNull(obj);
-		assertNotNull(obj.getDebtor());
-		assertNotNull(obj.getDebtor().getId());
-		assertFalse(obj.getDebtor().getPartial_pyments().isEmpty());
-		assertTrue(obj.getProductsWithAlerts().isEmpty());
-		assertEquals(MocksUtils.BIG_DECIMAL_100, obj.getDebtor().getTotal());
+		assertNotNull(obj.getData().getDebtor());
+		assertNotNull(obj.getData().getDebtor().getId());
+		assertNotNull(obj.getData().getDebtor().getPartial_pyments().isEmpty());
+		assertNotNull(obj.getData().getProductsWithAlerts().isEmpty());
+		assertEquals(MocksUtils.BIG_DECIMAL_100, obj.getData().getDebtor().getTotal());
 	}
 	
 	/**
@@ -471,7 +492,7 @@ public class SalesFacadeImplTest {
 				.andExpect(status().isCreated()).andReturn();
 		
 		var data = MocksUtils.getContentAsString(response, "registerSaleAndOldDebtor");
-		var obj = objectMapper.readValue(data, DtoWrapperSale.class);
+		var obj = objectMapper.readValue(data, MocksFactory.getReferenceFromWrapperSale());
 		
 		Mockito.verify(productsBusiness, Mockito.atLeastOnce()).getProduct(Mockito.anyString());
 		Mockito.verify(productsBusiness, Mockito.atLeastOnce()).updateProduct(Mockito.anyString(), Mockito.any());
@@ -485,11 +506,11 @@ public class SalesFacadeImplTest {
 		assertNotNull(data);
 		assertNotNull(obj);
 		assertNotNull(obj);
-		assertNotNull(obj.getDebtor());
-		assertNotNull(obj.getDebtor().getId());
-		assertFalse(obj.getDebtor().getPartial_pyments().isEmpty());
-		assertTrue(obj.getProductsWithAlerts().isEmpty());
-		assertEquals(MocksUtils.BIG_DECIMAL_70, obj.getDebtor().getTotal());
+		assertNotNull(obj.getData().getDebtor());
+		assertNotNull(obj.getData().getDebtor().getId());
+		assertNotNull(obj.getData().getDebtor().getPartial_pyments().isEmpty());
+		assertNotNull(obj.getData().getProductsWithAlerts().isEmpty());
+		assertEquals(MocksUtils.BIG_DECIMAL_70, obj.getData().getDebtor().getTotal());
 	}
 	
 	/**
@@ -528,7 +549,7 @@ public class SalesFacadeImplTest {
 				.andExpect(status().isCreated()).andReturn();
 		
 		var data = MocksUtils.getContentAsString(response, "registerSaleAndOldDebtor");
-		var obj = objectMapper.readValue(data, DtoWrapperSale.class);
+		var obj = objectMapper.readValue(data, MocksFactory.getReferenceFromWrapperSale());
 		
 		Mockito.verify(productsBusiness, Mockito.atLeastOnce()).getProduct(Mockito.anyString());
 		Mockito.verify(productsBusiness, Mockito.atLeastOnce()).updateProduct(Mockito.anyString(), Mockito.any());
@@ -540,7 +561,7 @@ public class SalesFacadeImplTest {
 		
 		assertNotNull(data);
 		assertNotNull(obj);
-		assertNotNull(obj.getSale());
-		assertNull(obj.getDebtor().getId());
+		assertNotNull(obj.getData().getSale());
+		assertNull(obj.getData().getDebtor().getId());
 	}
 }

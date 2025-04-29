@@ -1,6 +1,5 @@
 package com.blo.sales.facade.impl;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -19,8 +18,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import com.blo.sales.business.ICashboxBusiness;
 import com.blo.sales.business.IDebtorsBusiness;
 import com.blo.sales.business.ISalesBusiness;
-import com.blo.sales.facade.dto.DtoDebtor;
-import com.blo.sales.facade.dto.DtoDebtors;
 import com.blo.sales.facade.mapper.DtoDebtorMapper;
 import com.blo.sales.facade.mapper.DtoDebtorsMapper;
 import com.blo.sales.facade.mapper.DtoPartialPymentMapper;
@@ -66,10 +63,11 @@ public class DebtorFacadeImplTest {
 		 Mockito.verify(debtorMapper, Mockito.atLeastOnce()).toOuter(Mockito.any());
 		 
 		 var resultAsString = MocksUtils.getContentAsString(result, "retrieveDebtorById");
-		 var objResult = MocksUtils.parserStringTo(resultAsString, DtoDebtor.class);
+		 var objResult = MocksUtils.parserToCommonWrapper(resultAsString, MocksFactory.getReferenceFromDtoDebtor());
 		 
 		 assertNotNull(objResult);
-		 assertNotNull(objResult.getId());
+		 assertNotNull(objResult.getData());
+		 assertNotNull(objResult.getData().getId());
 	}
 	
 	@Test
@@ -86,10 +84,11 @@ public class DebtorFacadeImplTest {
 		Mockito.verify(debtorsMapper, Mockito.atLeastOnce()).toOuter(Mockito.any());
 		
 		var resultAsString = MocksUtils.getContentAsString(result, "retrieveAllDebtorsTest");
-		var objResult = MocksUtils.parserStringTo(resultAsString, DtoDebtors.class);
+		var objResult = MocksUtils.parserToCommonWrapper(resultAsString, MocksFactory.getReferenceFromDtoDebtors());
 		
 		assertNotNull(objResult);
-		assertFalse(objResult.getDebtors().isEmpty());
+		assertNotNull(objResult.getData());
+		assertFalse(objResult.getData().getDebtors().isEmpty());
 	}
 	
 	/**
@@ -123,9 +122,10 @@ public class DebtorFacadeImplTest {
 		Mockito.verify(sales, Mockito.atLeastOnce()).updateSale(Mockito.anyString(), Mockito.any());
 		
 		var resultAsString = MocksUtils.getContentAsString(result, "addPayNoCashboxTest");
+		var objResult = MocksUtils.parserToCommonWrapper(resultAsString, MocksFactory.getReferenceFromDtoDebtor());
 		
-		assertEquals(MocksUtils.EMPTY_STRING, resultAsString);
-		
+		assertNotNull(objResult);
+		assertNotNull(objResult.getData());
 	}
 	
 	/**
@@ -159,9 +159,10 @@ public class DebtorFacadeImplTest {
 		Mockito.verify(sales, Mockito.atLeastOnce()).updateSale(Mockito.anyString(), Mockito.any());
 		
 		var resultAsString = MocksUtils.getContentAsString(result, "addPayNoCashboxTest");
+		var objResult = MocksUtils.parserToCommonWrapper(resultAsString, MocksFactory.getReferenceFromDtoDebtor());
 		
-		assertEquals(MocksUtils.EMPTY_STRING, resultAsString);
-		
+		assertNotNull(objResult);
+		assertNotNull(objResult.getData());
 	}
 	
 	/**
@@ -186,10 +187,11 @@ public class DebtorFacadeImplTest {
             .andReturn();
 		
 		var resultAsString = MocksUtils.getContentAsString(result, "addPayNoCashboxTest");
-		var objResult = MocksUtils.parserStringTo(resultAsString, DtoDebtor.class);
+		var objResult = MocksUtils.parserToCommonWrapper(resultAsString, MocksFactory.getReferenceFromDtoDebtor());
 		
 		assertNotNull(objResult);
-		assertNotNull(objResult.getId());
+		assertNotNull(objResult.getData());
+		assertNotNull(objResult.getData().getId());
 	}
 
 }

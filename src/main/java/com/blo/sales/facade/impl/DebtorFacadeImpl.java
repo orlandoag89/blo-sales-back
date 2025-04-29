@@ -20,6 +20,8 @@ import com.blo.sales.facade.IDebtorFacade;
 import com.blo.sales.facade.dto.DtoDebtor;
 import com.blo.sales.facade.dto.DtoDebtors;
 import com.blo.sales.facade.dto.DtoPartialPyment;
+import com.blo.sales.facade.dto.commons.DtoCommonWrapper;
+import com.blo.sales.facade.dto.commons.DtoError;
 import com.blo.sales.facade.enums.StatusCashboxEnum;
 import com.blo.sales.facade.mapper.DtoDebtorMapper;
 import com.blo.sales.facade.mapper.DtoDebtorsMapper;
@@ -49,33 +51,42 @@ public class DebtorFacadeImpl implements IDebtorFacade {
 	private DtoPartialPymentMapper partialPymentMapper;
 
 	@Override
-	public ResponseEntity<DtoDebtor> retrieveDebtorById(String id) {
+	public ResponseEntity<DtoCommonWrapper<DtoDebtor>> retrieveDebtorById(String id) {
+		var output = new DtoCommonWrapper<DtoDebtor>();
 		try {
 			var debtorFound = business.getDebtorById(id);
 			LOGGER.info(String.format("Debtor found %s", String.valueOf(debtorFound)));
 			var out = debtorMapper.toOuter(debtorFound);
-			return new ResponseEntity<DtoDebtor>(out, HttpStatus.OK);
+			output.setData(out);
+			return new ResponseEntity<>(output, HttpStatus.OK);
 		} catch (BloSalesBusinessException e) {
 			LOGGER.error(e.getExceptionMessage());
-			return new ResponseEntity<>(null, e.getExceptHttpStatus());
+			var error = new DtoError(e.getErrorCode(), e.getExceptionMessage());
+			output.setError(error);
+			return new ResponseEntity<>(output, e.getExceptHttpStatus());
 		}
 	}
 
 	@Override
-	public ResponseEntity<DtoDebtors> retrieveAllDebtors() {
+	public ResponseEntity<DtoCommonWrapper<DtoDebtors>> retrieveAllDebtors() {
+		var output = new DtoCommonWrapper<DtoDebtors>();
 		try {
 			var debtors = business.getDebtors();
 			LOGGER.info(String.format("Debtors %s", String.valueOf(debtors)));
 			var out = debtorsMapper.toOuter(debtors);
-			return new ResponseEntity<DtoDebtors>(out, HttpStatus.OK);
+			output.setData(out);
+			return new ResponseEntity<>(output, HttpStatus.OK);
 		} catch (BloSalesBusinessException e) {
 			LOGGER.error(e.getExceptionMessage());
-			return new ResponseEntity<>(null, e.getExceptHttpStatus());
+			var error = new DtoError(e.getErrorCode(), e.getMessage());
+			output.setError(error);
+			return new ResponseEntity<>(output, e.getExceptHttpStatus());
 		}
 	}
 
 	@Override
-	public ResponseEntity<DtoDebtor> addPay(String id, long time, DtoPartialPyment partialPyment) {
+	public ResponseEntity<DtoCommonWrapper<DtoDebtor>> addPay(String id, long time, DtoPartialPyment partialPyment) {
+		var output = new DtoCommonWrapper<DtoDebtor>();
 		try {
 			LOGGER.info(String.format("adding payment %s to %s", Encode.forJava(String.valueOf(partialPyment)), id));
 			var partialPymentMapped = partialPymentMapper.toInner(partialPyment);
@@ -115,15 +126,19 @@ public class DebtorFacadeImpl implements IDebtorFacade {
 				// elimina deudor
 				business.deleteDebtorById(id);
 				LOGGER.info(String.format("%s was deleted, account was payed", id));
-				return new ResponseEntity<>(null, HttpStatus.OK);
+				output.setData(new DtoDebtor());
+				return new ResponseEntity<>(output, HttpStatus.OK);
 			}
 			
 			var out = debtorMapper.toOuter(saved);
 			LOGGER.info(String.format("partial payment was added to %s", id));
-			return new ResponseEntity<DtoDebtor>(out, HttpStatus.OK);
+			output.setData(out);
+			return new ResponseEntity<>(output, HttpStatus.OK);
 		} catch (BloSalesBusinessException e) {
 			LOGGER.error(e.getExceptionMessage());
-			return new ResponseEntity<>(null, e.getExceptHttpStatus());
+			var error = new DtoError(e.getErrorCode(), e.getExceptionMessage());
+			output.setError(error);
+			return new ResponseEntity<>(output, e.getExceptHttpStatus());
 		}
 	}
 

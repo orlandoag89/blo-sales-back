@@ -13,20 +13,21 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.blo.sales.facade.dto.DtoSale;
 import com.blo.sales.facade.dto.DtoSales;
 import com.blo.sales.facade.dto.DtoWrapperSale;
+import com.blo.sales.facade.dto.commons.DtoCommonWrapper;
 import com.blo.sales.facade.enums.StatusSaleEnum;
 
 @RequestMapping("/api/v1/sales")
 public interface ISalesFacade {
 	
 	@PostMapping
-	ResponseEntity<DtoWrapperSale> registerSale(@RequestBody DtoSale sale);
+	ResponseEntity<DtoCommonWrapper<DtoWrapperSale>> registerSale(@RequestBody DtoSale sale);
 	
 	@GetMapping
-	ResponseEntity<DtoSales> retrieveSales(@RequestParam StatusSaleEnum status);
+	ResponseEntity<DtoCommonWrapper<DtoSales>> retrieveSales(@RequestParam StatusSaleEnum status);
 	
 	@GetMapping("/{id}")
-	ResponseEntity<DtoSale> retrieveSaleById(@PathVariable String id);
+	ResponseEntity<DtoCommonWrapper<DtoSale>> retrieveSaleById(@PathVariable String id);
 	
 	@PostMapping("/debtors")
-	ResponseEntity<DtoWrapperSale> registerSaleAndDebtor(@RequestBody DtoWrapperSale sale, @RequestParam BigDecimal partialPyment);
+	ResponseEntity<DtoCommonWrapper<DtoWrapperSale>> registerSaleAndDebtor(@RequestBody DtoWrapperSale sale, @RequestParam BigDecimal partialPyment);
 }

@@ -7,14 +7,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.blo.sales.facade.dto.DtoCashbox;
 import com.blo.sales.facade.dto.DtoCashboxes;
+import com.blo.sales.facade.dto.commons.DtoCommonWrapper;
 
 @RequestMapping("/api/v1/cashbox")
 public interface ICashboxFacade {
 	
 	@GetMapping
-	ResponseEntity<DtoCashboxes> getAllCashboxes();
+	ResponseEntity<DtoCommonWrapper<DtoCashboxes>> getAllCashboxes();
 	
 	@PostMapping
-	ResponseEntity<DtoCashbox> closeCashbox();
+	ResponseEntity<DtoCommonWrapper<DtoCashbox>> closeCashbox();
 
 }
