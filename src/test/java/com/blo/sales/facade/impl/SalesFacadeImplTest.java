@@ -285,6 +285,7 @@ public class SalesFacadeImplTest {
 	 * intenta recuperar los ids cuando el campo no es informado
 	 * @throws Exception
 	 */
+	@Test
 	public void retrieveSaleByIdEmpty() throws Exception {
 		var result = mockMvc.perform(get("/api/v1/sales/ ")
                 .contentType(MediaType.APPLICATION_JSON))
