@@ -286,13 +286,13 @@ public class SalesFacadeImplTest {
 	 * @throws Exception
 	 */
 	@Test
-	public void retrieveSaleByIdEmpty() throws Exception {
+	public void retrieveSaleByIdEmptyTest() throws Exception {
 		var result = mockMvc.perform(get("/api/v1/sales/ ")
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isNotFound())
             .andReturn();
 		
-		var sale = MocksUtils.getContentAsString(result, "retrieveSaleByIdEmpty");
+		var sale = MocksUtils.getContentAsString(result, "retrieveSaleByIdEmptyTest");
 		var obj = objectMapper.readValue(sale, MocksFactory.getReferenceFromDtoSale());
 		
 		assertNotNull(sale);
@@ -329,7 +329,7 @@ public class SalesFacadeImplTest {
 				.content(body))
 				.andExpect(status().isCreated()).andReturn();
 		
-		var data = MocksUtils.getContentAsString(response, "registerSaleAndNewDebtor");
+		var data = MocksUtils.getContentAsString(response, "registerSaleAndNewDebtorTest");
 		var obj = objectMapper.readValue(data, MocksFactory.getReferenceFromWrapperSale());
 		
 		Mockito.verify(productsBusiness, Mockito.atLeastOnce()).getProduct(Mockito.anyString());
@@ -370,15 +370,16 @@ public class SalesFacadeImplTest {
 		Mockito.when(debtorMapper.toInner(Mockito.any())).thenReturn(MocksFactory.createNewDtoIntDebtor());
 		Mockito.when(debtorBusiness.addDebtor(Mockito.any())).thenReturn(MocksFactory.createExistsDtoIntDebtor());
 		Mockito.when(debtorMapper.toOuter(Mockito.any())).thenReturn(MocksFactory.createExistsDtoDebtor());
+		Mockito.when(productMapper.toOuter(Mockito.any())).thenReturn(MocksFactory.createDtoProduct());
 		
 		var body = objectMapper.writeValueAsString(wrapperSale);
 		
-		var response = mockMvc.perform(post("/api/v1/sales/debtors?partialPyment=10")
+		var response = mockMvc.perform(post("/api/v1/sales/debtors?partialPyment=100")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(body))
 				.andExpect(status().isCreated()).andReturn();
 		
-		var data = MocksUtils.getContentAsString(response, "registerSaleAndNewDebtor");
+		var data = MocksUtils.getContentAsString(response, "registerSaleAndNewDebtorAlertProductsTest");
 		var obj = objectMapper.readValue(data, MocksFactory.getReferenceFromWrapperSale());
 		
 		Mockito.verify(productsBusiness, Mockito.atLeastOnce()).getProduct(Mockito.anyString());
@@ -389,12 +390,68 @@ public class SalesFacadeImplTest {
 		Mockito.verify(debtorMapper, Mockito.atLeastOnce()).toInner(Mockito.any());
 		Mockito.verify(debtorBusiness, Mockito.atLeastOnce()).addDebtor(Mockito.any());
 		Mockito.verify(debtorMapper, Mockito.atLeastOnce()).toOuter(Mockito.any());
+		Mockito.verify(productMapper, Mockito.atLeastOnce()).toOuter(Mockito.any());
 		
 		assertNotNull(obj);
 		assertNotNull(obj.getData().getDebtor());
 		assertNotNull(obj.getData().getDebtor().getId());
 		assertNotNull(obj.getData().getDebtor().getPartial_pyments().isEmpty());
 		assertNotNull(obj.getData().getProductsWithAlerts().isEmpty());
+	}
+	
+	/**
+	 * Error cuando la diferencia entre la cuenta total y pago parcial no es igual al pago parcial
+	 * @throws Exception
+	 */
+	@Test
+	public void registerSalePartialPymentoErrorTest() throws Exception {
+		var newDebtor = MocksFactory.createNewDtoDebtor();
+		var saleFromDebtor = MocksFactory.createDtoSaleNoCashboxAndOpen();
+		saleFromDebtor.getProducts().get(0).setQuantity_on_sale(MocksUtils.BIG_DECIMAL_3);
+		var wrapperSale = new DtoWrapperSale();
+		wrapperSale.setDebtor(newDebtor);
+		wrapperSale.setSale(saleFromDebtor);
+		
+		var body = objectMapper.writeValueAsString(wrapperSale);
+		
+		var response = mockMvc.perform(post("/api/v1/sales/debtors?partialPyment=10")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(body))
+				.andExpect(status().isBadRequest()).andReturn();
+		
+		var data = MocksUtils.getContentAsString(response, "registerSalePartialPymentoErrorTest");
+		var obj = objectMapper.readValue(data, MocksFactory.getReferenceFromWrapperSale());
+		
+		assertNotNull(obj);
+		assertNotNull(obj.getError());
+	}
+	
+	/**
+	 * Error cuando la diferencia entre la cuenta total y pago parcial no es igual al pago parcial
+	 * @throws Exception
+	 */
+	@Test
+	public void registerSalePartialPymentsNotEqualsoErrorTest() throws Exception {
+		var newDebtor = MocksFactory.createNewDtoDebtor();
+		var saleFromDebtor = MocksFactory.createDtoSaleNoCashboxAndOpen();
+		saleFromDebtor.getProducts().get(0).setQuantity_on_sale(MocksUtils.BIG_DECIMAL_3);
+		var wrapperSale = new DtoWrapperSale();
+		wrapperSale.setDebtor(newDebtor);
+		wrapperSale.setSale(saleFromDebtor);
+		wrapperSale.getSale().setTotal(MocksUtils.BIG_DECIMAL_100);
+		
+		var body = objectMapper.writeValueAsString(wrapperSale);
+		
+		var response = mockMvc.perform(post("/api/v1/sales/debtors?partialPyment=10")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(body))
+				.andExpect(status().isBadRequest()).andReturn();
+		
+		var data = MocksUtils.getContentAsString(response, "registerSalePartialPymentsNotEqualsoErrorTest");
+		var obj = objectMapper.readValue(data, MocksFactory.getReferenceFromWrapperSale());
+		
+		assertNotNull(obj);
+		assertNotNull(obj.getError());
 	}
 	
 	/**

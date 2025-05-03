@@ -79,6 +79,18 @@ public class SalesFacadeImpl implements ISalesFacade {
 	@Value("${exceptions.messages.field-is-empty}")
 	private String exceptionsMessagesFieldsIsEmpty;
 	
+	@Value("${excpetions.codes.no-equals}")
+	private String exceptionsCodesNoEquals;
+	
+	@Value("${excpetions.messages.no-equals}")
+	private String excpetionsMessagesNoEquals;
+	
+	@Value("${exceptions.codes.total-not-valid}")
+	private String exceptionsCodesTotalNotValid;
+	
+	@Value("${exceptions.messages.total-not-valid}")
+	private String exceptionsMessagesTotalNotValid;
+	
 	@Override
 	public ResponseEntity<DtoCommonWrapper<DtoWrapperSale>> registerSale(DtoSale sale) {
 		var output = new DtoCommonWrapper<DtoWrapperSale>();
@@ -155,28 +167,47 @@ public class SalesFacadeImpl implements ISalesFacade {
 	}
 
 	@Override
-	public ResponseEntity<DtoCommonWrapper<DtoWrapperSale>> registerSaleAndDebtor(DtoWrapperSale sale, BigDecimal partialPyment) {
+	public ResponseEntity<DtoCommonWrapper<DtoWrapperSale>> registerSaleAndDebtor(DtoWrapperSale saleData, BigDecimal partialPyment) {
 		var wrapperResponse = new DtoCommonWrapper<DtoWrapperSale>();
 		try {
-			LOGGER.info(String.format("saving debtor %s", Encode.forJava(String.valueOf(sale.getDebtor()))));
-			if (sale.getDebtor() == null) {
+			LOGGER.info(String.format("saving debtor %s", Encode.forJava(String.valueOf(saleData.getDebtor()))));
+			if (saleData.getDebtor() == null) {
 				LOGGER.error("debtor is required");
 				throw new BloSalesBusinessException(exceptionsCodesFieldsIsEmpty, exceptionsMessagesFieldsIsEmpty, HttpStatus.BAD_REQUEST);
 			}
 			
-			var isNewDebtor = StringUtils.isBlank(sale.getDebtor().getId());
+			// valida que los totales sean iguales
+			if (saleData.getSale().getTotal().compareTo(saleData.getDebtor().getTotal()) != 0) {
+				LOGGER.error("totals is not equals");
+				throw new BloSalesBusinessException(excpetionsMessagesNoEquals, exceptionsCodesNoEquals, HttpStatus.BAD_REQUEST);
+			}
+			
+			var totalFromProducts = saleData.getSale().getProducts().stream().
+				map(p -> p.getQuantity_on_sale().multiply(p.getTotal_price())).
+				reduce(BigDecimal.ZERO, BigDecimal::add);
+			LOGGER.info(String.format("total from products %s", totalFromProducts));
+			var totalSubPartial = totalFromProducts.subtract(partialPyment);
+			LOGGER.info(String.format("diff total - partial pyment = %s", totalSubPartial));
+			// si la diferencia entre la cuenta total y pago parcial no es igual al pago parcial envia un error
+			if (totalSubPartial.compareTo(saleData.getDebtor().getTotal()) != 0 && totalFromProducts.compareTo(saleData.getSale().getTotal()) != 0) {
+				LOGGER.error("ambos totales no son la diferencia entre total menos pago parcial");
+				throw new BloSalesBusinessException(exceptionsMessagesTotalNotValid, exceptionsCodesTotalNotValid, HttpStatus.BAD_REQUEST);
+			}
+			
+			
+			var isNewDebtor = StringUtils.isBlank(saleData.getDebtor().getId());
 			DtoIntDebtor debtorInDb = null;
 			if (!isNewDebtor) {
 				// valida existencia de deudor por id
-				debtorInDb = debtorBusiness.getDebtorById(sale.getDebtor().getId());
+				debtorInDb = debtorBusiness.getDebtorById(saleData.getDebtor().getId());
 				LOGGER.info(String.format("debtor found %s", String.valueOf(debtorInDb)));
 			}
 			
 			var output = new DtoWrapperSale();
 			
-			LOGGER.info(String.format("new data info %s", Encode.forJava(String.valueOf(sale))));
-			output.setProductsWithAlerts(getProductsAlertsAndUpdate(sale.getSale().getProducts()));
-			var saleInn = saleMapper.toInner(sale.getSale());
+			LOGGER.info(String.format("new data info %s", Encode.forJava(String.valueOf(saleData))));
+			output.setProductsWithAlerts(getProductsAlertsAndUpdate(saleData.getSale().getProducts()));
+			var saleInn = saleMapper.toInner(saleData.getSale());
 			var saleSaved = business.addSale(saleInn);
 			LOGGER.info(String.format("sale saved %s", String.valueOf(saleSaved)));
 			var saleSavedOut = saleMapper.toOuter(saleSaved);
@@ -184,11 +215,11 @@ public class SalesFacadeImpl implements ISalesFacade {
 			
 			// nuevo deudor flujo
 			if (isNewDebtor) {
-				LOGGER.info(String.format("New debor %s", Encode.forJava(String.valueOf(sale.getDebtor()))));
+				LOGGER.info(String.format("New debor %s", Encode.forJava(String.valueOf(saleData.getDebtor()))));
 				List<DtoSale> sales = new ArrayList<>();
 				sales.add(saleSavedOut);
-				sale.getDebtor().setSales(sales);
-				var debtorToSave = debtorMapper.toInner(sale.getDebtor());
+				saleData.getDebtor().setSales(sales);
+				var debtorToSave = debtorMapper.toInner(saleData.getDebtor());
 				var debtorSaved = debtorBusiness.addDebtor(debtorToSave);
 				var out = debtorMapper.toOuter(debtorSaved);
 				LOGGER.info(String.format("Debtor saved %s", String.valueOf(out)));
@@ -206,7 +237,7 @@ public class SalesFacadeImpl implements ISalesFacade {
 			// actualiza su lista compras
 			debtorInDb.getSales().add(saleSaved);
 			// actualiza montos
-			var newAmount = debtorInDb.getTotal().add(sale.getDebtor().getTotal());
+			var newAmount = debtorInDb.getTotal().add(saleData.getDebtor().getTotal());
 			LOGGER.info(String.format("new account from payment %s", newAmount));
 			// no dejó algún pago
 			if (partialPyment.compareTo(BigDecimal.ZERO) == 0) {
@@ -259,6 +290,7 @@ public class SalesFacadeImpl implements ISalesFacade {
 			
 			if (newQuantity.compareTo(new BigDecimal("2")) <= 0) {
 				var productOut = productMapper.toOuter(productFound);
+				productOut.setQuantity(newQuantity);
 				productsWithAlert.add(productOut);
 			}
 			

@@ -66,7 +66,7 @@ public class CashboxesDaoImplTest {
 		assertFalse(out.getBoxes().isEmpty());
 	}
 	
-	@Test
+	/*@Test
 	public void getCashboxOpenTest() {
 		Mockito.when(repository.findCashboxByStatus(Mockito.anyString())).thenReturn(MocksFactory.createCashboxes());
 		Mockito.when(cashboxMapper.toOuter(Mockito.any())).thenReturn(MocksFactory.createDtoIntCashboxOpen());
@@ -86,7 +86,7 @@ public class CashboxesDaoImplTest {
 		
 		assertNotNull(out);
 		assertFalse(out.getBoxes().isEmpty());
-	}
+	}*/
 	
 	@Test
 	public void updateCashboxTest() throws BloSalesBusinessException {

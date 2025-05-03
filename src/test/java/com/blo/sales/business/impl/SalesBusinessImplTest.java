@@ -36,7 +36,7 @@ public class SalesBusinessImplTest {
 	}
 	
 	@Test
-	public void getSales() throws BloSalesBusinessException {
+	public void getSalesTest() throws BloSalesBusinessException {
 		Mockito.when(dao.getSales()).thenReturn(MocksFactory.createDtoIntSales());
 		
 		var out = impl.getSales();
@@ -72,7 +72,7 @@ public class SalesBusinessImplTest {
 	}
 
 	@Test
-	public void getSaleById() throws BloSalesBusinessException {
+	public void getSaleByIdTest() throws BloSalesBusinessException {
 		Mockito.when(dao.getSaleById(Mockito.anyString())).thenReturn(MocksFactory.createDtoIntSaleNoCashbox());
 		
 		var out = impl.getSaleById(MocksFactory.getId());
@@ -93,7 +93,7 @@ public class SalesBusinessImplTest {
 	}
 	
 	@Test
-	public void getSalesNotCashbox() throws BloSalesBusinessException {
+	public void getSalesNotCashboxTest() throws BloSalesBusinessException {
 		Mockito.when(dao.getSalesNotCashbox()).thenReturn(MocksFactory.createDtoIntSales());
 		
 		var out = impl.getSalesNotCashbox();

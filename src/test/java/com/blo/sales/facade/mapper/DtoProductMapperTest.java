@@ -29,7 +29,7 @@ public class DtoProductMapperTest {
 	}
 
 	@Test
-	public void toInnerInputNull() {
+	public void toInnerInputNullTest() {
 		var out = mapper.toInner(null);
 		assertNull(out);
 	}
@@ -48,7 +48,7 @@ public class DtoProductMapperTest {
 	}
 	
 	@Test
-	public void toOuterInputNull() {
+	public void toOuterInputNullTest() {
 		var out = mapper.toOuter(null);
 		assertNull(out);
 	}

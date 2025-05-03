@@ -231,7 +231,7 @@ public class ProductsFacadeImplTest {
 	 * @throws Exception
 	 */
 	@Test
-	public void updateProductById() throws Exception {
+	public void updateProductByIdTest() throws Exception {
 		var productToUpdate = MocksFactory.createDtoProduct();
 		
 		when(productMapper.toInner(any())).thenReturn(MocksFactory.createDtoIntProduct());
@@ -246,7 +246,7 @@ public class ProductsFacadeImplTest {
             .andExpect(status().isOk())
             .andReturn();
 		
-		var registerSale = MocksUtils.getContentAsString(result, "updateProductById");
+		var registerSale = MocksUtils.getContentAsString(result, "updateProductByIdTest");
 		var objtSale = MocksUtils.parserToCommonWrapper(registerSale,  MocksFactory.getReferenceFromDtoProduct());
 		
 		verify(productMapper, atLeastOnce()).toInner(Mockito.any());
@@ -286,7 +286,7 @@ public class ProductsFacadeImplTest {
 	 * @throws Exception
 	 */
 	@Test
-	public void updateProductByIdUndefined() throws Exception {
+	public void updateProductByIdUndefinedTest() throws Exception {
 		var productToUpdate = MocksFactory.createDtoProduct();
 		
 		var productToUpdateAsString = objectMapper.writeValueAsString(productToUpdate);
@@ -297,7 +297,7 @@ public class ProductsFacadeImplTest {
             .andExpect(status().isBadRequest())
             .andReturn();
 		
-		var registerSale = MocksUtils.getContentAsString(result, "updateProductByIdUndefined");
+		var registerSale = MocksUtils.getContentAsString(result, "updateProductByIdUndefinedTest");
 		var objtSale = MocksUtils.parserToCommonWrapper(registerSale,  MocksFactory.getReferenceFromDtoProducts());
 		
 		assertNotNull(result);

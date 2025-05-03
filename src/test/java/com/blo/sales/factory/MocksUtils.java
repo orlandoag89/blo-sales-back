@@ -35,11 +35,6 @@ public final class MocksUtils {
 		System.out.println("[" + fromMethod + "] " + contentString);
 		return contentString;
 	}
-
-	public static <T> T parserStringTo(String content, Class<T> type) throws Exception {
-		System.out.println(content);
-		return objectMapper.readValue(content, type); 
-	}
 	
 	public static <T> DtoCommonWrapper<T> parserToCommonWrapper(String json, TypeReference<DtoCommonWrapper<T>> typeRef)
 	        throws JsonProcessingException {

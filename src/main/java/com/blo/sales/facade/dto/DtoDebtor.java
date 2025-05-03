@@ -15,7 +15,7 @@ public @Data class DtoDebtor implements Serializable {
 
 	private String name;
 
-	private BigDecimal total; // deuda que tiene
+	private BigDecimal total; // deuda total que tiene
 
 	private long open_date;
 
