@@ -91,6 +91,7 @@ public class DebtorFacadeImpl implements IDebtorFacade {
 			LOGGER.info(String.format("adding payment %s to %s", Encode.forJava(String.valueOf(partialPyment)), id));
 			var partialPymentMapped = partialPymentMapper.toInner(partialPyment);
 			var saved = business.addPay(id, partialPymentMapped, time);
+			LOGGER.info(String.format("datos de deudor actualizados %s", String.valueOf(saved)));
 			
 			var currentCashbox = cashboxes.getCashboxOpen();
 			// valida si hay un nuevo cashbox
@@ -103,7 +104,8 @@ public class DebtorFacadeImpl implements IDebtorFacade {
 				dataCashbox.setStatus(StatusCashboxIntEnum.valueOf(StatusCashboxEnum.OPEN.name()));
 				currentCashbox = cashboxes.saveCashbox(dataCashbox);
 				LOGGER.info(String.format("cashbox saved %s", String.valueOf(currentCashbox)));
-			} else {
+			} 
+			else {
 				// agrega dinero a la caja actual
 				LOGGER.info("cashbox exists");
 				var money = currentCashbox.getMoney().add(partialPymentMapped.getPartial_pyment());
@@ -123,6 +125,7 @@ public class DebtorFacadeImpl implements IDebtorFacade {
 					var saleUpdated = sales.updateSale(sale.getId(), saleFound);
 					LOGGER.info(String.format("sale updated %s", String.valueOf(saleUpdated)));
 				}
+				// 
 				// elimina deudor
 				business.deleteDebtorById(id);
 				LOGGER.info(String.format("%s was deleted, account was payed", id));

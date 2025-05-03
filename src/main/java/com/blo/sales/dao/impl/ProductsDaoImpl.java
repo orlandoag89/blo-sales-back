@@ -33,11 +33,11 @@ public class ProductsDaoImpl implements IProductsDao {
 	@Autowired
 	private ProductsMapper productsMapper;
 	
-	@Value("${exceptions.codes.not-found}")
-	private String notFoundCode;
+	@Value("${exceptions.codes.product-not-found}")
+	private String productNotFoundCode;
 	
-	@Value("${exceptions.messages.not-found}")
-	private String notFoundMessage;
+	@Value("${exceptions.messages.product-not-found}")
+	private String productNotFoundMessage;
 
 	@Override
 	public DtoIntProducts addProducts(DtoIntProducts products) throws BloSalesBusinessException {
@@ -78,7 +78,7 @@ public class ProductsDaoImpl implements IProductsDao {
 		var productFound = repository.findById(productId);
 		if (!productFound.isPresent()) {
 			LOGGER.error(String.format("id %s not found", productId));
-			throw new BloSalesBusinessException(notFoundMessage, notFoundCode, HttpStatus.NOT_FOUND);
+			throw new BloSalesBusinessException(productNotFoundMessage, productNotFoundCode, HttpStatus.NOT_FOUND);
 		}
 		var product = productMapper.toOuter(productFound.get());
 		LOGGER.info(String.format("product found: %s", String.valueOf(product)));

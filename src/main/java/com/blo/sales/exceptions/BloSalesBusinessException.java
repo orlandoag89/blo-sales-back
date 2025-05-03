@@ -14,13 +14,6 @@ public @Getter class BloSalesBusinessException extends Exception {
 	
 	private String errorCode;
 	
-	public BloSalesBusinessException(String errorMessage, String errorCode) {
-		super("[" + errorCode + "] " + errorMessage);
-		exceptionMessage = errorMessage;
-		exceptionHttpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
-		this.errorCode = errorCode;
-	}
-
 	public BloSalesBusinessException(String errorMessage, String errorCode, HttpStatus httpStatus) {
 		super("[" + errorCode + "] " + errorMessage);
 		exceptionMessage = errorMessage;

@@ -69,7 +69,7 @@ public class CashboxFacadeImplTest {
 	 * @throws Exception
 	 */
 	@Test
-	public void closeCashboxNotCashboxOpen() throws Exception {
+	public void closeCashboxNotCashboxOpenTest() throws Exception {
 		Mockito.when(business.getCashboxOpen()).thenReturn(null);
 		Mockito.when(sales.getSalesNotCashbox()).thenReturn(MocksFactory.createDtoIntSales());
 		Mockito.when(sales.updateSale(Mockito.anyString(), Mockito.any())).thenReturn(MocksFactory.createDtoIntSaleOnCashbox());
@@ -89,7 +89,7 @@ public class CashboxFacadeImplTest {
 		Mockito.verify(business, Mockito.atLeastOnce()).saveCashbox(Mockito.any());
 		Mockito.verify(cashboxMapper, Mockito.atLeastOnce()).toOuter(Mockito.any());
 		
-		var resultAsString = MocksUtils.getContentAsString(result, "closeCashboxNotCashboxOpen");
+		var resultAsString = MocksUtils.getContentAsString(result, "closeCashboxNotCashboxOpenTest");
 		var obj = MocksUtils.parserToCommonWrapper(resultAsString, MocksFactory.getReferenceFromDtoCashbox());
 		
 		assertNotNull(obj);
@@ -101,7 +101,7 @@ public class CashboxFacadeImplTest {
 	 * @throws Exception
 	 */
 	@Test
-	public void closeCashboxCashboxOpen() throws Exception {
+	public void closeCashboxCashboxOpenTest() throws Exception {
 		Mockito.when(business.getCashboxOpen()).thenReturn(MocksFactory.createDtoIntCashboxOpen());
 		Mockito.when(cashboxMapper.toOuter(Mockito.any())).thenReturn(MocksFactory.createDtoCashboxOpen());
 		Mockito.when(sales.getSalesNotCashbox()).thenReturn(MocksFactory.createDtoIntSales());
@@ -123,7 +123,7 @@ public class CashboxFacadeImplTest {
 		Mockito.verify(business, Mockito.atLeastOnce()).updateCashbox(Mockito.anyString(), Mockito.any());
 		Mockito.verify(cashboxMapper, Mockito.atLeastOnce()).toOuter(Mockito.any());
 		
-		var resultAsString = MocksUtils.getContentAsString(result, "closeCashboxNotCashboxOpen");
+		var resultAsString = MocksUtils.getContentAsString(result, "closeCashboxNotCashboxOpenTest");
 		var obj = MocksUtils.parserToCommonWrapper(resultAsString, MocksFactory.getReferenceFromDtoCashbox());
 		
 		assertNotNull(obj);

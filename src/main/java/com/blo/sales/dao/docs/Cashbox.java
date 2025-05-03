@@ -9,7 +9,7 @@ import com.blo.sales.dao.enums.DocStatusCashboxEnum;
 
 import lombok.Data;
 
-@Document(collation = "cashboxes")
+@Document(collection = "cashboxes")
 public @Data class Cashbox implements Serializable {
 	
 	private static final long serialVersionUID = -7291701276850331402L;

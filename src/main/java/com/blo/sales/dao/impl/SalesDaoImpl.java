@@ -31,11 +31,11 @@ public class SalesDaoImpl implements ISalesDao {
 	@Autowired
 	private SaleMapper saleMapper;
 
-	@Value("${exceptions.codes.not-found}")
-	private String notFoundCode;
+	@Value("${exceptions.codes.sale-not-found}")
+	private String saleNotFoundCode;
 	
-	@Value("${exceptions.messages.not-found}")
-	private String notFoundMessage;
+	@Value("${exceptions.messages.sale-not-found}")
+	private String saleNotFoundMessage;
 
 	@Override
 	public DtoIntSale addSale(DtoIntSale sale) throws BloSalesBusinessException {
@@ -45,6 +45,7 @@ public class SalesDaoImpl implements ISalesDao {
 		var out = saleMapper.toOuter(saved);
 		LOGGER.info(String.format("Sale saved %s", String.valueOf(out)));
 		return out;
+		
 	}
 
 	@Override
@@ -84,7 +85,7 @@ public class SalesDaoImpl implements ISalesDao {
 		var saleFound = repository.findById(id);
 		if (!saleFound.isPresent()) {
 			LOGGER.error(String.format("sale id %s not found", id));
-			throw new BloSalesBusinessException(notFoundMessage, notFoundCode, HttpStatus.NOT_FOUND);
+			throw new BloSalesBusinessException(saleNotFoundMessage, saleNotFoundCode, HttpStatus.NOT_FOUND);
 		}
 		
 		var sale = saleMapper.toOuter(saleFound.get());;

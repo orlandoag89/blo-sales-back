@@ -62,12 +62,11 @@ public class CashboxesDaoImpl implements ICashboxesDao {
 	public DtoIntCashbox getCashboxOpen() {
 		LOGGER.info("retrieving open cashbox");
 		var openCashbox = repository.findCashboxByStatus(DocStatusCashboxEnum.OPEN.name());
-		LOGGER.info(String.format("open cashboxes %s", String.valueOf(openCashbox)));
-		var cashbox = openCashbox.getBoxes().stream().findFirst().orElse(null);
+		LOGGER.info(String.format("open cashbox %s", String.valueOf(openCashbox)));
+		var cashbox = openCashbox.stream().findFirst().orElse(null);
 		LOGGER.info(String.format("cashbox data %s", String.valueOf(cashbox)));
 		var outCashbox = cashboxMapper.toOuter(cashbox);
 		return outCashbox;
-		
 	}
 
 	@Override
@@ -75,12 +74,9 @@ public class CashboxesDaoImpl implements ICashboxesDao {
 		LOGGER.info("retrieving close cashboxes");
 		var closeCashboxes = repository.findCashboxByStatus(DocStatusCashboxEnum.CLOSE.name());
 		LOGGER.info(String.format("close cashboxes %s", String.valueOf(closeCashboxes)));
-		var cashbox = closeCashboxes.getBoxes();
-		LOGGER.info(String.format("close cashbox data %s", String.valueOf(cashbox)));
-		
 		var cashboxes = new Cashboxes();
-		cashboxes.setBoxes(cashbox);
-		
+		cashboxes.setBoxes(closeCashboxes);
+		LOGGER.info(String.format("close cashbox data %s", String.valueOf(cashboxes)));
 		var out = cashboxesMapper.toOuter(cashboxes);
 		return out;
 	}

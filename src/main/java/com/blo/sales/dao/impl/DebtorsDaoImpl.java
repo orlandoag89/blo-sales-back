@@ -30,11 +30,11 @@ public class DebtorsDaoImpl implements IDebtorsDao {
 	@Autowired
 	private DebtorsMapper debtorsMapper;
 	
-	@Value("${exceptions.codes.not-found}")
-	private String notFoundCode;
+	@Value("${exceptions.codes.debtor-not-found}")
+	private String debtorNotFoundCode;
 	
-	@Value("${exceptions.messages.not-found}")
-	private String notFoundMessage;
+	@Value("${exceptions.messages.debtor-not-found}")
+	private String debtorNotFoundMessage;
 
 	@Override
 	public DtoIntDebtor addDebtor(DtoIntDebtor debtor) throws BloSalesBusinessException {
@@ -64,7 +64,7 @@ public class DebtorsDaoImpl implements IDebtorsDao {
 		var debtorFound = repository.findById(id);
 		if (!debtorFound.isPresent()) {
 			LOGGER.error(String.format("id %s not found", id));
-			throw new BloSalesBusinessException(notFoundMessage, notFoundCode, HttpStatus.NOT_FOUND);
+			throw new BloSalesBusinessException(debtorNotFoundMessage, debtorNotFoundCode, HttpStatus.NOT_FOUND);
 		}
 		var debtor = debtorFound.get();
 		var out = mapper.toOuter(debtor);
