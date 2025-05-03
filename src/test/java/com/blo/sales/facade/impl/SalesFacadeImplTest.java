@@ -9,6 +9,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.math.BigDecimal;
+
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -103,6 +105,48 @@ public class SalesFacadeImplTest {
 		assertNotNull(objtSale.getData().getSale());
 		assertNotNull(objtSale.getData().getSale().getId());
 		assertNull(objtSale.getData().getDebtor());
+		assertNull(objtSale.getError());
+		assertTrue(objtSale.getData().getProductsWithAlerts().isEmpty());
+	}
+	
+	@Test
+	public void registerInvalidSaleTest() throws Exception {
+		var sale = MocksFactory.createDtoNewSaleNoCashbox();
+		sale.setTotal(new BigDecimal("-1"));
+		var saleSaved = MocksFactory.createDtoIntSaleNoCashbox();
+		saleSaved.setTotal(new BigDecimal("-1"));
+		var saleNoCashbox = MocksFactory.createDtoSaleNoCashbox();
+		saleNoCashbox.setTotal(BigDecimal.ZERO);
+		var saleAsString = objectMapper.writeValueAsString(sale);
+		
+		Mockito.when(saleMapper.toInner(Mockito.any())).thenReturn(saleSaved);
+		Mockito.when(business.addSale(Mockito.any())).thenReturn(saleSaved);
+		Mockito.when(saleMapper.toOuter(Mockito.any())).thenReturn(saleNoCashbox);
+		Mockito.when(productsBusiness.getProduct(Mockito.anyString())).thenReturn(MocksFactory.createDtoIntProduct());
+		Mockito.when(productsBusiness.updateProduct(Mockito.anyString(), Mockito.any())).thenReturn(MocksFactory.createDtoIntProduct());
+		
+		 var result = mockMvc.perform(post("/api/v1/sales")
+				 	.header(MocksUtils.X_TRACKING_ID, "registerInvalidSaleTest")
+	                .contentType(MediaType.APPLICATION_JSON)
+	                .content(saleAsString))
+	            .andExpect(status().isCreated())
+	            .andReturn();
+		
+		var registerSale = MocksUtils.getContentAsString(result, "registerInvalidSaleTest");
+		var objtSale = MocksUtils.parserToCommonWrapper(registerSale,  MocksFactory.getReferenceFromWrapperSale());
+		
+		Mockito.verify(saleMapper, Mockito.atLeastOnce()).toInner(Mockito.any());
+		Mockito.verify(business, Mockito.atLeastOnce()).addSale(Mockito.any());
+		Mockito.verify(saleMapper, Mockito.atLeastOnce()).toOuter(Mockito.any());
+		Mockito.verify(productsBusiness, Mockito.atLeastOnce()).getProduct(Mockito.anyString());
+		Mockito.verify(productsBusiness, Mockito.atLeastOnce()).updateProduct(Mockito.anyString(), Mockito.any());
+		
+		assertNotNull(result);
+		assertNotNull(registerSale);
+		assertNotNull(objtSale.getData().getSale());
+		assertNotNull(objtSale.getData().getSale().getId());
+		assertNull(objtSale.getData().getDebtor());
+		assertEquals(BigDecimal.ZERO, objtSale.getData().getSale().getTotal());
 		assertNull(objtSale.getError());
 		assertTrue(objtSale.getData().getProductsWithAlerts().isEmpty());
 	}

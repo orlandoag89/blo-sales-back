@@ -100,8 +100,13 @@ public class SalesFacadeImpl implements ISalesFacade {
 			var productsAlert = getProductsAlertsAndUpdate(sale.getProducts());
 			
 			var saleIn = saleMapper.toInner(sale);
-			var saleSaved = business.addSale(saleIn);
 			
+			//valida si es una compra interna que no debe ser registrada en la caja de dinero
+			if (saleIn.getTotal().compareTo(new BigDecimal("-1")) == 0) {
+				saleIn.setTotal(BigDecimal.ZERO);
+			}
+			
+			var saleSaved = business.addSale(saleIn);
 			LOGGER.info(String.format("sale registered %s", String.valueOf(saleSaved)));
 			out.setSale(saleMapper.toOuter(saleSaved));
 			out.setProductsWithAlerts(productsAlert);
