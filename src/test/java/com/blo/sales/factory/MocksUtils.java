@@ -14,6 +14,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public final class MocksUtils {
 	
 	public static final String EMPTY_STRING = "";
+	public static final String X_TRACKING_ID = "X-Tracking-Id";
 	public static final BigDecimal BIG_DECIMAL_00 = new BigDecimal("0");
 	public static final BigDecimal BIG_DECIMAL_10 = new BigDecimal("10");
 	public static final BigDecimal BIG_DECIMAL_100 = new BigDecimal("100");

@@ -55,6 +55,7 @@ public class DebtorFacadeImplTest {
 		Mockito.when(debtorMapper.toOuter(Mockito.any())).thenReturn(MocksFactory.createExistsDtoDebtor());
 		
 		 var result = mockMvc.perform(get("/api/v1/debtors/1a2b3c")
+				 .header(MocksUtils.X_TRACKING_ID, "retrieveDebtorByIdTest")
 	                .contentType(MediaType.APPLICATION_JSON))
 	            .andExpect(status().isOk())
 	            .andReturn();
@@ -76,6 +77,7 @@ public class DebtorFacadeImplTest {
 		Mockito.when(debtorsMapper.toOuter(Mockito.any())).thenReturn(MocksFactory.createDtoDebtors());
 		
 		var result = mockMvc.perform(get("/api/v1/debtors")
+				.header(MocksUtils.X_TRACKING_ID, "retrieveAllDebtorsTest")
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andReturn();
@@ -109,6 +111,7 @@ public class DebtorFacadeImplTest {
 		Mockito.doNothing().when(business).deleteDebtorById(Mockito.anyString());
 		
 		var result = mockMvc.perform(put("/api/v1/debtors/1a2b3c4d?time=" + MocksFactory.getNowDate())
+				.header(MocksUtils.X_TRACKING_ID, "addAllPayNoCashboxTest")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(MocksUtils.parserToString(MocksFactory.createDtoPartialPyment())))
             .andExpect(status().isOk())
@@ -146,6 +149,7 @@ public class DebtorFacadeImplTest {
 		Mockito.doNothing().when(business).deleteDebtorById(Mockito.anyString());
 		
 		var result = mockMvc.perform(put("/api/v1/debtors/1a2b3c4d?time=" + MocksFactory.getNowDate())
+				.header(MocksUtils.X_TRACKING_ID, "addAllPayCashboxTest")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(MocksUtils.parserToString(MocksFactory.createDtoPartialPyment())))
             .andExpect(status().isOk())
@@ -181,6 +185,7 @@ public class DebtorFacadeImplTest {
 		Mockito.when(debtorMapper.toOuter(Mockito.any())).thenReturn(MocksFactory.createExistsDtoDebtor());
 		
 		var result = mockMvc.perform(put("/api/v1/debtors/1a2b3c4d?time=" + MocksFactory.getNowDate())
+				.header(MocksUtils.X_TRACKING_ID, "addPartialPayNoCashboxTest")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(MocksUtils.parserToString(MocksFactory.createDtoPartialPyment())))
             .andExpect(status().isOk())

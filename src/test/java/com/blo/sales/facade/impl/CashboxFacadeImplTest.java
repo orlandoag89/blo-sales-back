@@ -49,6 +49,7 @@ public class CashboxFacadeImplTest {
 		Mockito.when(cashboxesMapper.toOuter(Mockito.any())).thenReturn(MocksFactory.createDtoCashboxes());
 		
 		var result = mockMvc.perform(get("/api/v1/cashbox")
+				.header(MocksUtils.X_TRACKING_ID, "getAllCashboxesTest")
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andReturn();
@@ -78,6 +79,7 @@ public class CashboxFacadeImplTest {
 		Mockito.when(cashboxMapper.toOuter(Mockito.any())).thenReturn(MocksFactory.createDtoCashboxClose());
 		
 		var result = mockMvc.perform(post("/api/v1/cashbox")
+				.header(MocksUtils.X_TRACKING_ID, "closeCashboxNotCashboxOpenTest")
                 .contentType(MediaType.APPLICATION_JSON).content("{}"))
             .andExpect(status().isOk())
             .andReturn();
@@ -111,6 +113,7 @@ public class CashboxFacadeImplTest {
 		Mockito.when(cashboxMapper.toOuter(Mockito.any())).thenReturn(MocksFactory.createDtoCashboxClose());
 		
 		var result = mockMvc.perform(post("/api/v1/cashbox")
+				.header(MocksUtils.X_TRACKING_ID, "closeCashboxNotCashboxOpenTest")
                 .contentType(MediaType.APPLICATION_JSON).content("{}"))
             .andExpect(status().isOk())
             .andReturn();

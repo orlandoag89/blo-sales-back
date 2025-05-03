@@ -83,6 +83,7 @@ public class SalesFacadeImplTest {
 		Mockito.when(productsBusiness.updateProduct(Mockito.anyString(), Mockito.any())).thenReturn(MocksFactory.createDtoIntProduct());
 		
 		 var result = mockMvc.perform(post("/api/v1/sales")
+				 	.header(MocksUtils.X_TRACKING_ID, "registerSaleTest")
 	                .contentType(MediaType.APPLICATION_JSON)
 	                .content(saleAsString))
 	            .andExpect(status().isCreated())
@@ -120,6 +121,7 @@ public class SalesFacadeImplTest {
 		var saleAsString = objectMapper.writeValueAsString(sale);
 		
 		 var result = mockMvc.perform(post("/api/v1/sales")
+				 	.header(MocksUtils.X_TRACKING_ID, "registerSaleWithInsuficientProductsTest")
 	                .contentType(MediaType.APPLICATION_JSON)
 	                .content(saleAsString))
 	            .andExpect(status().isUnprocessableEntity())
@@ -154,6 +156,7 @@ public class SalesFacadeImplTest {
 		var saleAsString = objectMapper.writeValueAsString(sale);
 		
 		 var result = mockMvc.perform(post("/api/v1/sales")
+				 	.header(MocksUtils.X_TRACKING_ID, "registerSaleWithAlertsProductsTest")
 	                .contentType(MediaType.APPLICATION_JSON)
 	                .content(saleAsString))
 	            .andExpect(status().isCreated())
@@ -185,6 +188,7 @@ public class SalesFacadeImplTest {
 		Mockito.when(salesMapper.toOuter(Mockito.any())).thenReturn(MocksFactory.createDtoSales());
 		
 		var result = mockMvc.perform(get("/api/v1/sales?status=ALL")
+				.header(MocksUtils.X_TRACKING_ID, "retrieveAllSalesTest")
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andReturn();
@@ -211,6 +215,7 @@ public class SalesFacadeImplTest {
 		Mockito.when(salesMapper.toOuter(Mockito.any())).thenReturn(MocksFactory.createOpenDtoSales());
 		
 		var result = mockMvc.perform(get("/api/v1/sales?status=OPEN")
+				.header(MocksUtils.X_TRACKING_ID, "retrieveOpenSalesTest")
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andReturn();
@@ -238,6 +243,7 @@ public class SalesFacadeImplTest {
 		Mockito.when(salesMapper.toOuter(Mockito.any())).thenReturn(MocksFactory.createOpenDtoSales());
 		
 		var result = mockMvc.perform(get("/api/v1/sales?status=CLOSE")
+				.header(MocksUtils.X_TRACKING_ID, "retrieveCloseTest")
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andReturn();
@@ -265,6 +271,7 @@ public class SalesFacadeImplTest {
 		Mockito.when(saleMapper.toOuter(Mockito.any())).thenReturn(MocksFactory.createDtoSaleOnCashbox());
 		
 		var result = mockMvc.perform(get("/api/v1/sales/1a2b3c4d5e")
+				.header(MocksUtils.X_TRACKING_ID, "retrieveSaleByIdTest")
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andReturn();
@@ -288,6 +295,7 @@ public class SalesFacadeImplTest {
 	@Test
 	public void retrieveSaleByIdEmptyTest() throws Exception {
 		var result = mockMvc.perform(get("/api/v1/sales/ ")
+				.header(MocksUtils.X_TRACKING_ID, "retrieveSaleByIdEmptyTest")
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isNotFound())
             .andReturn();
@@ -325,6 +333,7 @@ public class SalesFacadeImplTest {
 		var body = objectMapper.writeValueAsString(wrapperSale);
 		
 		var response = mockMvc.perform(post("/api/v1/sales/debtors?partialPyment=10")
+				.header(MocksUtils.X_TRACKING_ID, "registerSaleAndNewDebtorTest")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(body))
 				.andExpect(status().isCreated()).andReturn();
@@ -375,6 +384,7 @@ public class SalesFacadeImplTest {
 		var body = objectMapper.writeValueAsString(wrapperSale);
 		
 		var response = mockMvc.perform(post("/api/v1/sales/debtors?partialPyment=100")
+				.header(MocksUtils.X_TRACKING_ID, "registerSaleAndNewDebtorAlertProductsTest")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(body))
 				.andExpect(status().isCreated()).andReturn();
@@ -415,6 +425,7 @@ public class SalesFacadeImplTest {
 		var body = objectMapper.writeValueAsString(wrapperSale);
 		
 		var response = mockMvc.perform(post("/api/v1/sales/debtors?partialPyment=10")
+				.header(MocksUtils.X_TRACKING_ID, "registerSalePartialPymentoErrorTest")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(body))
 				.andExpect(status().isBadRequest()).andReturn();
@@ -443,6 +454,7 @@ public class SalesFacadeImplTest {
 		var body = objectMapper.writeValueAsString(wrapperSale);
 		
 		var response = mockMvc.perform(post("/api/v1/sales/debtors?partialPyment=10")
+				.header(MocksUtils.X_TRACKING_ID, "registerSalePartialPymentsNotEqualsoErrorTest")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(body))
 				.andExpect(status().isBadRequest()).andReturn();
@@ -461,7 +473,7 @@ public class SalesFacadeImplTest {
 	 * @throws Exception
 	 */
 	@Test
-	public void registerSaleAndOldDebtor() throws Exception {
+	public void registerSaleAndOldDebtorTest() throws Exception {
 		var debtor = MocksFactory.createExistsDtoDebtor();
 		var sale = MocksFactory.createDtoSaleNoCashboxAndOpen();
 		var wrapper = new DtoWrapperSale();
@@ -487,11 +499,12 @@ public class SalesFacadeImplTest {
 		Mockito.when(debtorMapper.toOuter(Mockito.any())).thenReturn(debtorUpdated2);
 		
 		var response = mockMvc.perform(post("/api/v1/sales/debtors?partialPyment=0")
+				.header(MocksUtils.X_TRACKING_ID, "registerSaleAndOldDebtorTest")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(body))
 				.andExpect(status().isCreated()).andReturn();
 		
-		var data = MocksUtils.getContentAsString(response, "registerSaleAndOldDebtor");
+		var data = MocksUtils.getContentAsString(response, "registerSaleAndOldDebtorTest");
 		var obj = objectMapper.readValue(data, MocksFactory.getReferenceFromWrapperSale());
 		
 		Mockito.verify(productsBusiness, Mockito.atLeastOnce()).getProduct(Mockito.anyString());
@@ -520,7 +533,7 @@ public class SalesFacadeImplTest {
 	 * @throws Exception
 	 */
 	@Test
-	public void registerSaleAndOldDebtorWithPartialPyment() throws Exception {
+	public void registerSaleAndOldDebtorWithPartialPymentTest() throws Exception {
 		var debtor = MocksFactory.createExistsDtoDebtor();
 		var sale = MocksFactory.createDtoSaleNoCashboxAndOpen();
 		var wrapper = new DtoWrapperSale();
@@ -545,11 +558,12 @@ public class SalesFacadeImplTest {
 		Mockito.when(debtorMapper.toOuter(Mockito.any())).thenReturn(debtorUpdated2);
 		
 		var response = mockMvc.perform(post("/api/v1/sales/debtors?partialPyment=30")
+				.header(MocksUtils.X_TRACKING_ID, "registerSaleAndOldDebtorWithPartialPymentTest")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(body))
 				.andExpect(status().isCreated()).andReturn();
 		
-		var data = MocksUtils.getContentAsString(response, "registerSaleAndOldDebtor");
+		var data = MocksUtils.getContentAsString(response, "registerSaleAndOldDebtorWithPartialPymentTest");
 		var obj = objectMapper.readValue(data, MocksFactory.getReferenceFromWrapperSale());
 		
 		Mockito.verify(productsBusiness, Mockito.atLeastOnce()).getProduct(Mockito.anyString());
@@ -578,7 +592,7 @@ public class SalesFacadeImplTest {
 	 * @throws Exception
 	 */
 	@Test
-	public void registerSaleAndOldDebtorWithAllPyment() throws Exception {
+	public void registerSaleAndOldDebtorWithAllPymentTest() throws Exception {
 		var debtor = MocksFactory.createExistsDtoDebtor();
 		var sale = MocksFactory.createDtoSaleNoCashboxAndOpen();
 		var wrapper = new DtoWrapperSale();
@@ -602,11 +616,12 @@ public class SalesFacadeImplTest {
 		Mockito.doNothing().when(debtorBusiness).deleteDebtorById(Mockito.anyString());
 		
 		var response = mockMvc.perform(post("/api/v1/sales/debtors?partialPyment=500")
+				.header(MocksUtils.X_TRACKING_ID, "registerSaleAndOldDebtorWithAllPymentTest")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(body))
 				.andExpect(status().isCreated()).andReturn();
 		
-		var data = MocksUtils.getContentAsString(response, "registerSaleAndOldDebtor");
+		var data = MocksUtils.getContentAsString(response, "registerSaleAndOldDebtorWithAllPymentTest");
 		var obj = objectMapper.readValue(data, MocksFactory.getReferenceFromWrapperSale());
 		
 		Mockito.verify(productsBusiness, Mockito.atLeastOnce()).getProduct(Mockito.anyString());
