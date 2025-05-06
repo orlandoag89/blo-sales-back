@@ -23,7 +23,7 @@ public class UsersBusinessImpl implements IUsersBusiness {
 	@Override
 	public DtoIntUserToken login(DtoIntUser user) throws BloSalesBusinessException {
 		LOGGER.info(String.format("login with user data %s", Encode.forJava(user.getUsername())));
-		return null;
+		return dao.login(user);
 	}
 
 	@Override
@@ -33,27 +33,21 @@ public class UsersBusinessImpl implements IUsersBusiness {
 	}
 
 	@Override
-	public DtoIntUser resetUser(DtoIntUser rootUserData, String idUser) throws BloSalesBusinessException {
-		LOGGER.info(String.format("reseting user: %s", Encode.forJava(idUser)));
-		return null;
+	public DtoIntUser registerTemporaryPassword(DtoIntUser userData) throws BloSalesBusinessException {
+		LOGGER.info(String.format("updating user %s [%s]", Encode.forJava(userData.getUsername()), userData.getId()));
+		return dao.registerTemporaryPassword(userData);
 	}
 
 	@Override
-	public DtoIntUser updateUser(DtoIntUser user) throws BloSalesBusinessException {
-		LOGGER.info(String.format("updating user %s", Encode.forJava(user.getUsername())));
-		return null;
-	}
-
-	@Override
-	public DtoIntUser getUserByIdOrNull(String idUser) throws BloSalesBusinessException {
-		LOGGER.info(String.format("get user by id %s", Encode.forJava(idUser)));
-		return null;
-	}
-
-	@Override
-	public DtoIntUser getUserByNameOrNull(String username) throws BloSalesBusinessException {
+	public DtoIntUser getUserByName(String username) throws BloSalesBusinessException {
 		LOGGER.info(String.format("get user by id %s", Encode.forJava(username)));
-		return null;
+		return dao.getUserByName(username);
+	}
+
+	@Override
+	public DtoIntUser getUserOrNullByName(String username) throws BloSalesBusinessException {
+		LOGGER.info(String.format("buscando usuario %s", username));
+		return dao.getUserOrNullByName(username);
 	}
 
 }

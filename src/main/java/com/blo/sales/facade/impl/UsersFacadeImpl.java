@@ -19,6 +19,7 @@ import com.blo.sales.facade.dto.commons.DtoError;
 import com.blo.sales.facade.enums.RolesEnum;
 import com.blo.sales.facade.mapper.DtoUserMapper;
 import com.blo.sales.facade.mapper.DtoUserTokenMapper;
+import com.blo.sales.utils.PasswordUtil;
 
 @RestController
 public class UsersFacadeImpl implements IUsersFacade {
@@ -57,11 +58,35 @@ public class UsersFacadeImpl implements IUsersFacade {
 	@Value("${exceptions.messages.rol-username}")
 	private String exceptionsMessagesRolUsername;
 	
+	@Value("${exceptions.codes.user-not-found}")
+	private String exceptionsCodesUserNotFound;
+	
+	@Value("${exceptions.messages.user-not-found}")
+	private String exceptionsMessagesUserNotFound;
+	
 	private static final String ROOT_USER = "root";
 
 	@Override
 	public ResponseEntity<DtoCommonWrapper<DtoUserToken>> login(DtoUser user) {
-		return null;
+		var body = new DtoCommonWrapper<DtoUserToken>();
+		try {
+			// valida existencia de usuario
+			LOGGER.info(String.format("buscando al usuario: %s", Encode.forJava(user.getUsername())));
+			business.getUserByName(user.getUsername());
+			var innerUser = userMapper.toInner(user);
+			LOGGER.info("usuario encontrado");
+			
+			var token = business.login(innerUser);
+			var tokenToBody = userTokenMapper.toOuter(token);
+			LOGGER.info(String.format("token info %s", String.valueOf(tokenToBody)));
+			body.setData(tokenToBody);
+			return new ResponseEntity<>(body, HttpStatus.OK);
+		} catch (BloSalesBusinessException e) {
+			LOGGER.error(String.format("Error %s", e.getMessage()));
+			var error = new DtoError(e.getErrorCode(), e.getExceptionMessage());
+			body.setError(error);
+			return new ResponseEntity<>(body, e.getExceptHttpStatus());
+		}
 	}
 
 	@Override
@@ -90,7 +115,15 @@ public class UsersFacadeImpl implements IUsersFacade {
 				LOGGER.error("el rol y nombre de usuario no corresponden");
 				throw new BloSalesBusinessException(exceptionsCodesRolUsername, exceptionsMessagesRolUsername, HttpStatus.BAD_REQUEST);
 			}
-			var innerUser = userMapper.toInner(user);
+			
+			LOGGER.info("validando existencia de usuario");
+			var userFound = existsUserByUserName(user.getUsername());
+			if (userFound) {
+				LOGGER.error(String.format("%s ya esta registrado", user.getUsername()));
+				throw new BloSalesBusinessException(exceptionsMessagesUserExists, exceptionsCodesUserExists, HttpStatus.UNPROCESSABLE_ENTITY);
+			}
+			
+			var innerUser = userMapper.toInner(user);			
 			LOGGER.info(String.format("registrando usuario %s", Encode.forJava(user.getUsername())));
 			var userReg = business.register(innerUser);
 			var toBody = userTokenMapper.toOuter(userReg);
@@ -106,8 +139,30 @@ public class UsersFacadeImpl implements IUsersFacade {
 	}
 
 	@Override
-	public ResponseEntity<DtoCommonWrapper<DtoUser>> createTemporaryPassword(DtoUser rootDataUser, String idUser) {
-		return null;
+	public ResponseEntity<DtoCommonWrapper<DtoUser>> createTemporaryPassword(DtoUser rootDataUser, String username) {
+		var body = new DtoCommonWrapper<DtoUser>();
+		try {
+			if (!rootDataUser.getUsername().equals(ROOT_USER)) {
+				LOGGER.error("Solo el usuario root debe actualizar la contrasenia");
+				throw new BloSalesBusinessException(exceptionsMessagesUserNotFound, exceptionsCodesUserNotFound, HttpStatus.NOT_FOUND);
+			}
+			login(rootDataUser);
+			
+			var userFound = business.getUserByName(username);
+			var passwordTmp = PasswordUtil.generateAlphanumeric(8);
+			// actualiza la contraseña actual
+			userFound.setPassword(passwordTmp);
+			var userUpdate = business.registerTemporaryPassword(userFound);
+			userUpdate.setPassword(passwordTmp);
+			LOGGER.info(String.format("el usuario %s fue actualizado", userUpdate.getUsername()));
+			var toBody = userMapper.toOuter(userUpdate);
+			body.setData(toBody);
+			return new ResponseEntity<>(body, HttpStatus.OK);
+		} catch (BloSalesBusinessException e) {
+			LOGGER.error(e.getMessage());
+			body.setError(new DtoError(e.getErrorCode(), e.getExceptionMessage()));
+			return new ResponseEntity<>(body, e.getExceptHttpStatus());
+		}
 	}
 
 	@Override
@@ -115,4 +170,10 @@ public class UsersFacadeImpl implements IUsersFacade {
 		return null;
 	}
 
+	/**
+	 * return true si existe un usuario con ese nombre
+	 */
+	private boolean existsUserByUserName(String username) throws BloSalesBusinessException {
+		return business.getUserOrNullByName(username) != null;
+	}
 }

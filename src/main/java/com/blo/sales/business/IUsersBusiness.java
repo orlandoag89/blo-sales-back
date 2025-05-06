@@ -10,11 +10,10 @@ public interface IUsersBusiness {
 
 	DtoIntUserToken register(DtoIntUser userData) throws BloSalesBusinessException;
 	
-	DtoIntUser resetUser(DtoIntUser rootUserData, String idUser) throws BloSalesBusinessException;
+	DtoIntUser registerTemporaryPassword(DtoIntUser userData) throws BloSalesBusinessException;
 	
-	DtoIntUser updateUser(DtoIntUser user) throws BloSalesBusinessException;
+	DtoIntUser getUserByName(String userName) throws BloSalesBusinessException;
 	
-	DtoIntUser getUserByIdOrNull(String idUser) throws BloSalesBusinessException;
+	DtoIntUser getUserOrNullByName(String username) throws BloSalesBusinessException;
 
-	DtoIntUser getUserByNameOrNull(String username) throws BloSalesBusinessException;
 }

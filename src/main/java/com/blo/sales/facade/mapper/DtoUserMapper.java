@@ -22,7 +22,9 @@ public class DtoUserMapper implements IToInner<DtoIntUser, DtoUser>, IToOuter<Dt
 			return null;
 		}
 		var inner = mapper.map(outer, DtoIntUser.class);
-		inner.setRole(RolesIntEnum.valueOf(outer.getRole().name()));
+		if (outer.getRole() != null) {
+			inner.setRole(RolesIntEnum.valueOf(outer.getRole().name()));
+		}
 		return inner;
 	}
 

@@ -20,8 +20,8 @@ public interface IUsersFacade {
 	@PostMapping("/actions/register")
 	ResponseEntity<DtoCommonWrapper<DtoUserToken>> registerUser(@RequestBody DtoUser user);
 	
-	@PutMapping("/actions/reset/{idUsed}")
-	ResponseEntity<DtoCommonWrapper<DtoUser>> createTemporaryPassword(@RequestBody DtoUser rootDataUser, @PathVariable String idUser);
+	@PutMapping("/actions/reset/{username}")
+	ResponseEntity<DtoCommonWrapper<DtoUser>> createTemporaryPassword(@RequestBody DtoUser rootDataUser, @PathVariable String username);
 	
 	@PutMapping("/actions/change-password/{idUsed}")
 	ResponseEntity<DtoCommonWrapper<DtoUser>> changePassword(@RequestBody DtoUser userData, @PathVariable String idUser);

@@ -6,9 +6,11 @@ import org.apache.commons.lang3.StringUtils;
 
 public final class Utils {
 	
-	private Utils() { }
+	public static final String EMPTY_STRING = "";
 	
-	private static final String UNDEFINED = "undefined"; 
+	private static final String UNDEFINED = "undefined";
+	
+	private Utils() { }
 	
 	/**
 	 * metodo para recuperar el tiempo en mili segundos
