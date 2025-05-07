@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import com.blo.sales.business.dto.DtoIntUser;
 import com.blo.sales.business.dto.DtoIntUserToken;
 import com.blo.sales.dao.IUsersDao;
+import com.blo.sales.dao.docs.Usuario;
 import com.blo.sales.dao.mapper.UsuarioMapper;
 import com.blo.sales.dao.repository.UsuariosRepository;
 import com.blo.sales.exceptions.BloSalesBusinessException;
@@ -49,6 +50,18 @@ public class UsersDaoImpl implements IUsersDao {
 	
 	@Value("${exceptions.messages.password-restart-pending}")
 	private String exceptionsMessagesPasswordRestartPending;
+	
+	@Value("${exceptions.codes.passwords-no-equals}")
+	private String exceptionsCodesPasswordsNoEquals;
+	
+	@Value("${exceptions.messages.passwords-no-equals}")
+	private String exceptionsMessagesPasswordsNoEquals;
+	
+	@Value("${exceptions.codes.password-already-use}")
+	private String exceptionsCodesPasswordAlreadyUse;
+	
+	@Value("${exceptions.messages.password-already-use}")
+	private String exceptionsMessagesPasswordAlreadyUse;
 	
 	@Override
 	public DtoIntUserToken register(DtoIntUser userData) throws BloSalesBusinessException {
@@ -113,12 +126,7 @@ public class UsersDaoImpl implements IUsersDao {
 
 	@Override
 	public DtoIntUser registerTemporaryPassword(DtoIntUser userData) throws BloSalesBusinessException {
-		var userFound = repository.findById(userData.getId());
-		if (!userFound.isPresent()) {
-			LOGGER.error(String.format("usuario %s no fue encontrado", Encode.forJava(userData.getUsername())));
-			throw new BloSalesBusinessException(exceptionsMessagesLogin, exceptionsCodesLogin, HttpStatus.UNPROCESSABLE_ENTITY);
-		}
-		var userDbInfo = userFound.get();
+		var userDbInfo = getUserById(userData.getId());
 		var lastIndex = userDbInfo.getPassword().size() - 1;
 		var lastPassword = userDbInfo.getPassword().get(lastIndex);
 		/**
@@ -139,6 +147,67 @@ public class UsersDaoImpl implements IUsersDao {
 		LOGGER.info("el usuario fue actualizado");
 		var userToOuter = usuarioMapper.toOuter(userSaved);
 		return userToOuter;
+	}
+
+	@Override
+	public DtoIntUser updatePassword(DtoIntUser userData) throws BloSalesBusinessException {
+		var userDbInfo = getUserById(userData.getId());
+		var lastIndex = userDbInfo.getPassword().size() - 1;
+		var lastPassword = userDbInfo.getPassword().get(lastIndex);
+		var fluxResetActived = lastPassword.endsWith(RESTART_ACTIVED);
+		
+		// si es una actualizacion por reseteo
+		if (fluxResetActived) {
+			// eliminar subfijo reseteo activado
+			lastPassword = lastPassword.substring(0, lastPassword.length() - RESTART_ACTIVED.length());
+		}
+		
+		// validacion que la ultima contraseña sea igual a la que llega en el dto
+		var isValid = PasswordUtil.checkPassword(userData.getOld_password(), lastPassword);
+		if (!isValid) {
+			// error que la contraseña no es igual a la ultima
+			LOGGER.error("las contraseñas no son iguales");
+			throw new BloSalesBusinessException(exceptionsMessagesPasswordsNoEquals, exceptionsCodesPasswordsNoEquals, HttpStatus.BAD_REQUEST);
+		}
+		
+		// valida que la contraseña actual no exista en el historial
+		var passwordHistoryFound = userDbInfo.getPassword().stream().filter(s -> PasswordUtil.checkPassword(userData.getPassword(), s)).findFirst();
+		LOGGER.info(String.format("contrasenia encontrada en el historial %s", passwordHistoryFound.isPresent()));
+		if (passwordHistoryFound.isPresent()) {
+			// error porque ya existe esa contraseña guardada
+			LOGGER.error("Esta contraseña ya fue usada");
+			throw new BloSalesBusinessException(exceptionsMessagesPasswordAlreadyUse, exceptionsCodesPasswordAlreadyUse, HttpStatus.BAD_REQUEST);
+		}
+		// guarda la contraseña
+		userDbInfo.getPassword().add(PasswordUtil.hashPassword(userData.getPassword()));
+		
+		// si es una actualizacion por reseteo
+		if (fluxResetActived) {
+			// actualiza la ultima contraseña con el subfijo para desactivar reseteo
+			lastPassword = lastPassword + RESTART_DISACTIVED;
+			userDbInfo.getPassword().set(lastIndex, lastPassword);
+		}
+		
+		// guarda contraseña
+		var saved = repository.save(userDbInfo);
+		LOGGER.info("Cambio de contrasenia exitoso");
+		return usuarioMapper.toOuter(saved);
+	}
+	
+	/**
+	 * recupera un usuario porid
+	 * @param id
+	 * @return
+	 * @throws BloSalesBusinessException
+	 */
+	private Usuario getUserById(String id) throws BloSalesBusinessException {
+		var userFound = repository.findById(id);
+		if (!userFound.isPresent()) {
+			LOGGER.error(String.format("usuario %s no fue encontrado", Encode.forJava(id)));
+			throw new BloSalesBusinessException(exceptionsMessagesLogin, exceptionsCodesLogin, HttpStatus.UNPROCESSABLE_ENTITY);
+		}
+		LOGGER.info(String.format("Usuario encontrado %s", Encode.forJava(id)));
+		return userFound.get();
 	}
 	
 }

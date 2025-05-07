@@ -23,7 +23,7 @@ public interface IUsersFacade {
 	@PutMapping("/actions/reset/{username}")
 	ResponseEntity<DtoCommonWrapper<DtoUser>> createTemporaryPassword(@RequestBody DtoUser rootDataUser, @PathVariable String username);
 	
-	@PutMapping("/actions/change-password/{idUsed}")
-	ResponseEntity<DtoCommonWrapper<DtoUser>> changePassword(@RequestBody DtoUser userData, @PathVariable String idUser);
+	@PutMapping("/actions/change-password")
+	ResponseEntity<DtoCommonWrapper<DtoUser>> changePassword(@RequestBody DtoUser userData);
 
 }

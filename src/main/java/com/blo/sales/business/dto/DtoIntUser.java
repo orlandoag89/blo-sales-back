@@ -16,5 +16,7 @@ public @Data class DtoIntUser implements Serializable {
 
 	private String password;
 	
+	private String old_password;
+	
 	private RolesIntEnum role;
 }

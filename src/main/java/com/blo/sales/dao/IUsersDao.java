@@ -15,5 +15,7 @@ public interface IUsersDao {
 	DtoIntUser getUserOrNullByName(String username) throws BloSalesBusinessException;
 	
 	DtoIntUser registerTemporaryPassword(DtoIntUser userData) throws BloSalesBusinessException;
+	
+	DtoIntUser updatePassword(DtoIntUser userData) throws BloSalesBusinessException;
 
 }

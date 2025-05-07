@@ -46,8 +46,14 @@ public class UsersBusinessImpl implements IUsersBusiness {
 
 	@Override
 	public DtoIntUser getUserOrNullByName(String username) throws BloSalesBusinessException {
-		LOGGER.info(String.format("buscando usuario %s", username));
+		LOGGER.info(String.format("buscando usuario %s", Encode.forJava(username)));
 		return dao.getUserOrNullByName(username);
+	}
+
+	@Override
+	public DtoIntUser updatePassword(DtoIntUser userData) throws BloSalesBusinessException {
+		LOGGER.info(String.format("actualizando %s", Encode.forJava(userData.getPassword())));
+		return dao.updatePassword(userData);
 	}
 
 }

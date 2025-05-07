@@ -18,6 +18,8 @@ public @Data class DtoUser implements Serializable {
 	
 	private String password_confirm;
 	
+	private String old_password;
+	
 	private RolesEnum role;
 
 }

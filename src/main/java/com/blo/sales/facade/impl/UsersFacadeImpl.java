@@ -166,8 +166,31 @@ public class UsersFacadeImpl implements IUsersFacade {
 	}
 
 	@Override
-	public ResponseEntity<DtoCommonWrapper<DtoUser>> changePassword(DtoUser userData, String idUser) {
-		return null;
+	public ResponseEntity<DtoCommonWrapper<DtoUser>> changePassword(DtoUser userData) {
+		var body = new DtoCommonWrapper<DtoUser>();
+		try {
+			// valida contraseñas
+			if (!userData.getPassword().equals(userData.getPassword_confirm())) {
+				LOGGER.error("las contraseñas no son iguales");
+				throw new BloSalesBusinessException(exceptionsMessagesPasswordNotEquals, exceptionsCodesPasswordNotEquals, HttpStatus.BAD_REQUEST);
+			}
+			
+			// valida existencia de usuario
+			LOGGER.info(String.format("buscando al usuario: %s", Encode.forJava(userData.getUsername())));
+			business.getUserByName(userData.getUsername());
+			
+			var userDataInner = userMapper.toInner(userData);
+			LOGGER.info(String.format("actualizando usuario %s", Encode.forJava(userDataInner.getUsername())));
+			var userInfoUpdated = business.updatePassword(userDataInner);
+			var toBody = userMapper.toOuter(userInfoUpdated);
+			LOGGER.info("Usuario actualizado");
+			body.setData(toBody);
+			return new ResponseEntity<>(body, HttpStatus.OK);
+		} catch (BloSalesBusinessException e) {
+			LOGGER.error(String.format("Excepcion: %s", e));
+			body.setError(new DtoError(e.getErrorCode(), e.getExceptionMessage()));
+			return new ResponseEntity<>(body, e.getExceptHttpStatus());
+		}
 	}
 
 	/**

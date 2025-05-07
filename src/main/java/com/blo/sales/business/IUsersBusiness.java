@@ -16,4 +16,5 @@ public interface IUsersBusiness {
 	
 	DtoIntUser getUserOrNullByName(String username) throws BloSalesBusinessException;
 
+	DtoIntUser updatePassword(DtoIntUser userData) throws BloSalesBusinessException;
 }
