@@ -7,6 +7,8 @@ import org.springframework.stereotype.Component;
 
 import com.blo.sales.business.dto.DtoIntUser;
 import com.blo.sales.business.enums.RolesIntEnum;
+import com.blo.sales.dao.commons.PasswordTemplate;
+import com.blo.sales.dao.docs.Contrasenia;
 import com.blo.sales.dao.docs.Usuario;
 import com.blo.sales.dao.enums.DocRolesEnum;
 import com.blo.sales.utils.IToInner;
@@ -22,8 +24,9 @@ public class UsuarioMapper implements IToInner<Usuario, DtoIntUser>, IToOuter<Us
 		}
 		var inner = new Usuario();
 		
-		List<String> passwords = new ArrayList<>();
-		passwords.add(outer.getPassword());
+		List<Contrasenia> passwords = new ArrayList<>();
+		
+		passwords.add(PasswordTemplate.generatePasswordTemplate(outer.getPassword()));
 		inner.setPassword(passwords);
 		
 		inner.setRol(DocRolesEnum.valueOf(outer.getRole().name()));
@@ -44,7 +47,7 @@ public class UsuarioMapper implements IToInner<Usuario, DtoIntUser>, IToOuter<Us
 		outer.setUsername(inner.getUsername());
 		
 		var lastPassword = inner.getPassword().get(inner.getPassword().size() - 1);
-		outer.setPassword(lastPassword);
+		outer.setPassword(lastPassword.getPassword());
 		
 		return outer;
 	}

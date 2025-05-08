@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import com.blo.sales.business.dto.DtoIntUser;
 import com.blo.sales.business.dto.DtoIntUserToken;
 import com.blo.sales.dao.IUsersDao;
+import com.blo.sales.dao.commons.PasswordTemplate;
 import com.blo.sales.dao.docs.Usuario;
 import com.blo.sales.dao.mapper.UsuarioMapper;
 import com.blo.sales.dao.repository.UsuariosRepository;
@@ -22,10 +23,6 @@ import com.blo.sales.utils.PasswordUtil;
 public class UsersDaoImpl implements IUsersDao {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(UsersDaoImpl.class);
-	
-	private static final String RESTART_ACTIVED = "_RESTART:ACTIVED";
-	
-	private static final String RESTART_DISACTIVED = "_RESTART:DISACTIVED";
 	
 	@Autowired
 	private UsuarioMapper usuarioMapper;
@@ -81,19 +78,20 @@ public class UsersDaoImpl implements IUsersDao {
 	@Override
 	public DtoIntUserToken login(DtoIntUser user) throws BloSalesBusinessException {
 		LOGGER.info("login dao flow init");
-		var userDb = getUserByName(user.getUsername());
+		var userDb = getUserById(user.getId());
 		// validar que la contraseña no sea temporal
-		if (userDb.getPassword().endsWith(RESTART_ACTIVED)) {
-			LOGGER.error("El usuario tiene una actualizacion pendiente");
+		var lastPassword = userDb.getPassword().get(userDb.getPassword().size() - 1);
+		if (lastPassword.isProcess_reset()) {
+			LOGGER.error("El usuario tiene una actualizacion de contrasenia pendiente");
 			throw new BloSalesBusinessException(exceptionsMessagesPasswordRestartPending, exceptionsCodesPasswordRestartPending, HttpStatus.BAD_REQUEST);
 		}
 		//realiza login
-		if (!PasswordUtil.checkPassword(user.getPassword(), userDb.getPassword())) {
+		if (!PasswordUtil.checkPassword(user.getPassword(), lastPassword.getPassword())) {
 			LOGGER.error("Error en la password");
 			throw new BloSalesBusinessException(exceptionsMessagesLoginInit, exceptionsCodesLoginInit, HttpStatus.UNPROCESSABLE_ENTITY);
 		}
 		LOGGER.info("login exitoso");
-		var token = JwtUtil.generateTokenConClaims(userDb.getUsername(), userDb.getRole().name());
+		var token = JwtUtil.generateTokenConClaims(userDb.getUsername(), userDb.getRol().name());
 		var out = new DtoIntUserToken(token);
 		LOGGER.info(String.format("token generado %s", String.valueOf(out)));
 		return out;
@@ -126,6 +124,7 @@ public class UsersDaoImpl implements IUsersDao {
 
 	@Override
 	public DtoIntUser registerTemporaryPassword(DtoIntUser userData) throws BloSalesBusinessException {
+		// bascando usuario
 		var userDbInfo = getUserById(userData.getId());
 		var lastIndex = userDbInfo.getPassword().size() - 1;
 		var lastPassword = userDbInfo.getPassword().get(lastIndex);
@@ -134,19 +133,18 @@ public class UsersDaoImpl implements IUsersDao {
 		 * 	se va a desactivar y actualizar ese proceso
 		 * se va a abrir otro proceso de reseteo y se guardara como ultima contraseña
 		 */
-		if (lastPassword.endsWith(RESTART_ACTIVED)) {
-			lastPassword = lastPassword.substring(0, lastPassword.length() - RESTART_ACTIVED.length());
-			lastPassword = lastPassword + RESTART_DISACTIVED;
+		if (lastPassword.isProcess_reset()) {
+			lastPassword.setProcess_reset(false);
 			userDbInfo.getPassword().set(lastIndex, lastPassword);
-			repository.save(userDbInfo);
-			LOGGER.info("Password guardada actualizada");
+			LOGGER.info("se cambia el estatus del proceso de reseteo");
 		}
-		var passwordToSave = PasswordUtil.hashPassword(userData.getPassword()) + RESTART_ACTIVED;
+		var passwordToSave = PasswordTemplate.generatePasswordTemplateResetting(PasswordUtil.hashPassword(userData.getPassword()));
+		LOGGER.info("contrasenia creada");
 		userDbInfo.getPassword().add(passwordToSave);
 		var userSaved = repository.save(userDbInfo);
-		LOGGER.info("el usuario fue actualizado");
-		var userToOuter = usuarioMapper.toOuter(userSaved);
-		return userToOuter;
+		LOGGER.info(String.format("usuario %s actualizado con las nueva contrasenia", userSaved.getId()));
+		return usuarioMapper.toOuter(userSaved);
+		
 	}
 
 	@Override
@@ -154,16 +152,9 @@ public class UsersDaoImpl implements IUsersDao {
 		var userDbInfo = getUserById(userData.getId());
 		var lastIndex = userDbInfo.getPassword().size() - 1;
 		var lastPassword = userDbInfo.getPassword().get(lastIndex);
-		var fluxResetActived = lastPassword.endsWith(RESTART_ACTIVED);
-		
-		// si es una actualizacion por reseteo
-		if (fluxResetActived) {
-			// eliminar subfijo reseteo activado
-			lastPassword = lastPassword.substring(0, lastPassword.length() - RESTART_ACTIVED.length());
-		}
 		
 		// validacion que la ultima contraseña sea igual a la que llega en el dto
-		var isValid = PasswordUtil.checkPassword(userData.getOld_password(), lastPassword);
+		var isValid = PasswordUtil.checkPassword(userData.getOld_password(), lastPassword.getPassword());
 		if (!isValid) {
 			// error que la contraseña no es igual a la ultima
 			LOGGER.error("las contraseñas no son iguales");
@@ -171,22 +162,23 @@ public class UsersDaoImpl implements IUsersDao {
 		}
 		
 		// valida que la contraseña actual no exista en el historial
-		var passwordHistoryFound = userDbInfo.getPassword().stream().filter(s -> PasswordUtil.checkPassword(userData.getPassword(), s)).findFirst();
+		var passwordHistoryFound = userDbInfo.getPassword().stream().filter(s -> PasswordUtil.checkPassword(userData.getPassword(), s.getPassword())).findFirst();
 		LOGGER.info(String.format("contrasenia encontrada en el historial %s", passwordHistoryFound.isPresent()));
 		if (passwordHistoryFound.isPresent()) {
 			// error porque ya existe esa contraseña guardada
 			LOGGER.error("Esta contraseña ya fue usada");
 			throw new BloSalesBusinessException(exceptionsMessagesPasswordAlreadyUse, exceptionsCodesPasswordAlreadyUse, HttpStatus.BAD_REQUEST);
 		}
-		// guarda la contraseña
-		userDbInfo.getPassword().add(PasswordUtil.hashPassword(userData.getPassword()));
 		
 		// si es una actualizacion por reseteo
-		if (fluxResetActived) {
+		if (lastPassword.isProcess_reset()) {
 			// actualiza la ultima contraseña con el subfijo para desactivar reseteo
-			lastPassword = lastPassword + RESTART_DISACTIVED;
+			lastPassword.setProcess_reset(false);
 			userDbInfo.getPassword().set(lastIndex, lastPassword);
 		}
+		
+		// guarda la contraseña
+		userDbInfo.getPassword().add(PasswordTemplate.generatePasswordTemplate(PasswordUtil.hashPassword(userData.getPassword())));
 		
 		// guarda contraseña
 		var saved = repository.save(userDbInfo);
@@ -209,5 +201,6 @@ public class UsersDaoImpl implements IUsersDao {
 		LOGGER.info(String.format("Usuario encontrado %s", Encode.forJava(id)));
 		return userFound.get();
 	}
+	
 	
 }

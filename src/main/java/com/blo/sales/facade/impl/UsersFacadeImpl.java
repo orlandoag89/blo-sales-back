@@ -72,7 +72,7 @@ public class UsersFacadeImpl implements IUsersFacade {
 		try {
 			// valida existencia de usuario
 			LOGGER.info(String.format("buscando al usuario: %s", Encode.forJava(user.getUsername())));
-			business.getUserByName(user.getUsername());
+			puttingIdToUser(user);
 			var innerUser = userMapper.toInner(user);
 			LOGGER.info("usuario encontrado");
 			
@@ -146,7 +146,8 @@ public class UsersFacadeImpl implements IUsersFacade {
 				LOGGER.error("Solo el usuario root debe actualizar la contrasenia");
 				throw new BloSalesBusinessException(exceptionsMessagesUserNotFound, exceptionsCodesUserNotFound, HttpStatus.NOT_FOUND);
 			}
-			login(rootDataUser);
+			puttingIdToUser(rootDataUser);
+			business.login(userMapper.toInner(rootDataUser));
 			
 			var userFound = business.getUserByName(username);
 			var passwordTmp = PasswordUtil.generateAlphanumeric(8);
@@ -176,8 +177,7 @@ public class UsersFacadeImpl implements IUsersFacade {
 			}
 			
 			// valida existencia de usuario
-			LOGGER.info(String.format("buscando al usuario: %s", Encode.forJava(userData.getUsername())));
-			business.getUserByName(userData.getUsername());
+			puttingIdToUser(userData);
 			
 			var userDataInner = userMapper.toInner(userData);
 			LOGGER.info(String.format("actualizando usuario %s", Encode.forJava(userDataInner.getUsername())));
@@ -198,5 +198,12 @@ public class UsersFacadeImpl implements IUsersFacade {
 	 */
 	private boolean existsUserByUserName(String username) throws BloSalesBusinessException {
 		return business.getUserOrNullByName(username) != null;
+	}
+	
+	private void puttingIdToUser(DtoUser userData) throws BloSalesBusinessException {
+		LOGGER.info(String.format("buscando al usuario: %s", Encode.forJava(userData.getUsername())));
+		var userByName = business.getUserByName(userData.getUsername());
+		// setea el id
+		userData.setId(userByName.getId());
 	}
 }

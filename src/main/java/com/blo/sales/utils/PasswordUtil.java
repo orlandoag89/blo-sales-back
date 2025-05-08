@@ -13,7 +13,7 @@ public final class PasswordUtil {
 
 	private PasswordUtil() {
 	}
-
+	
 	// crea el hash de una contraseña
 	public static String hashPassword(String password) {
 		if (!IS_CIPHER) {

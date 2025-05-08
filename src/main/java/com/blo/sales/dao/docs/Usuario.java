@@ -18,7 +18,7 @@ public @Data class Usuario implements Serializable {
 
 	private String username;
 
-	private List<String> password;
+	private List<Contrasenia> password;
 	
 	private DocRolesEnum rol;
 
