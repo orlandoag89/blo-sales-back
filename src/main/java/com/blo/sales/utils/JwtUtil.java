@@ -47,6 +47,10 @@ public final class JwtUtil {
                 .build()
                 .parseClaimsJws(token);
     }
+    
+    public static String extractRole(String token) {
+        return extractAllClaims(token).getBody().get("role", String.class);
+    }
 
     public static boolean isTokenValid(String token) {
         try {
