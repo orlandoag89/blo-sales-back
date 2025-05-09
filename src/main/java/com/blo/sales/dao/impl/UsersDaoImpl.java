@@ -155,6 +155,7 @@ public class UsersDaoImpl implements IUsersDao {
 		
 		// validacion que la ultima contraseña sea igual a la que llega en el dto
 		var isValid = PasswordUtil.checkPassword(userData.getOld_password(), lastPassword.getPassword());
+		LOGGER.info(String.format("la contraseña es igual a la ultima contraseña %s", isValid));
 		if (!isValid) {
 			// error que la contraseña no es igual a la ultima
 			LOGGER.error("las contraseñas no son iguales");
