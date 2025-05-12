@@ -343,7 +343,7 @@ public class SalesFacadeImplTest {
 		var result = mockMvc.perform(get("/api/v1/sales/ ")
 				.header(MocksUtils.X_TRACKING_ID, "retrieveSaleByIdEmptyTest")
                 .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isNotFound())
+            .andExpect(status().isBadRequest())
             .andReturn();
 		
 		var sale = MocksUtils.getContentAsString(result, "retrieveSaleByIdEmptyTest");

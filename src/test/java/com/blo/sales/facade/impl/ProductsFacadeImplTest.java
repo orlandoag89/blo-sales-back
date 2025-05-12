@@ -249,7 +249,7 @@ public class ProductsFacadeImplTest {
 		
 		var productToUpdateAsString = objectMapper.writeValueAsString(productToUpdate);
 		
-		var result = mockMvc.perform(put("/api/v1/products/1a2b3c4d")
+		var result = mockMvc.perform(put("/api/v1/products/mgmt/1a2b3c4d")
 				.header(MocksUtils.X_TRACKING_ID, "updateProductByIdTest")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(productToUpdateAsString))
@@ -278,7 +278,7 @@ public class ProductsFacadeImplTest {
 		
 		var productToUpdateAsString = objectMapper.writeValueAsString(productToUpdate);
 		
-		var result = mockMvc.perform(put("/api/v1/products/ ")
+		var result = mockMvc.perform(put("/api/v1/products/mgmt/ ")
 				.header(MocksUtils.X_TRACKING_ID, "updateProductByIdNotId")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(productToUpdateAsString))
@@ -302,7 +302,7 @@ public class ProductsFacadeImplTest {
 		
 		var productToUpdateAsString = objectMapper.writeValueAsString(productToUpdate);
 		
-		var result = mockMvc.perform(put("/api/v1/products/undefined")
+		var result = mockMvc.perform(put("/api/v1/products/mgmt/undefined")
 				.header(MocksUtils.X_TRACKING_ID, "updateProductByIdUndefinedTest")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(productToUpdateAsString))
@@ -325,7 +325,7 @@ public class ProductsFacadeImplTest {
 		
 		var productToUpdateAsString = objectMapper.writeValueAsString(null);
 		
-		var result = mockMvc.perform(put("/api/v1/products/ ")
+		var result = mockMvc.perform(put("/api/v1/products/mgmt/ ")
 				.header(MocksUtils.X_TRACKING_ID, "addPartialPayNoCashboxTest")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(productToUpdateAsString))

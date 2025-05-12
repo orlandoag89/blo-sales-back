@@ -28,7 +28,12 @@ public class JwtAuthFilterRoot extends OncePerRequestFilter {
         var path = request.getRequestURI();
         var header = request.getHeader("Authorization");
 
-        if (path.startsWith("/api/v1/users/mgmt/actions") && header != null && header.startsWith("Bearer ")) {
+        if (
+        	path.startsWith("/api/v1/users/mgmt/actions") ||
+        	path.startsWith("/api/v1/products/mgmt") &&
+        	header != null &&
+        	header.startsWith("Bearer ")
+        ) {
             var token = header.substring(7);
             // Valida el token con JwtUtilA
             if (JwtUtil.isTokenValid(token)) {
