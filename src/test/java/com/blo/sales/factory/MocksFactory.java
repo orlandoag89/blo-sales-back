@@ -15,9 +15,13 @@ import com.blo.sales.business.dto.DtoIntProducts;
 import com.blo.sales.business.dto.DtoIntSale;
 import com.blo.sales.business.dto.DtoIntSaleProduct;
 import com.blo.sales.business.dto.DtoIntSales;
+import com.blo.sales.business.dto.DtoIntUser;
+import com.blo.sales.business.dto.DtoIntUserToken;
+import com.blo.sales.business.enums.RolesIntEnum;
 import com.blo.sales.business.enums.StatusCashboxIntEnum;
 import com.blo.sales.dao.docs.Cashbox;
 import com.blo.sales.dao.docs.Cashboxes;
+import com.blo.sales.dao.docs.Contrasenia;
 import com.blo.sales.dao.docs.Debtor;
 import com.blo.sales.dao.docs.Debtors;
 import com.blo.sales.dao.docs.PartialPyment;
@@ -26,6 +30,8 @@ import com.blo.sales.dao.docs.Products;
 import com.blo.sales.dao.docs.Sale;
 import com.blo.sales.dao.docs.SaleProduct;
 import com.blo.sales.dao.docs.Sales;
+import com.blo.sales.dao.docs.Usuario;
+import com.blo.sales.dao.enums.DocRolesEnum;
 import com.blo.sales.dao.enums.DocStatusCashboxEnum;
 import com.blo.sales.facade.dto.DtoCashbox;
 import com.blo.sales.facade.dto.DtoCashboxes;
@@ -37,14 +43,18 @@ import com.blo.sales.facade.dto.DtoProducts;
 import com.blo.sales.facade.dto.DtoSale;
 import com.blo.sales.facade.dto.DtoSaleProduct;
 import com.blo.sales.facade.dto.DtoSales;
+import com.blo.sales.facade.dto.DtoUser;
+import com.blo.sales.facade.dto.DtoUserToken;
 import com.blo.sales.facade.dto.DtoWrapperSale;
 import com.blo.sales.facade.dto.commons.DtoCommonWrapper;
+import com.blo.sales.facade.enums.RolesEnum;
 import com.blo.sales.facade.enums.StatusCashboxEnum;
 import com.blo.sales.utils.Utils;
 import com.fasterxml.jackson.core.type.TypeReference;
 
 public final class MocksFactory {
 
+	private static final String TOKEN = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0Iiwicm9sZSI6IkNPTU1PTiIsImlhdCI6MTc0Njc2MTQzMiwiZXhwIjoxNzQ2ODI2MjMyfQ.GFHwBEDt0nemtEeXisQIDy4rw5xd5sY28KDUkDmYDkE";
 	private static final String ANY_STRING = "any_string";
 	private static final String ANY_NAME = "Pepe";
 	private static final String ANY_ID = "1a2b3c4d5e";
@@ -712,7 +722,95 @@ public final class MocksFactory {
 		boxes.add(createCloseCashbox());
 		return boxes;
 	}
+	
+	public static DtoIntUserToken createDtoIntUserToken() {
+		return new DtoIntUserToken(TOKEN);
+	}
+	
+	public static DtoUserToken createDtoUserToken() {
+		var out = new DtoUserToken();
+		out.setToken(TOKEN);
+		return out;
+	}
+	
+	public static DtoIntUser createDtoIntCommonUser() {
+		var out = new DtoIntUser();
+		out.setId(ANY_ID);
+		out.setOld_password(ANY_STRING);
+		out.setPassword(ANY_STRING);
+		out.setRole(RolesIntEnum.COMMON);
+		out.setUsername(ANY_STRING);
+		return out;
+	}
+	
+	public static DtoUser createDtoCommonUser() {
+		var out = new DtoUser();
+		out.setId(ANY_ID);
+		out.setOld_password(ANY_STRING);
+		out.setPassword(ANY_STRING);
+		out.setRole(RolesEnum.COMMON);
+		out.setUsername(ANY_STRING);
+		out.setPassword_confirm(ANY_STRING);
+		return out;
+	}
+	
+	public static DtoIntUser createDtoIntRootUser() {
+		var user = createDtoIntCommonUser();
+		user.setRole(RolesIntEnum.ROOT);
+		return user;
+	}
+	
+	public static DtoUser createDtoRootUser() {
+		var user = createDtoCommonUser();
+		user.setUsername("root");
+		user.setRole(RolesEnum.ROOT);
+		return user;
+	}
+	
+	public static Usuario createCommonUsuarioWithOpenPasswordOpen() {
+		var out = new Usuario();
+		out.setId(ANY_ID);
+		out.setRol(DocRolesEnum.COMMON);
+		out.setUsername(ANY_STRING);
 		
+		List<Contrasenia> passwords = new ArrayList<>();
+		passwords.add(createContrasenia());
+		var itemAux = createContrasenia();
+		itemAux.setProcess_reset(true);
+		passwords.add(itemAux);
+		
+		out.setPassword(passwords);
+		return out;
+	}
+	
+	public static Usuario createCommonUsuarioWithoutOpenPasswordOpen() {
+		var out = createCommonUsuarioWithOpenPasswordOpen();
+		out.getPassword().get(1).setProcess_reset(false);
+		return out;
+	}
+	
+	public static Usuario createNewCommonUsuarioWithoutOpenPasswordOpen() {
+		var out = createCommonUsuarioWithoutOpenPasswordOpen();
+		out.setId(null);
+		return out;
+	}
+	
+	public static Contrasenia createContrasenia() {
+		var out = new Contrasenia();
+		out.setCreated_date(NOW);
+		out.setPassword(ANY_STRING);
+		out.setProcess_reset(false);
+		return out;
+	}
+	
+	public static Optional<Usuario> createOptionalUsuario() {
+		return Optional.of(createCommonUsuarioWithoutOpenPasswordOpen());
+	}
+	
+	public static Optional<Usuario> createOptionalUsuarioOpenProcess() {
+		return Optional.of(createCommonUsuarioWithOpenPasswordOpen());
+	}
+	
 	public static Optional<Cashbox> createOptionalCashbox() {
 		return Optional.of(createOpenCashbox());
 	}
@@ -735,6 +833,10 @@ public final class MocksFactory {
 	
 	public static String getId() {
 		return ANY_ID;
+	}
+	
+	public static String getAnyString() {
+		return ANY_STRING;
 	}
 	
 	public static TypeReference<DtoCommonWrapper<DtoWrapperSale>> getReferenceFromWrapperSale() {
@@ -771,5 +873,13 @@ public final class MocksFactory {
 	
 	public static TypeReference<DtoCommonWrapper<DtoCashboxes>> getReferenceFromDtoCashboxes() {
 		return new TypeReference<DtoCommonWrapper<DtoCashboxes>>() { };
+	}
+	
+	public static TypeReference<DtoCommonWrapper<DtoUserToken>> getReferenceFromDtoUserToken() {
+		return new TypeReference<DtoCommonWrapper<DtoUserToken>>() { };
+	}
+	
+	public static TypeReference<DtoCommonWrapper<DtoUser>> getReferenceFromDtoUser() {
+		return new TypeReference<DtoCommonWrapper<DtoUser>>() { };
 	}
 }

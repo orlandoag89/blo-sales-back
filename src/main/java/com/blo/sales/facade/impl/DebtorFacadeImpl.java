@@ -6,6 +6,7 @@ import org.owasp.encoder.Encode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,6 +27,7 @@ import com.blo.sales.facade.enums.StatusCashboxEnum;
 import com.blo.sales.facade.mapper.DtoDebtorMapper;
 import com.blo.sales.facade.mapper.DtoDebtorsMapper;
 import com.blo.sales.facade.mapper.DtoPartialPymentMapper;
+import com.blo.sales.utils.Utils;
 
 @RestController
 public class DebtorFacadeImpl implements IDebtorFacade {
@@ -49,11 +51,19 @@ public class DebtorFacadeImpl implements IDebtorFacade {
 	
 	@Autowired
 	private DtoPartialPymentMapper partialPymentMapper;
+	
+	@Value("${exceptions.messages.debtor-not-valid}")
+	private String exceptionsMessagesDebtorNotValid;
+	
+	@Value("${exceptions.codes.debtor-not-valid}")
+	private String exceptionsCodesDebtorNotValid;
 
 	@Override
 	public ResponseEntity<DtoCommonWrapper<DtoDebtor>> retrieveDebtorById(String id) {
 		var output = new DtoCommonWrapper<DtoDebtor>();
 		try {
+			Utils.isStringIsBlankOrUndefined(id, exceptionsMessagesDebtorNotValid, exceptionsCodesDebtorNotValid);
+			
 			var debtorFound = business.getDebtorById(id);
 			LOGGER.info(String.format("Debtor found %s", String.valueOf(debtorFound)));
 			var out = debtorMapper.toOuter(debtorFound);
@@ -88,6 +98,9 @@ public class DebtorFacadeImpl implements IDebtorFacade {
 	public ResponseEntity<DtoCommonWrapper<DtoDebtor>> addPay(String id, long time, DtoPartialPyment partialPyment) {
 		var output = new DtoCommonWrapper<DtoDebtor>();
 		try {
+			
+			Utils.isStringIsBlankOrUndefined(id, exceptionsMessagesDebtorNotValid, exceptionsCodesDebtorNotValid);
+			
 			LOGGER.info(String.format("adding payment %s to %s", Encode.forJava(String.valueOf(partialPyment)), id));
 			var partialPymentMapped = partialPymentMapper.toInner(partialPyment);
 			var saved = business.addPay(id, partialPymentMapped, time);

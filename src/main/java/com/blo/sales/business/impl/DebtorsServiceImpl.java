@@ -14,9 +14,9 @@ import com.blo.sales.dao.IDebtorsDao;
 import com.blo.sales.exceptions.BloSalesBusinessException;
 
 @Service
-public class DebtorsService implements IDebtorsBusiness {
+public class DebtorsServiceImpl implements IDebtorsBusiness {
 	
-	private static final Logger LOGGER = LoggerFactory.getLogger(DebtorsService.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(DebtorsServiceImpl.class);
 	
 	@Autowired
 	private IDebtorsDao dao;

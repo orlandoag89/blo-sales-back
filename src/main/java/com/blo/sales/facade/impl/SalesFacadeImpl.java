@@ -34,6 +34,7 @@ import com.blo.sales.facade.mapper.DtoDebtorMapper;
 import com.blo.sales.facade.mapper.DtoProductMapper;
 import com.blo.sales.facade.mapper.DtoSaleMapper;
 import com.blo.sales.facade.mapper.DtoSalesMapper;
+import com.blo.sales.utils.Utils;
 
 @RestController
 public class SalesFacadeImpl implements ISalesFacade {
@@ -100,8 +101,13 @@ public class SalesFacadeImpl implements ISalesFacade {
 			var productsAlert = getProductsAlertsAndUpdate(sale.getProducts());
 			
 			var saleIn = saleMapper.toInner(sale);
-			var saleSaved = business.addSale(saleIn);
 			
+			//valida si es una compra interna que no debe ser registrada en la caja de dinero
+			if (saleIn.getTotal().compareTo(new BigDecimal("-1")) == 0) {
+				saleIn.setTotal(BigDecimal.ZERO);
+			}
+			
+			var saleSaved = business.addSale(saleIn);
 			LOGGER.info(String.format("sale registered %s", String.valueOf(saleSaved)));
 			out.setSale(saleMapper.toOuter(saleSaved));
 			out.setProductsWithAlerts(productsAlert);
@@ -151,9 +157,7 @@ public class SalesFacadeImpl implements ISalesFacade {
 		LOGGER.info(String.format("retrieving sales by flag %s", id));
 		var output = new DtoCommonWrapper<DtoSale>();
 		try {
-			if (StringUtils.isBlank(id)) {
-				throw new BloSalesBusinessException(exceptionsMessagesNotFound, exceptionsCodesNotFound, HttpStatus.NOT_FOUND);
-			}
+			Utils.isStringIsBlankOrUndefined(id, exceptionsMessagesNotFound, exceptionsCodesNotFound);
 			var sale = business.getSaleById(id);
 			var out = saleMapper.toOuter(sale);
 			output.setData(out);

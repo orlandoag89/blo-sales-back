@@ -22,7 +22,7 @@ public class DebtorsServiceImplTest {
 	private IDebtorsDao dao;
 	
 	@InjectMocks
-	private DebtorsService service;
+	private DebtorsServiceImpl service;
 
 	@Test
 	public void addDebtorTest() throws BloSalesBusinessException {

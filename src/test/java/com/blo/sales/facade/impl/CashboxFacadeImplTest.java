@@ -14,6 +14,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.blo.sales.business.ICashboxBusiness;
@@ -26,6 +27,7 @@ import com.blo.sales.factory.MocksUtils;
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@ActiveProfiles("test")
 public class CashboxFacadeImplTest {
 
 	@Autowired
@@ -49,6 +51,7 @@ public class CashboxFacadeImplTest {
 		Mockito.when(cashboxesMapper.toOuter(Mockito.any())).thenReturn(MocksFactory.createDtoCashboxes());
 		
 		var result = mockMvc.perform(get("/api/v1/cashbox")
+				.header(MocksUtils.X_TRACKING_ID, "getAllCashboxesTest")
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andReturn();
@@ -78,6 +81,7 @@ public class CashboxFacadeImplTest {
 		Mockito.when(cashboxMapper.toOuter(Mockito.any())).thenReturn(MocksFactory.createDtoCashboxClose());
 		
 		var result = mockMvc.perform(post("/api/v1/cashbox")
+				.header(MocksUtils.X_TRACKING_ID, "closeCashboxNotCashboxOpenTest")
                 .contentType(MediaType.APPLICATION_JSON).content("{}"))
             .andExpect(status().isOk())
             .andReturn();
@@ -111,6 +115,7 @@ public class CashboxFacadeImplTest {
 		Mockito.when(cashboxMapper.toOuter(Mockito.any())).thenReturn(MocksFactory.createDtoCashboxClose());
 		
 		var result = mockMvc.perform(post("/api/v1/cashbox")
+				.header(MocksUtils.X_TRACKING_ID, "closeCashboxNotCashboxOpenTest")
                 .contentType(MediaType.APPLICATION_JSON).content("{}"))
             .andExpect(status().isOk())
             .andReturn();

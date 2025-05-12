@@ -22,6 +22,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -39,6 +40,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 	"excpetions.messages.products-empty=ERR05",
 	"excpetions.codes.products-empty=Productos no presente"
 })
+@ActiveProfiles("test")
 public class ProductsFacadeImplTest {
 
 	@Autowired
@@ -71,8 +73,9 @@ public class ProductsFacadeImplTest {
 	    when(service.addProducts(Mockito.any())).thenReturn(allProducts); 
 
 	    var result = mockMvc.perform(post("/api/v1/products")
-	                .contentType(MediaType.APPLICATION_JSON)
-	                .content(objectMapper.writeValueAsString(products)))
+	    		.header(MocksUtils.X_TRACKING_ID, "addProductsTest")
+	            .contentType(MediaType.APPLICATION_JSON)
+	            .content(objectMapper.writeValueAsString(products)))
 	            .andExpect(status().isCreated())
 	            .andReturn();
 
@@ -97,6 +100,7 @@ public class ProductsFacadeImplTest {
 	@Test
 	public void addProductsNullProductsTest() throws JsonProcessingException, Exception {
 		var result = mockMvc.perform(post("/api/v1/products")
+				.header(MocksUtils.X_TRACKING_ID, "addProductsNullProductsTest")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(null)))
             .andExpect(status().isBadRequest())
@@ -116,6 +120,7 @@ public class ProductsFacadeImplTest {
 		productsToRegister.setProducts(null);
 		
 		var result = mockMvc.perform(post("/api/v1/products")
+				.header(MocksUtils.X_TRACKING_ID, "addProductsNullListTest")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(productsToRegister)))
             .andExpect(status().isBadRequest())
@@ -139,6 +144,7 @@ public class ProductsFacadeImplTest {
 		productsToRegister.setProducts(new ArrayList<>());
 		
 		var result = mockMvc.perform(post("/api/v1/products")
+				.header(MocksUtils.X_TRACKING_ID, "addProductsEmptyListTest")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(productsToRegister)))
             .andExpect(status().isBadRequest())
@@ -164,6 +170,7 @@ public class ProductsFacadeImplTest {
 		when(productsMapper.toOuter(Mockito.any())).thenReturn(productsOut);
 		
 		var result = mockMvc.perform(get("/api/v1/products")
+				.header(MocksUtils.X_TRACKING_ID, "retrieveAllProductsTest")
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andReturn();
@@ -193,6 +200,7 @@ public class ProductsFacadeImplTest {
 		when(productMapper.toOuter(Mockito.any())).thenReturn(productFromService);
 		
 		var result = mockMvc.perform(get("/api/v1/products/id")
+				.header(MocksUtils.X_TRACKING_ID, "retrieveProductTest")
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andReturn();
@@ -215,6 +223,7 @@ public class ProductsFacadeImplTest {
 	public void retrieveProductEmptyIdTest() throws Exception {
 		
 		var result = mockMvc.perform(get("/api/v1/products/ ")
+				.header(MocksUtils.X_TRACKING_ID, "retrieveProductEmptyIdTest")
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isBadRequest())
             .andReturn();
@@ -240,7 +249,8 @@ public class ProductsFacadeImplTest {
 		
 		var productToUpdateAsString = objectMapper.writeValueAsString(productToUpdate);
 		
-		var result = mockMvc.perform(put("/api/v1/products/1a2b3c4d")
+		var result = mockMvc.perform(put("/api/v1/products/mgmt/1a2b3c4d")
+				.header(MocksUtils.X_TRACKING_ID, "updateProductByIdTest")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(productToUpdateAsString))
             .andExpect(status().isOk())
@@ -268,7 +278,8 @@ public class ProductsFacadeImplTest {
 		
 		var productToUpdateAsString = objectMapper.writeValueAsString(productToUpdate);
 		
-		var result = mockMvc.perform(put("/api/v1/products/ ")
+		var result = mockMvc.perform(put("/api/v1/products/mgmt/ ")
+				.header(MocksUtils.X_TRACKING_ID, "updateProductByIdNotId")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(productToUpdateAsString))
             .andExpect(status().isBadRequest())
@@ -291,7 +302,8 @@ public class ProductsFacadeImplTest {
 		
 		var productToUpdateAsString = objectMapper.writeValueAsString(productToUpdate);
 		
-		var result = mockMvc.perform(put("/api/v1/products/undefined")
+		var result = mockMvc.perform(put("/api/v1/products/mgmt/undefined")
+				.header(MocksUtils.X_TRACKING_ID, "updateProductByIdUndefinedTest")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(productToUpdateAsString))
             .andExpect(status().isBadRequest())
@@ -313,7 +325,8 @@ public class ProductsFacadeImplTest {
 		
 		var productToUpdateAsString = objectMapper.writeValueAsString(null);
 		
-		var result = mockMvc.perform(put("/api/v1/products/ ")
+		var result = mockMvc.perform(put("/api/v1/products/mgmt/ ")
+				.header(MocksUtils.X_TRACKING_ID, "addPartialPayNoCashboxTest")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(productToUpdateAsString))
             .andExpect(status().isBadRequest())
