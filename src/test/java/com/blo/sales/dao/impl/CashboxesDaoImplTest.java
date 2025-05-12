@@ -66,9 +66,9 @@ public class CashboxesDaoImplTest {
 		assertFalse(out.getBoxes().isEmpty());
 	}
 	
-	/*@Test
+	@Test
 	public void getCashboxOpenTest() {
-		Mockito.when(repository.findCashboxByStatus(Mockito.anyString())).thenReturn(MocksFactory.createCashboxes());
+		Mockito.when(repository.findCashboxByStatus(Mockito.anyString())).thenReturn(MocksFactory.createCashboxes().getBoxes());
 		Mockito.when(cashboxMapper.toOuter(Mockito.any())).thenReturn(MocksFactory.createDtoIntCashboxOpen());
 		
 		var out = impl.getCashboxOpen();
@@ -79,14 +79,14 @@ public class CashboxesDaoImplTest {
 	
 	@Test
 	public void getCashboxCloseTest() {
-		Mockito.when(repository.findCashboxByStatus(Mockito.anyString())).thenReturn(MocksFactory.createCashboxes());
+		Mockito.when(repository.findCashboxByStatus(Mockito.anyString())).thenReturn(MocksFactory.createCashboxes().getBoxes());
 		Mockito.when(cashboxesMapper.toOuter(Mockito.any())).thenReturn(MocksFactory.createDtoIntCashboxes());
 		
 		var out = impl.getCashboxesClose();
 		
 		assertNotNull(out);
 		assertFalse(out.getBoxes().isEmpty());
-	}*/
+	}
 	
 	@Test
 	public void updateCashboxTest() throws BloSalesBusinessException {

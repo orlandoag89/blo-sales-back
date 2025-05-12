@@ -1,5 +1,6 @@
 package com.blo.sales.facade.impl;
 
+import org.apache.commons.lang3.StringUtils;
 import org.owasp.encoder.Encode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +21,7 @@ import com.blo.sales.facade.enums.RolesEnum;
 import com.blo.sales.facade.mapper.DtoUserMapper;
 import com.blo.sales.facade.mapper.DtoUserTokenMapper;
 import com.blo.sales.utils.PasswordUtil;
+import com.blo.sales.utils.Utils;
 
 @RestController
 public class UsersFacadeImpl implements IUsersFacade {
@@ -31,6 +33,7 @@ public class UsersFacadeImpl implements IUsersFacade {
 
 	@Autowired
 	private DtoUserTokenMapper userTokenMapper;
+	
 	@Autowired
 	private IUsersBusiness business;
 
@@ -64,6 +67,12 @@ public class UsersFacadeImpl implements IUsersFacade {
 	@Value("${exceptions.messages.user-not-found}")
 	private String exceptionsMessagesUserNotFound;
 	
+	@Value("${exceptions.codes.user-not-valid}")
+	private String exceptionsCodesUserNotValid;
+	
+	@Value("${exceptions.messages.user-not-valid}")
+	private String exceptionsMessagesUserNotValid;
+	
 	private static final String ROOT_USER = "root";
 
 	@Override
@@ -95,9 +104,9 @@ public class UsersFacadeImpl implements IUsersFacade {
 		try {
 			//valida el nombre de usuario
 			if (
-					user.getUsername().trim().isBlank() ||
-					user.getPassword_confirm().trim().isBlank() ||
-					user.getPassword().trim().isBlank()
+					StringUtils.isBlank(user.getUsername())||
+					StringUtils.isBlank(user.getPassword_confirm()) ||
+					StringUtils.isBlank(user.getPassword())
 				) {
 				LOGGER.error("Algun campo esta vacio");
 				throw new BloSalesBusinessException(exceptionsCodesFieldBlank, exceptionsMessagessFieldBlank, HttpStatus.BAD_REQUEST);
@@ -142,10 +151,17 @@ public class UsersFacadeImpl implements IUsersFacade {
 	public ResponseEntity<DtoCommonWrapper<DtoUser>> createTemporaryPassword(DtoUser rootDataUser, String username) {
 		var body = new DtoCommonWrapper<DtoUser>();
 		try {
+			LOGGER.info("Validando el nombre de usuario");
 			if (!rootDataUser.getUsername().equals(ROOT_USER)) {
 				LOGGER.error("Solo el usuario root debe actualizar la contrasenia");
-				throw new BloSalesBusinessException(exceptionsMessagesUserNotFound, exceptionsCodesUserNotFound, HttpStatus.NOT_FOUND);
+				throw new BloSalesBusinessException(exceptionsMessagesUserNotFound, exceptionsCodesUserNotFound, HttpStatus.BAD_REQUEST);
 			}
+			
+			if (StringUtils.isBlank(username) || Utils.includesUndefined(username)) {
+				LOGGER.error("nombre de usuario no valido");
+				throw new BloSalesBusinessException(exceptionsMessagesUserNotValid, exceptionsCodesUserNotValid, HttpStatus.BAD_REQUEST);
+			}
+			
 			puttingIdToUser(rootDataUser);
 			business.login(userMapper.toInner(rootDataUser));
 			

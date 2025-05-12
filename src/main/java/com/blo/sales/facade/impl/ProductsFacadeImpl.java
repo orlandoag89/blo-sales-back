@@ -1,6 +1,5 @@
 package com.blo.sales.facade.impl;
 
-import org.apache.commons.lang3.StringUtils;
 import org.owasp.encoder.Encode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -90,9 +89,8 @@ public class ProductsFacadeImpl implements IProductsFacade {
 		LOGGER.info(String.format("Retrieving product %s", productId));
 		var output = new DtoCommonWrapper<DtoProduct>();
 		try {
-			if (StringUtils.isBlank(productId)) {
-				throw new BloSalesBusinessException(noIdMessage, noIdCode, HttpStatus.BAD_REQUEST);
-			}
+			Utils.isStringIsBlankOrUndefined(productId, noIdMessage, noIdCode);
+			
 			var product = service.getProduct(productId);
 			var mappedProduct = productMapper.toOuter(product);
 			output.setData(mappedProduct);
@@ -110,9 +108,8 @@ public class ProductsFacadeImpl implements IProductsFacade {
 		LOGGER.info(String.format("Update info by id: %s, data %s", productId,  Encode.forJava(String.valueOf(product))));
 		var output = new DtoCommonWrapper<DtoProduct>();
 		try {
-			if (StringUtils.isBlank(productId) || Utils.includesUndefined(productId)) {
-				throw new BloSalesBusinessException(noIdMessage, noIdCode, HttpStatus.BAD_REQUEST);
-			}
+			Utils.isStringIsBlankOrUndefined(productId, noIdMessage, noIdCode);
+			
 			if (product == null) {
 				throw new BloSalesBusinessException(productId, productId, HttpStatus.BAD_REQUEST);
 			}

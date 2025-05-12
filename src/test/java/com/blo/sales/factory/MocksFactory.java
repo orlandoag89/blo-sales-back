@@ -750,6 +750,7 @@ public final class MocksFactory {
 		out.setPassword(ANY_STRING);
 		out.setRole(RolesEnum.COMMON);
 		out.setUsername(ANY_STRING);
+		out.setPassword_confirm(ANY_STRING);
 		return out;
 	}
 	
@@ -761,6 +762,7 @@ public final class MocksFactory {
 	
 	public static DtoUser createDtoRootUser() {
 		var user = createDtoCommonUser();
+		user.setUsername("root");
 		user.setRole(RolesEnum.ROOT);
 		return user;
 	}
@@ -871,5 +873,13 @@ public final class MocksFactory {
 	
 	public static TypeReference<DtoCommonWrapper<DtoCashboxes>> getReferenceFromDtoCashboxes() {
 		return new TypeReference<DtoCommonWrapper<DtoCashboxes>>() { };
+	}
+	
+	public static TypeReference<DtoCommonWrapper<DtoUserToken>> getReferenceFromDtoUserToken() {
+		return new TypeReference<DtoCommonWrapper<DtoUserToken>>() { };
+	}
+	
+	public static TypeReference<DtoCommonWrapper<DtoUser>> getReferenceFromDtoUser() {
+		return new TypeReference<DtoCommonWrapper<DtoUser>>() { };
 	}
 }
