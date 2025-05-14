@@ -17,10 +17,10 @@ public class SecurityConfig {
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		http.csrf(csrf -> csrf.disable())
 	    .authorizeHttpRequests(auth -> auth
-	        .requestMatchers("/api/v1/users/actions/login").permitAll()
-	        .requestMatchers("/api/v1/users/mgmt/actions/**").hasRole("ROOT") // protegidos con token ROOT
-	        .requestMatchers("/api/v1/products/mgmt/**").hasRole("ROOT") // protegidos con token ROOT
-	        .requestMatchers("/api/v1/**").authenticated() // protegidos con token común
+	        .antMatchers("/api/v1/users/actions/login").permitAll()
+	        .antMatchers("/api/v1/users/mgmt/actions/**").hasRole("ROOT") // protegidos con token ROOT
+	        .antMatchers("/api/v1/products/mgmt/**").hasRole("ROOT") // protegidos con token ROOT
+	        .antMatchers("/api/v1/**").authenticated() // protegidos con token común
 	        .anyRequest().denyAll()
 	    )
 	    .addFilterBefore(new JwtAuthFilterRoot(), UsernamePasswordAuthenticationFilter.class)
