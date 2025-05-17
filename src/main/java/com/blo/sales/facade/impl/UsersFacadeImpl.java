@@ -73,6 +73,24 @@ public class UsersFacadeImpl implements IUsersFacade {
 	@Value("${exceptions.messages.user-not-valid}")
 	private String exceptionsMessagesUserNotValid;
 	
+	@Value("${exceptions.codes.user-not-root}")
+	private String exceptionsCodesUserNotRoot;
+	
+	@Value("${exceptions.messages.user-not-root}")
+	private String exceptionsMesssagesUserNotRoot;
+	
+	@Value("${exceptions.codes.user-not-root-rol}")
+	private String exceptionsCodesUserNotRootRol;
+		
+	@Value("${exceptions.messages.user-not-root-rol}")
+	private String exceptionsMessagesUserNotRootRol;
+	
+	@Value("${exceptions.codes.user-found}")
+	private String exceptionsCodesUserFound;
+	
+	@Value("${exceptions.messages.user-found}")
+	private String exceptionsMessagesUserFound;
+	
 	private static final String ROOT_USER = "root";
 
 	@Override
@@ -92,6 +110,44 @@ public class UsersFacadeImpl implements IUsersFacade {
 			return new ResponseEntity<>(body, HttpStatus.OK);
 		} catch (BloSalesBusinessException e) {
 			LOGGER.error(String.format("Error %s", e.getMessage()));
+			var error = new DtoError(e.getErrorCode(), e.getExceptionMessage());
+			body.setError(error);
+			return new ResponseEntity<>(body, e.getExceptHttpStatus());
+		}
+	}
+	
+	@Override
+	public ResponseEntity<DtoCommonWrapper<DtoUserToken>> registerRootUser(DtoUser rootUser) {
+		var body = new DtoCommonWrapper<DtoUserToken>();
+		try {
+			LOGGER.info("validando root user");
+			if (!rootUser.getUsername().equals(ROOT_USER)) {
+				LOGGER.error("este usuario no es root");
+				throw new BloSalesBusinessException(exceptionsMesssagesUserNotRoot, exceptionsCodesUserNotRoot, HttpStatus.UNPROCESSABLE_ENTITY);
+			}
+			if (rootUser.getRole().compareTo(RolesEnum.ROOT) < 0) {
+				LOGGER.error("el usuario no es root");
+				throw new BloSalesBusinessException(exceptionsMessagesUserNotRootRol, exceptionsCodesUserNotRootRol, HttpStatus.UNPROCESSABLE_ENTITY);
+			}
+			if (!rootUser.getPassword().equals(rootUser.getPassword_confirm())) {
+				LOGGER.error("Las contrasenias no coinciden");
+				throw new BloSalesBusinessException(exceptionsMessagesPasswordNotEquals, exceptionsCodesPasswordNotEquals, HttpStatus.BAD_REQUEST);
+			}
+			LOGGER.info("buscando usuario root");
+			var userFound = business.getUserOrNullByName(ROOT_USER);
+			if (userFound != null) {
+				LOGGER.error(String.format("usuario encontrado %s", String.valueOf(userFound.getUsername())));
+				throw new BloSalesBusinessException(exceptionsCodesUserFound, exceptionsMessagesUserFound, HttpStatus.UNPROCESSABLE_ENTITY);
+			}
+			LOGGER.info("usuario no registrado");
+			var inner = userMapper.toInner(rootUser);
+			var token = business.register(inner);
+			var toBody = userTokenMapper.toOuter(token);
+			LOGGER.info(String.format("usuario registrado %s", String.valueOf(toBody)));
+			body.setData(toBody);
+			return new ResponseEntity<>(body, HttpStatus.CREATED);
+		} catch (BloSalesBusinessException e) {
+			LOGGER.error(String.format("error [%s]", String.valueOf(e)));
 			var error = new DtoError(e.getErrorCode(), e.getExceptionMessage());
 			body.setError(error);
 			return new ResponseEntity<>(body, e.getExceptHttpStatus());
@@ -222,4 +278,5 @@ public class UsersFacadeImpl implements IUsersFacade {
 		// setea el id
 		userData.setId(userByName.getId());
 	}
+
 }

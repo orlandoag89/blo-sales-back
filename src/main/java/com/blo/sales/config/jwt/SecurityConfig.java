@@ -18,6 +18,7 @@ public class SecurityConfig {
 		http.csrf(csrf -> csrf.disable())
 	    .authorizeHttpRequests(auth -> auth
 	        .antMatchers("/api/v1/users/actions/login").permitAll()
+	        .antMatchers("/api/v1/users/actions/register/root").permitAll()
 	        .antMatchers("/api/v1/users/mgmt/actions/**").hasRole("ROOT") // protegidos con token ROOT
 	        .antMatchers("/api/v1/products/mgmt/**").hasRole("ROOT") // protegidos con token ROOT
 	        .antMatchers("/api/v1/**").authenticated() // protegidos con token común
