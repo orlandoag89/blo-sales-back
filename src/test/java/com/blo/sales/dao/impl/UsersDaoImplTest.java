@@ -11,13 +11,18 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.context.TestPropertySource;
 
 import com.blo.sales.dao.mapper.UsuarioMapper;
+import com.blo.sales.dao.repository.ConfigsRepository;
 import com.blo.sales.dao.repository.UsuariosRepository;
 import com.blo.sales.exceptions.BloSalesBusinessException;
 import com.blo.sales.factory.MocksFactory;
 
 @ExtendWith(MockitoExtension.class)
+@TestPropertySource(properties = {
+	"exceptions.messages.not-config=No hay configuracion existente"
+})
 public class UsersDaoImplTest {
 	
 	@InjectMocks
@@ -28,11 +33,15 @@ public class UsersDaoImplTest {
 
 	@Mock
 	private UsuariosRepository repository;
+	
+	@Mock
+	private ConfigsRepository configsRepository;
 
 	@Test
 	public void registerTest() throws BloSalesBusinessException {
 		Mockito.when(usuarioMapper.toInner(Mockito.any())).thenReturn(MocksFactory.createNewCommonUsuarioWithoutOpenPasswordOpen());
 		Mockito.when(repository.save(Mockito.any())).thenReturn(MocksFactory.createCommonUsuarioWithoutOpenPasswordOpen());
+		Mockito.when(configsRepository.getNoCiphered()).thenReturn(MocksFactory.createConfig());
 		
 		var saved = dao.register(MocksFactory.createDtoIntCommonUser());
 		
@@ -46,6 +55,7 @@ public class UsersDaoImplTest {
 	@Test
 	public void loginSuccessTest() throws BloSalesBusinessException {
 		Mockito.when(repository.findById(Mockito.anyString())).thenReturn(MocksFactory.createOptionalUsuario());
+		Mockito.when(configsRepository.getNoCiphered()).thenReturn(MocksFactory.createConfig());
 		
 		var login = dao.login(MocksFactory.createDtoIntCommonUser());
 		
@@ -73,6 +83,7 @@ public class UsersDaoImplTest {
 	@Test
 	public void loginFailIdNotPasswordsEqualsTest() throws BloSalesBusinessException {
 		Mockito.when(repository.findById(Mockito.anyString())).thenReturn(MocksFactory.createOptionalUsuario());
+		Mockito.when(configsRepository.getNoCiphered()).thenReturn(MocksFactory.createConfig());
 		
 		var input = MocksFactory.createDtoIntCommonUser();
 		input.setPassword("abcd");
@@ -116,6 +127,7 @@ public class UsersDaoImplTest {
 		Mockito.when(repository.findById(Mockito.anyString())).thenReturn(MocksFactory.createOptionalUsuario());
 		Mockito.when(repository.save(Mockito.any())).thenReturn(MocksFactory.createCommonUsuarioWithoutOpenPasswordOpen());
 		Mockito.when(usuarioMapper.toOuter(Mockito.any())).thenReturn(MocksFactory.createDtoIntCommonUser());
+		Mockito.when(configsRepository.getNoCiphered()).thenReturn(MocksFactory.createConfig());
 		
 		var out = dao.registerTemporaryPassword(MocksFactory.createDtoIntCommonUser());
 		
@@ -131,6 +143,7 @@ public class UsersDaoImplTest {
 		Mockito.when(repository.findById(Mockito.anyString())).thenReturn(MocksFactory.createOptionalUsuarioOpenProcess());
 		Mockito.when(repository.save(Mockito.any())).thenReturn(MocksFactory.createCommonUsuarioWithoutOpenPasswordOpen());
 		Mockito.when(usuarioMapper.toOuter(Mockito.any())).thenReturn(MocksFactory.createDtoIntCommonUser());
+		Mockito.when(configsRepository.getNoCiphered()).thenReturn(MocksFactory.createConfig());
 		
 		var out = dao.registerTemporaryPassword(MocksFactory.createDtoIntCommonUser());
 		
@@ -168,6 +181,7 @@ public class UsersDaoImplTest {
 		Mockito.when(repository.findById(Mockito.anyString())).thenReturn(Optional.of(foundId));
 		Mockito.when(repository.save(Mockito.any())).thenReturn(MocksFactory.createCommonUsuarioWithoutOpenPasswordOpen());
 		Mockito.when(usuarioMapper.toOuter(Mockito.any())).thenReturn(MocksFactory.createDtoIntCommonUser());
+		Mockito.when(configsRepository.getNoCiphered()).thenReturn(MocksFactory.createConfig());
 		
 		var userNewInfo = MocksFactory.createDtoIntCommonUser();
 		userNewInfo.setOld_password(PASS);
@@ -191,6 +205,7 @@ public class UsersDaoImplTest {
 		Mockito.when(repository.findById(Mockito.anyString())).thenReturn(Optional.of(foundId));
 		Mockito.when(repository.save(Mockito.any())).thenReturn(MocksFactory.createCommonUsuarioWithoutOpenPasswordOpen());
 		Mockito.when(usuarioMapper.toOuter(Mockito.any())).thenReturn(MocksFactory.createDtoIntCommonUser());
+		Mockito.when(configsRepository.getNoCiphered()).thenReturn(MocksFactory.createConfig());
 		
 		var userNewInfo = MocksFactory.createDtoIntCommonUser();
 		userNewInfo.setPassword(PASS + PASS);

@@ -105,6 +105,13 @@ public class UsersFacadeImplTest {
 		assertNotNull(obj.getError());
 	}
 	
+	public void registerRootUserSuccess() throws BloSalesBusinessException {
+		Mockito.when(business.getUserOrNullByName(Mockito.anyString())).thenReturn(null);
+		Mockito.when(userMapper.toInner(Mockito.any())).thenReturn(MocksFactory.createDtoIntRootUser());
+		Mockito.when(business.register(Mockito.any())).thenReturn(MocksFactory.createDtoIntUserToken());
+		Mockito.when(userTokenMapper.toOuter(Mockito.any())).thenReturn(MocksFactory.createDtoUserToken());
+	}
+	
 	@Test
 	public void registerUserSuccessTest() throws JsonProcessingException, Exception {
 		var body = MocksFactory.createDtoCommonUser();
