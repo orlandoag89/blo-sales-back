@@ -757,6 +757,7 @@ public final class MocksFactory {
 	
 	public static DtoIntUser createDtoIntRootUser() {
 		var user = createDtoIntCommonUser();
+		user.setUsername("root");
 		user.setRole(RolesIntEnum.ROOT);
 		return user;
 	}
@@ -804,10 +805,12 @@ public final class MocksFactory {
 		return out;
 	}
 	
-	public static Optional<Config> createConfig() {
+	public static List<Config> createConfig() {
+		List<Config> out = new ArrayList<Config>();
 		var config = new Config();
 		config.setCiphered(false);
-		return Optional.of(config);
+		out.add(config);
+		return out;
 	}
 	
 	public static Optional<Usuario> createOptionalUsuario() {

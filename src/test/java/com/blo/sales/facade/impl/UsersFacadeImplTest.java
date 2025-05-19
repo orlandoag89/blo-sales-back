@@ -20,6 +20,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.blo.sales.business.IUsersBusiness;
 import com.blo.sales.exceptions.BloSalesBusinessException;
+import com.blo.sales.facade.enums.RolesEnum;
 import com.blo.sales.facade.mapper.DtoUserMapper;
 import com.blo.sales.facade.mapper.DtoUserTokenMapper;
 import com.blo.sales.factory.MocksFactory;
@@ -105,11 +106,122 @@ public class UsersFacadeImplTest {
 		assertNotNull(obj.getError());
 	}
 	
-	public void registerRootUserSuccess() throws BloSalesBusinessException {
+	@Test
+	public void registerRootUserSuccessTest() throws JsonProcessingException, Exception {
 		Mockito.when(business.getUserOrNullByName(Mockito.anyString())).thenReturn(null);
 		Mockito.when(userMapper.toInner(Mockito.any())).thenReturn(MocksFactory.createDtoIntRootUser());
 		Mockito.when(business.register(Mockito.any())).thenReturn(MocksFactory.createDtoIntUserToken());
 		Mockito.when(userTokenMapper.toOuter(Mockito.any())).thenReturn(MocksFactory.createDtoUserToken());
+		
+		var result = mockMvc.perform(post("/api/v1/users/actions/register/root")
+			 	.header(MocksUtils.X_TRACKING_ID, "registerRootUserSuccessTest")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(MocksFactory.createDtoRootUser())))
+            .andExpect(status().isCreated())
+            .andReturn();
+		
+		var data = MocksUtils.getContentAsString(result, "registerRootUserSuccessTest");
+		var obj = MocksUtils.parserToCommonWrapper(data, MocksFactory.getReferenceFromDtoUserToken());
+		
+		assertNotNull(obj);
+		assertNotNull(obj.getData());
+		assertNull(obj.getError());
+	}
+	
+	/**
+	 * Se intenta registrar un nombre de usuario diferente a root
+	 * @throws JsonProcessingException
+	 * @throws Exception
+	 */
+	@Test
+	public void registerNotRootUsernameFailTest() throws JsonProcessingException, Exception {
+		var result = mockMvc.perform(post("/api/v1/users/actions/register/root")
+			 	.header(MocksUtils.X_TRACKING_ID, "registerNotRootUsernameFailTest")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(MocksFactory.createDtoCommonUser())))
+            .andExpect(status().isBadRequest())
+            .andReturn();
+		
+		var data = MocksUtils.getContentAsString(result, "registerNotRootUsernameFailTest");
+		var obj = MocksUtils.parserToCommonWrapper(data, MocksFactory.getReferenceFromDtoUserToken());
+		
+		assertNotNull(obj);
+		assertNull(obj.getData());
+		assertNotNull(obj.getError());
+	}
+	
+	/**
+	 * Se intenta registrar un usuario con un rol diferente a root
+	 * @throws JsonProcessingException
+	 * @throws Exception
+	 */
+	@Test
+	public void registerNotRootRolFailTest() throws JsonProcessingException, Exception {
+		var body = MocksFactory.createDtoRootUser();
+		body.setRole(RolesEnum.COMMON);
+		
+		var result = mockMvc.perform(post("/api/v1/users/actions/register/root")
+			 	.header(MocksUtils.X_TRACKING_ID, "registerNotRootRolFailTest")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(body)))
+            .andExpect(status().isBadRequest())
+            .andReturn();
+		
+		var data = MocksUtils.getContentAsString(result, "registerNotRootRolFailTest");
+		var obj = MocksUtils.parserToCommonWrapper(data, MocksFactory.getReferenceFromDtoUserToken());
+		
+		assertNotNull(obj);
+		assertNull(obj.getData());
+		assertNotNull(obj.getError());
+	}
+	
+	/**
+	 * Se intenta registrar un usuario cuando ya existe un usuario root
+	 * @throws JsonProcessingException
+	 * @throws Exception
+	 */
+	@Test
+	public void registerRootExistsFailTest() throws JsonProcessingException, Exception {
+		Mockito.when(business.getUserOrNullByName(Mockito.anyString())).thenReturn(MocksFactory.createDtoIntRootUser());
+		
+		var result = mockMvc.perform(post("/api/v1/users/actions/register/root")
+			 	.header(MocksUtils.X_TRACKING_ID, "registerNotRootRolFailTest")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(MocksFactory.createDtoRootUser())))
+            .andExpect(status().isUnprocessableEntity())
+            .andReturn();
+		
+		var data = MocksUtils.getContentAsString(result, "registerNotRootRolFailTest");
+		var obj = MocksUtils.parserToCommonWrapper(data, MocksFactory.getReferenceFromDtoUserToken());
+		
+		assertNotNull(obj);
+		assertNull(obj.getData());
+		assertNotNull(obj.getError());
+	}
+	
+	/**
+	 * Se intenta registrar un usuario root con contraseñas diferentes
+	 * @throws JsonProcessingException
+	 * @throws Exception
+	 */
+	@Test
+	public void registerDiffPasswordFailTest() throws JsonProcessingException, Exception {
+		var body = MocksFactory.createDtoRootUser();
+		body.setPassword("abcd");
+		
+		var result = mockMvc.perform(post("/api/v1/users/actions/register/root")
+			 	.header(MocksUtils.X_TRACKING_ID, "registerDiffPasswordFailTest")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(body)))
+            .andExpect(status().isBadRequest())
+            .andReturn();
+		
+		var data = MocksUtils.getContentAsString(result, "registerDiffPasswordFailTest");
+		var obj = MocksUtils.parserToCommonWrapper(data, MocksFactory.getReferenceFromDtoUserToken());
+		
+		assertNotNull(obj);
+		assertNull(obj.getData());
+		assertNotNull(obj.getError());
 	}
 	
 	@Test

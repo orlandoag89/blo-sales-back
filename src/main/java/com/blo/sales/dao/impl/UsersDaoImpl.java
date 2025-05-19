@@ -220,13 +220,16 @@ public class UsersDaoImpl implements IUsersDao {
 	
 	private Config getConfig() throws BloSalesBusinessException {
 		LOGGER.info("Buscando configuraciones de ambiente");
-		var configFound = configsRepository.getNoCiphered();
-		LOGGER.info(String.format("configuraciones encontradas: %s", String.valueOf(configFound)));
-		if (!configFound.isPresent()) {
+		var configFound = configsRepository.findAll();
+		LOGGER.info(String.format("Configuracion por ambiente :%s", String.valueOf(configFound)));
+		var config = configFound.stream().findFirst().orElse(null);
+		if (config == null) {
 			LOGGER.error("Las configuraciones no existen");
 			throw new BloSalesBusinessException(exceptionsMessagesNotConfig, exceptionsCodesNotConfig, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-		return configFound.get();
+		
+		LOGGER.info(String.format("configuraciones encontradas: %s", String.valueOf(config)));
+		return config;
 	}
 	
 }

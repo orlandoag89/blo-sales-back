@@ -122,12 +122,12 @@ public class UsersFacadeImpl implements IUsersFacade {
 		try {
 			LOGGER.info("validando root user");
 			if (!rootUser.getUsername().equals(ROOT_USER)) {
-				LOGGER.error("este usuario no es root");
-				throw new BloSalesBusinessException(exceptionsMesssagesUserNotRoot, exceptionsCodesUserNotRoot, HttpStatus.UNPROCESSABLE_ENTITY);
+				LOGGER.error("este nombre de usuario no es root");
+				throw new BloSalesBusinessException(exceptionsMesssagesUserNotRoot, exceptionsCodesUserNotRoot, HttpStatus.BAD_REQUEST);
 			}
-			if (rootUser.getRole().compareTo(RolesEnum.ROOT) < 0) {
-				LOGGER.error("el usuario no es root");
-				throw new BloSalesBusinessException(exceptionsMessagesUserNotRootRol, exceptionsCodesUserNotRootRol, HttpStatus.UNPROCESSABLE_ENTITY);
+			if (rootUser.getRole().compareTo(RolesEnum.ROOT) != 0) {
+				LOGGER.error("el rol de este usuario no es root");
+				throw new BloSalesBusinessException(exceptionsMessagesUserNotRootRol, exceptionsCodesUserNotRootRol, HttpStatus.BAD_REQUEST);
 			}
 			if (!rootUser.getPassword().equals(rootUser.getPassword_confirm())) {
 				LOGGER.error("Las contrasenias no coinciden");
