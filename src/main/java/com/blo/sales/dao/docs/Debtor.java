@@ -20,6 +20,8 @@ public @Data class Debtor implements Serializable {
 	private BigDecimal total; // deuda que tiene
 
 	private long open_date;
+	
+	private long update_date; // fecha de ultima compra
 
 	private List<PartialPyment> partial_pyments;
 

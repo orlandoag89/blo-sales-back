@@ -19,6 +19,8 @@ public @Data class DtoIntDebtor implements Serializable {
 	
 	private long open_date;
 	
+	private long update_date; // fecha de ultima compra
+	
 	private List<DtoIntPartialPyment> partial_pyments;
 	
 	private List<DtoIntSale> sales;

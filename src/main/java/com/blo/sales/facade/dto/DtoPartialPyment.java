@@ -12,5 +12,5 @@ public @Data class DtoPartialPyment implements Serializable {
 	private BigDecimal partial_pyment;
 	
 	private long date;
-
+	
 }

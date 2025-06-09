@@ -6,8 +6,9 @@ public enum StatusSaleEnum {
 	 * TODAS
 	 * ABIERTAS
 	 * CERRADAS
+	 * No CajaDinero
 	 */
 	
-	ALL, OPEN, CLOSE
+	ALL, OPEN, CLOSE, NOT_CASHBOX
 
 }

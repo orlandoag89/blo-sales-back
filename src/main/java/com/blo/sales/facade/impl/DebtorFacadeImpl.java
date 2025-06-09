@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.blo.sales.business.ICashboxBusiness;
@@ -30,6 +31,7 @@ import com.blo.sales.facade.mapper.DtoPartialPymentMapper;
 import com.blo.sales.utils.Utils;
 
 @RestController
+@CrossOrigin(origins = "http://localhost:4200")
 public class DebtorFacadeImpl implements IDebtorFacade {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(DebtorFacadeImpl.class);
@@ -138,7 +140,6 @@ public class DebtorFacadeImpl implements IDebtorFacade {
 					var saleUpdated = sales.updateSale(sale.getId(), saleFound);
 					LOGGER.info(String.format("sale updated %s", String.valueOf(saleUpdated)));
 				}
-				// 
 				// elimina deudor
 				business.deleteDebtorById(id);
 				LOGGER.info(String.format("%s was deleted, account was payed", id));

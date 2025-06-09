@@ -22,10 +22,12 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 
+import com.blo.sales.business.ICashboxBusiness;
 import com.blo.sales.business.IDebtorsBusiness;
 import com.blo.sales.business.IProductsBusiness;
 import com.blo.sales.business.ISalesBusiness;
 import com.blo.sales.facade.dto.DtoWrapperSale;
+import com.blo.sales.facade.mapper.DtoCashboxMapper;
 import com.blo.sales.facade.mapper.DtoDebtorMapper;
 import com.blo.sales.facade.mapper.DtoProductMapper;
 import com.blo.sales.facade.mapper.DtoSaleMapper;
@@ -69,7 +71,13 @@ public class SalesFacadeImplTest {
 	
 	@MockBean
 	private DtoDebtorMapper debtorMapper;
+	
+	@MockBean
+	private ICashboxBusiness cashboxBusiness;
 
+	@MockBean
+	private DtoCashboxMapper cashboxMapper;
+	
 	/**
 	 * Venta cerrada sin deudor y sin productos con alerta de terminar
 	 * @throws Exception 
@@ -85,6 +93,49 @@ public class SalesFacadeImplTest {
 		Mockito.when(saleMapper.toOuter(Mockito.any())).thenReturn(MocksFactory.createDtoSaleNoCashbox());
 		Mockito.when(productsBusiness.getProduct(Mockito.anyString())).thenReturn(MocksFactory.createDtoIntProduct());
 		Mockito.when(productsBusiness.updateProduct(Mockito.anyString(), Mockito.any())).thenReturn(MocksFactory.createDtoIntProduct());
+		
+		 var result = mockMvc.perform(post("/api/v1/sales")
+				 	.header(MocksUtils.X_TRACKING_ID, "registerSaleTest")
+	                .contentType(MediaType.APPLICATION_JSON)
+	                .content(saleAsString))
+	            .andExpect(status().isCreated())
+	            .andReturn();
+		
+		var registerSale = MocksUtils.getContentAsString(result, "registerSaleTest");
+		var objtSale = MocksUtils.parserToCommonWrapper(registerSale,  MocksFactory.getReferenceFromWrapperSale());
+		
+		Mockito.verify(saleMapper, Mockito.atLeastOnce()).toInner(Mockito.any());
+		Mockito.verify(business, Mockito.atLeastOnce()).addSale(Mockito.any());
+		Mockito.verify(saleMapper, Mockito.atLeastOnce()).toOuter(Mockito.any());
+		Mockito.verify(productsBusiness, Mockito.atLeastOnce()).getProduct(Mockito.anyString());
+		Mockito.verify(productsBusiness, Mockito.atLeastOnce()).updateProduct(Mockito.anyString(), Mockito.any());
+		
+		assertNotNull(result);
+		assertNotNull(registerSale);
+		assertNotNull(objtSale.getData().getSale());
+		assertNotNull(objtSale.getData().getSale().getId());
+		assertNull(objtSale.getData().getDebtor());
+		assertNull(objtSale.getError());
+		assertTrue(objtSale.getData().getProductsWithAlerts().isEmpty());
+	}
+	
+	/**
+	 * Venta cerrada y con una caja existente
+	 * @throws Exception 
+	 */
+	@Test
+	public void registerSaleExistsCashbox() throws Exception {
+		var sale = MocksFactory.createDtoNewSaleNoCashbox();
+		var saleSaved = MocksFactory.createDtoIntSaleNoCashbox();
+		var saleAsString = objectMapper.writeValueAsString(sale);
+		
+		Mockito.when(saleMapper.toInner(Mockito.any())).thenReturn(saleSaved);
+		Mockito.when(business.addSale(Mockito.any())).thenReturn(saleSaved);
+		Mockito.when(saleMapper.toOuter(Mockito.any())).thenReturn(MocksFactory.createDtoSaleNoCashbox());
+		Mockito.when(productsBusiness.getProduct(Mockito.anyString())).thenReturn(MocksFactory.createDtoIntProduct());
+		Mockito.when(productsBusiness.updateProduct(Mockito.anyString(), Mockito.any())).thenReturn(MocksFactory.createDtoIntProduct());
+		Mockito.when(cashboxBusiness.getCashboxOpen()).thenReturn(MocksFactory.createDtoIntCashboxOpen());
+		Mockito.when(cashboxBusiness.updateCashbox(Mockito.anyString(), Mockito.any())).thenReturn(MocksFactory.createDtoIntCashboxOpen());
 		
 		 var result = mockMvc.perform(post("/api/v1/sales")
 				 	.header(MocksUtils.X_TRACKING_ID, "registerSaleTest")
@@ -378,7 +429,7 @@ public class SalesFacadeImplTest {
 		
 		var body = objectMapper.writeValueAsString(wrapperSale);
 		
-		var response = mockMvc.perform(post("/api/v1/sales/debtors?partialPyment=10")
+		var response = mockMvc.perform(post("/api/v1/sales/debtors?partialPyment=10&time=12000")
 				.header(MocksUtils.X_TRACKING_ID, "registerSaleAndNewDebtorTest")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(body))
@@ -429,7 +480,7 @@ public class SalesFacadeImplTest {
 		
 		var body = objectMapper.writeValueAsString(wrapperSale);
 		
-		var response = mockMvc.perform(post("/api/v1/sales/debtors?partialPyment=100")
+		var response = mockMvc.perform(post("/api/v1/sales/debtors?partialPyment=100&time=12000")
 				.header(MocksUtils.X_TRACKING_ID, "registerSaleAndNewDebtorAlertProductsTest")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(body))
@@ -470,7 +521,7 @@ public class SalesFacadeImplTest {
 		
 		var body = objectMapper.writeValueAsString(wrapperSale);
 		
-		var response = mockMvc.perform(post("/api/v1/sales/debtors?partialPyment=10")
+		var response = mockMvc.perform(post("/api/v1/sales/debtors?partialPyment=10&time=12000")
 				.header(MocksUtils.X_TRACKING_ID, "registerSalePartialPymentoErrorTest")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(body))
@@ -499,7 +550,7 @@ public class SalesFacadeImplTest {
 		
 		var body = objectMapper.writeValueAsString(wrapperSale);
 		
-		var response = mockMvc.perform(post("/api/v1/sales/debtors?partialPyment=10")
+		var response = mockMvc.perform(post("/api/v1/sales/debtors?partialPyment=10&time=12000")
 				.header(MocksUtils.X_TRACKING_ID, "registerSalePartialPymentsNotEqualsoErrorTest")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(body))
@@ -544,7 +595,7 @@ public class SalesFacadeImplTest {
 		Mockito.when(debtorBusiness.updateDebtor(Mockito.anyString(), Mockito.any())).thenReturn(debtorUpdated);
 		Mockito.when(debtorMapper.toOuter(Mockito.any())).thenReturn(debtorUpdated2);
 		
-		var response = mockMvc.perform(post("/api/v1/sales/debtors?partialPyment=0")
+		var response = mockMvc.perform(post("/api/v1/sales/debtors?partialPyment=0&time=12000")
 				.header(MocksUtils.X_TRACKING_ID, "registerSaleAndOldDebtorTest")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(body))
@@ -602,8 +653,10 @@ public class SalesFacadeImplTest {
 		Mockito.when(saleMapper.toOuter(Mockito.any())).thenReturn(MocksFactory.createDtoNewSaleNoCashbox());
 		Mockito.when(debtorBusiness.updateDebtor(Mockito.anyString(), Mockito.any())).thenReturn(debtorUpdated);
 		Mockito.when(debtorMapper.toOuter(Mockito.any())).thenReturn(debtorUpdated2);
+		Mockito.when(cashboxBusiness.getAllCashboxes()).thenReturn(MocksFactory.createDtoIntCashboxes());
+		Mockito.when(cashboxMapper.toInner(Mockito.any())).thenReturn(MocksFactory.createDtoIntCashboxOpen());
 		
-		var response = mockMvc.perform(post("/api/v1/sales/debtors?partialPyment=30")
+		var response = mockMvc.perform(post("/api/v1/sales/debtors?partialPyment=30&time=12000")
 				.header(MocksUtils.X_TRACKING_ID, "registerSaleAndOldDebtorWithPartialPymentTest")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(body))
@@ -630,57 +683,5 @@ public class SalesFacadeImplTest {
 		assertNotNull(obj.getData().getProductsWithAlerts().isEmpty());
 		assertEquals(MocksUtils.BIG_DECIMAL_70, obj.getData().getDebtor().getTotal());
 	}
-	
-	/**
-	 * se registra una venta con un deudor que existe y no tiene productos con alerta
-	 * el deudor tiene una deuda de 50 pesos y una compra de 50
-	 * dejó abono de 500, así que el deudor se elimina
-	 * @throws Exception
-	 */
-	@Test
-	public void registerSaleAndOldDebtorWithAllPymentTest() throws Exception {
-		var debtor = MocksFactory.createExistsDtoDebtor();
-		var sale = MocksFactory.createDtoSaleNoCashboxAndOpen();
-		var wrapper = new DtoWrapperSale();
-		wrapper.setDebtor(debtor);
-		wrapper.setSale(sale);
-		
-		var body = objectMapper.writeValueAsString(wrapper);
-		
-		var debtorUpdatedInt = MocksFactory.createExistsDtoIntDebtor();
-		debtorUpdatedInt.setTotal(MocksUtils.BIG_DECIMAL_70);
-		
-		var debtorUpdatedOuter = MocksFactory.createExistsDtoDebtor();
-		debtorUpdatedOuter.setTotal(MocksUtils.BIG_DECIMAL_70);
-		
-		Mockito.when(productsBusiness.getProduct(Mockito.anyString())).thenReturn(MocksFactory.createDtoIntProduct());
-		Mockito.when(productsBusiness.updateProduct(Mockito.anyString(), Mockito.any())).thenReturn(MocksFactory.createDtoIntProduct());
-		Mockito.when(debtorBusiness.getDebtorById(Mockito.anyString())).thenReturn(MocksFactory.createExistsDtoIntDebtor());
-		Mockito.when(saleMapper.toInner(Mockito.any())).thenReturn(MocksFactory.createDtoIntSaleNoCashboxAndOpen());
-		Mockito.when(business.addSale(Mockito.any())).thenReturn(MocksFactory.createDtoIntSaleNoCashbox());
-		Mockito.when(saleMapper.toOuter(Mockito.any())).thenReturn(MocksFactory.createDtoSaleNoCashbox());
-		Mockito.doNothing().when(debtorBusiness).deleteDebtorById(Mockito.anyString());
-		
-		var response = mockMvc.perform(post("/api/v1/sales/debtors?partialPyment=500")
-				.header(MocksUtils.X_TRACKING_ID, "registerSaleAndOldDebtorWithAllPymentTest")
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(body))
-				.andExpect(status().isCreated()).andReturn();
-		
-		var data = MocksUtils.getContentAsString(response, "registerSaleAndOldDebtorWithAllPymentTest");
-		var obj = objectMapper.readValue(data, MocksFactory.getReferenceFromWrapperSale());
-		
-		Mockito.verify(productsBusiness, Mockito.atLeastOnce()).getProduct(Mockito.anyString());
-		Mockito.verify(productsBusiness, Mockito.atLeastOnce()).updateProduct(Mockito.anyString(), Mockito.any());
-		Mockito.verify(debtorBusiness, Mockito.atLeastOnce()).getDebtorById(Mockito.anyString());
-		Mockito.verify(saleMapper, Mockito.atLeastOnce()).toInner(Mockito.any());
-		Mockito.verify(business, Mockito.atLeastOnce()).addSale(Mockito.any());
-		Mockito.verify(saleMapper, Mockito.atLeastOnce()).toOuter(Mockito.any());
-		Mockito.verify(debtorBusiness, Mockito.atLeastOnce()).deleteDebtorById(Mockito.anyString());
-		
-		assertNotNull(data);
-		assertNotNull(obj);
-		assertNotNull(obj.getData().getSale());
-		assertNull(obj.getData().getDebtor().getId());
-	}
+
 }

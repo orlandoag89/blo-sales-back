@@ -12,10 +12,13 @@ import com.blo.sales.facade.dto.commons.DtoCommonWrapper;
 @RequestMapping("/api/v1/cashbox")
 public interface ICashboxFacade {
 	
-	@GetMapping
+	@GetMapping("/all")
 	ResponseEntity<DtoCommonWrapper<DtoCashboxes>> getAllCashboxes();
 	
 	@PostMapping
 	ResponseEntity<DtoCommonWrapper<DtoCashbox>> closeCashbox();
+	
+	@GetMapping
+	ResponseEntity<DtoCommonWrapper<DtoCashbox>> getOpenCashbox();
 
 }

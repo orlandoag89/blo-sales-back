@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.blo.sales.business.IUsersBusiness;
@@ -24,6 +25,7 @@ import com.blo.sales.utils.PasswordUtil;
 import com.blo.sales.utils.Utils;
 
 @RestController
+@CrossOrigin(origins = "http://localhost:4200")
 public class UsersFacadeImpl implements IUsersFacade {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(UsersFacadeImpl.class);

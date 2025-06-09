@@ -35,7 +35,7 @@ public class SalesBusinessImpl implements ISalesBusiness {
 	@Override
 	public DtoIntSales getSalesOpen() throws BloSalesBusinessException {
 		LOGGER.info("retrieving open sales");
-		return dao.getSales();
+		return dao.getSalesOpen();
 	}
 
 	@Override
