@@ -12,8 +12,10 @@ import com.blo.sales.business.dto.DtoIntUser;
 import com.blo.sales.business.dto.DtoIntUserToken;
 import com.blo.sales.dao.IUsersDao;
 import com.blo.sales.dao.commons.PasswordTemplate;
+import com.blo.sales.dao.docs.Config;
 import com.blo.sales.dao.docs.Usuario;
 import com.blo.sales.dao.mapper.UsuarioMapper;
+import com.blo.sales.dao.repository.ConfigsRepository;
 import com.blo.sales.dao.repository.UsuariosRepository;
 import com.blo.sales.exceptions.BloSalesBusinessException;
 import com.blo.sales.utils.JwtUtil;
@@ -29,6 +31,9 @@ public class UsersDaoImpl implements IUsersDao {
 
 	@Autowired
 	private UsuariosRepository repository;
+	
+	@Autowired
+	private ConfigsRepository configsRepository;
 	
 	@Value("${exceptions.codes.login}")
 	private String exceptionsCodesLogin;
@@ -60,10 +65,17 @@ public class UsersDaoImpl implements IUsersDao {
 	@Value("${exceptions.messages.password-already-use}")
 	private String exceptionsMessagesPasswordAlreadyUse;
 	
+	@Value("${exceptions.codes.not-config}")
+	private String exceptionsCodesNotConfig;
+	
+	@Value("${exceptions.messages.not-config}")
+	private String exceptionsMessagesNotConfig;
+	
 	@Override
 	public DtoIntUserToken register(DtoIntUser userData) throws BloSalesBusinessException {
+		var ciphered = getConfig().isCiphered();
 		LOGGER.info(String.format("registrando usuario %s", Encode.forJava(userData.getUsername())));
-		userData.setPassword(PasswordUtil.hashPassword(userData.getPassword()));
+		userData.setPassword(PasswordUtil.hashPassword(userData.getPassword(), ciphered));
 		var usuarioDoc = usuarioMapper.toInner(userData);
 		LOGGER.info("cifrando password");
 		var usuarioSaved = repository.save(usuarioDoc);
@@ -86,7 +98,8 @@ public class UsersDaoImpl implements IUsersDao {
 			throw new BloSalesBusinessException(exceptionsMessagesPasswordRestartPending, exceptionsCodesPasswordRestartPending, HttpStatus.BAD_REQUEST);
 		}
 		//realiza login
-		if (!PasswordUtil.checkPassword(user.getPassword(), lastPassword.getPassword())) {
+		var ciphered = getConfig().isCiphered();
+		if (!PasswordUtil.checkPassword(user.getPassword(), lastPassword.getPassword(), ciphered)) {
 			LOGGER.error("Error en la password");
 			throw new BloSalesBusinessException(exceptionsMessagesLoginInit, exceptionsCodesLoginInit, HttpStatus.UNPROCESSABLE_ENTITY);
 		}
@@ -138,7 +151,8 @@ public class UsersDaoImpl implements IUsersDao {
 			userDbInfo.getPassword().set(lastIndex, lastPassword);
 			LOGGER.info("se cambia el estatus del proceso de reseteo");
 		}
-		var passwordToSave = PasswordTemplate.generatePasswordTemplateResetting(PasswordUtil.hashPassword(userData.getPassword()));
+		var config = getConfig();
+		var passwordToSave = PasswordTemplate.generatePasswordTemplateResetting(PasswordUtil.hashPassword(userData.getPassword(), config.isCiphered()));
 		LOGGER.info("contrasenia creada");
 		userDbInfo.getPassword().add(passwordToSave);
 		var userSaved = repository.save(userDbInfo);
@@ -153,8 +167,9 @@ public class UsersDaoImpl implements IUsersDao {
 		var lastIndex = userDbInfo.getPassword().size() - 1;
 		var lastPassword = userDbInfo.getPassword().get(lastIndex);
 		
+		var ciphered = getConfig().isCiphered();
 		// validacion que la ultima contraseña sea igual a la que llega en el dto
-		var isValid = PasswordUtil.checkPassword(userData.getOld_password(), lastPassword.getPassword());
+		var isValid = PasswordUtil.checkPassword(userData.getOld_password(), lastPassword.getPassword(), ciphered);
 		LOGGER.info(String.format("la contraseña es igual a la ultima contraseña %s", isValid));
 		if (!isValid) {
 			// error que la contraseña no es igual a la ultima
@@ -163,7 +178,7 @@ public class UsersDaoImpl implements IUsersDao {
 		}
 		
 		// valida que la contraseña actual no exista en el historial
-		var passwordHistoryFound = userDbInfo.getPassword().stream().filter(s -> PasswordUtil.checkPassword(userData.getPassword(), s.getPassword())).findFirst();
+		var passwordHistoryFound = userDbInfo.getPassword().stream().filter(s -> PasswordUtil.checkPassword(userData.getPassword(), s.getPassword(), ciphered)).findFirst();
 		LOGGER.info(String.format("contrasenia encontrada en el historial %s", passwordHistoryFound.isPresent()));
 		if (passwordHistoryFound.isPresent()) {
 			// error porque ya existe esa contraseña guardada
@@ -179,7 +194,7 @@ public class UsersDaoImpl implements IUsersDao {
 		}
 		
 		// guarda la contraseña
-		userDbInfo.getPassword().add(PasswordTemplate.generatePasswordTemplate(PasswordUtil.hashPassword(userData.getPassword())));
+		userDbInfo.getPassword().add(PasswordTemplate.generatePasswordTemplate(PasswordUtil.hashPassword(userData.getPassword(), ciphered)));
 		
 		// guarda contraseña
 		var saved = repository.save(userDbInfo);
@@ -203,5 +218,18 @@ public class UsersDaoImpl implements IUsersDao {
 		return userFound.get();
 	}
 	
+	private Config getConfig() throws BloSalesBusinessException {
+		LOGGER.info("Buscando configuraciones de ambiente");
+		var configFound = configsRepository.findAll();
+		LOGGER.info(String.format("Configuracion por ambiente :%s", String.valueOf(configFound)));
+		var config = configFound.stream().findFirst().orElse(null);
+		if (config == null) {
+			LOGGER.error("Las configuraciones no existen");
+			throw new BloSalesBusinessException(exceptionsMessagesNotConfig, exceptionsCodesNotConfig, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		
+		LOGGER.info(String.format("configuraciones encontradas: %s", String.valueOf(config)));
+		return config;
+	}
 	
 }

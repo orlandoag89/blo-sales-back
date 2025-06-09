@@ -87,6 +87,7 @@ public class DebtorsDaoImpl implements IDebtorsDao {
 		debtorFound.setPartial_pyments(debtor.getPartial_pyments());
 		debtorFound.setSales(debtor.getSales());
 		debtorFound.setTotal(debtor.getTotal());
+		debtorFound.setUpdate_date(debtor.getUpdate_date());
 		
 		var parsedDebtor = mapper.toInner(debtorFound);
 		LOGGER.info(String.format("Debtor updated: %s", String.valueOf(parsedDebtor)));

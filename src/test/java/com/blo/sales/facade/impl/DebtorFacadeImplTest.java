@@ -22,6 +22,7 @@ import com.blo.sales.business.ISalesBusiness;
 import com.blo.sales.facade.mapper.DtoDebtorMapper;
 import com.blo.sales.facade.mapper.DtoDebtorsMapper;
 import com.blo.sales.facade.mapper.DtoPartialPymentMapper;
+import com.blo.sales.facade.mapper.DtoSaleMapper;
 import com.blo.sales.factory.MocksFactory;
 import com.blo.sales.factory.MocksUtils;
 
@@ -47,6 +48,9 @@ public class DebtorFacadeImplTest {
 
 	@MockBean
 	private DtoDebtorsMapper debtorsMapper;
+	
+	@MockBean
+	private DtoSaleMapper saleMapper;
 	
 	@MockBean
 	private DtoPartialPymentMapper partialPymentMapper;
@@ -112,7 +116,7 @@ public class DebtorFacadeImplTest {
 		Mockito.when(sales.updateSale(Mockito.anyString(), Mockito.any())).thenReturn(MocksFactory.createDtoIntSaleOnCashbox());
 		Mockito.doNothing().when(business).deleteDebtorById(Mockito.anyString());
 		
-		var result = mockMvc.perform(put("/api/v1/debtors/1a2b3c4d?time=" + MocksFactory.getNowDate())
+		var result = mockMvc.perform(put("/api/v1/debtors/1a2b3c4d/payments?time=" + MocksFactory.getNowDate())
 				.header(MocksUtils.X_TRACKING_ID, "addAllPayNoCashboxTest")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(MocksUtils.parserToString(MocksFactory.createDtoPartialPyment())))
@@ -150,7 +154,7 @@ public class DebtorFacadeImplTest {
 		Mockito.when(sales.updateSale(Mockito.anyString(), Mockito.any())).thenReturn(MocksFactory.createDtoIntSaleOnCashbox());
 		Mockito.doNothing().when(business).deleteDebtorById(Mockito.anyString());
 		
-		var result = mockMvc.perform(put("/api/v1/debtors/1a2b3c4d?time=" + MocksFactory.getNowDate())
+		var result = mockMvc.perform(put("/api/v1/debtors/1a2b3c4d/payments?time=" + MocksFactory.getNowDate())
 				.header(MocksUtils.X_TRACKING_ID, "addAllPayCashboxTest")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(MocksUtils.parserToString(MocksFactory.createDtoPartialPyment())))
@@ -186,7 +190,7 @@ public class DebtorFacadeImplTest {
 		Mockito.when(cashboxes.saveCashbox(Mockito.any())).thenReturn(MocksFactory.createDtoIntCashboxOpen());
 		Mockito.when(debtorMapper.toOuter(Mockito.any())).thenReturn(MocksFactory.createExistsDtoDebtor());
 		
-		var result = mockMvc.perform(put("/api/v1/debtors/1a2b3c4d?time=" + MocksFactory.getNowDate())
+		var result = mockMvc.perform(put("/api/v1/debtors/1a2b3c4d/payments?time=" + MocksFactory.getNowDate())
 				.header(MocksUtils.X_TRACKING_ID, "addPartialPayNoCashboxTest")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(MocksUtils.parserToString(MocksFactory.createDtoPartialPyment())))

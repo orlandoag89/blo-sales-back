@@ -17,8 +17,10 @@ public @Data class DtoDebtor implements Serializable {
 
 	private BigDecimal total; // deuda total que tiene
 
-	private long open_date;
-
+	private long open_date;  //fecha de registro
+	
+	private long update_date; // fecha de ultima compra
+	
 	private List<DtoPartialPyment> partial_pyments;
 
 	private List<DtoSale> sales;

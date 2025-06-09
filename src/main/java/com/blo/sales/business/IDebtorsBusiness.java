@@ -20,4 +20,5 @@ public interface IDebtorsBusiness {
 	DtoIntDebtor updateDebtor(String id, DtoIntDebtor debtor) throws BloSalesBusinessException;
 		
 	DtoIntDebtor getDebtorOrNull(String id) throws BloSalesBusinessException;
+	
 }

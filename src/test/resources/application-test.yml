@@ -3,3 +3,8 @@ server:
 logging:
   level:
     root: WARN
+    
+spring:
+  cloud:
+    config:
+      enabled: false  # Desactiva Spring Cloud Config para tests

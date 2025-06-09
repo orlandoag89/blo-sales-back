@@ -1,8 +1,9 @@
 package com.blo.sales.facade.dto;
 
 import lombok.Data;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
+
+import javax.validation.constraints.NotNull;  // Para Java EE 8 / Spring Boot 2.x
+import javax.validation.constraints.Pattern;
 
 import java.io.Serializable;
 import java.math.BigDecimal;

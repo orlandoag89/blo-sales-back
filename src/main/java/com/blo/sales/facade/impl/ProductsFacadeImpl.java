@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.blo.sales.business.IProductsBusiness;
@@ -21,6 +22,7 @@ import com.blo.sales.facade.mapper.DtoProductsMapper;
 import com.blo.sales.utils.Utils;
 
 @RestController
+@CrossOrigin(origins = "http://localhost:4200")
 public class ProductsFacadeImpl implements IProductsFacade {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ProductsFacadeImpl.class);

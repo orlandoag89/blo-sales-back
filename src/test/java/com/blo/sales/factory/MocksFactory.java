@@ -21,6 +21,7 @@ import com.blo.sales.business.enums.RolesIntEnum;
 import com.blo.sales.business.enums.StatusCashboxIntEnum;
 import com.blo.sales.dao.docs.Cashbox;
 import com.blo.sales.dao.docs.Cashboxes;
+import com.blo.sales.dao.docs.Config;
 import com.blo.sales.dao.docs.Contrasenia;
 import com.blo.sales.dao.docs.Debtor;
 import com.blo.sales.dao.docs.Debtors;
@@ -756,6 +757,7 @@ public final class MocksFactory {
 	
 	public static DtoIntUser createDtoIntRootUser() {
 		var user = createDtoIntCommonUser();
+		user.setUsername("root");
 		user.setRole(RolesIntEnum.ROOT);
 		return user;
 	}
@@ -800,6 +802,14 @@ public final class MocksFactory {
 		out.setCreated_date(NOW);
 		out.setPassword(ANY_STRING);
 		out.setProcess_reset(false);
+		return out;
+	}
+	
+	public static List<Config> createConfig() {
+		List<Config> out = new ArrayList<Config>();
+		var config = new Config();
+		config.setCiphered(false);
+		out.add(config);
 		return out;
 	}
 	

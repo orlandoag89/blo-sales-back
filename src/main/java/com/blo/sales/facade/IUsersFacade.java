@@ -18,6 +18,9 @@ public interface IUsersFacade {
 	@PostMapping("/actions/login")
 	ResponseEntity<DtoCommonWrapper<DtoUserToken>> login(@RequestBody DtoUser user);
 	
+	@PostMapping("/actions/register/root")
+	ResponseEntity<DtoCommonWrapper<DtoUserToken>> registerRootUser(@RequestBody DtoUser rootUser);
+	
 	@PreAuthorize("hasRole('ROOT')")
 	@PostMapping("/mgmt/actions/register")
 	ResponseEntity<DtoCommonWrapper<DtoUserToken>> registerUser(@RequestBody DtoUser user);

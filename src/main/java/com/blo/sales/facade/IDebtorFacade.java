@@ -22,7 +22,6 @@ public interface IDebtorFacade {
 	@GetMapping
 	ResponseEntity<DtoCommonWrapper<DtoDebtors>> retrieveAllDebtors();
 	
-	@PutMapping("/{id}")
+	@PutMapping("/{id}/payments")
 	ResponseEntity<DtoCommonWrapper<DtoDebtor>> addPay(@PathVariable String id, @RequestParam long time, @RequestBody DtoPartialPyment partialPyment);
-	
 }

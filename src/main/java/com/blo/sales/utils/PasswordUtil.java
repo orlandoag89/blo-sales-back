@@ -9,22 +9,21 @@ public final class PasswordUtil {
 
 	private static final SecureRandom secureRandom = new SecureRandom();
 	private static final String ALPHANUMERIC = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-	private static final boolean IS_CIPHER = false;
 
 	private PasswordUtil() {
 	}
 	
 	// crea el hash de una contraseña
-	public static String hashPassword(String password) {
-		if (!IS_CIPHER) {
+	public static String hashPassword(String password, boolean isCipher) {
+		if (!isCipher) {
 			return password;
 		}
 		return BCrypt.hashpw(password, BCrypt.gensalt());
 	}
 
 	// Verifica una contraseña ingresada contra el hash almacenado
-	public static boolean checkPassword(String plainPassword, String hashedPassword) {
-		if (!IS_CIPHER) {
+	public static boolean checkPassword(String plainPassword, String hashedPassword, boolean ciphered) {
+		if (!ciphered) {
 			return plainPassword.equals(hashedPassword);
 		}
 		return BCrypt.checkpw(plainPassword, hashedPassword);

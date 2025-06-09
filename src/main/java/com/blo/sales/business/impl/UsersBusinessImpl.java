@@ -40,7 +40,7 @@ public class UsersBusinessImpl implements IUsersBusiness {
 
 	@Override
 	public DtoIntUser getUserByName(String username) throws BloSalesBusinessException {
-		LOGGER.info(String.format("get user by id %s", Encode.forJava(username)));
+		LOGGER.info(String.format("get user by username %s", Encode.forJava(username)));
 		return dao.getUserByName(username);
 	}
 
