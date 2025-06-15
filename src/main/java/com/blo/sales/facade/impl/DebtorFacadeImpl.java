@@ -31,7 +31,7 @@ import com.blo.sales.facade.mapper.DtoPartialPymentMapper;
 import com.blo.sales.utils.Utils;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = {"http://localhost:4200", "http://localhost:4300", "http://localhost:4400"})
 public class DebtorFacadeImpl implements IDebtorFacade {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(DebtorFacadeImpl.class);
