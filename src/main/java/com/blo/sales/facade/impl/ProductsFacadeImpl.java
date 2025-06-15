@@ -22,7 +22,7 @@ import com.blo.sales.facade.mapper.DtoProductsMapper;
 import com.blo.sales.utils.Utils;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = {"http://localhost:4200", "http://localhost:4300", "http://localhost:4400"})
 public class ProductsFacadeImpl implements IProductsFacade {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ProductsFacadeImpl.class);

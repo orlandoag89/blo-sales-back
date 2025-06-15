@@ -25,7 +25,7 @@ import com.blo.sales.utils.PasswordUtil;
 import com.blo.sales.utils.Utils;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = {"http://localhost:4200", "http://localhost:4300", "http://localhost:4400"})
 public class UsersFacadeImpl implements IUsersFacade {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(UsersFacadeImpl.class);

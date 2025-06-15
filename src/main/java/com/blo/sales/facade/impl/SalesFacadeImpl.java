@@ -42,7 +42,7 @@ import com.blo.sales.facade.mapper.DtoSalesMapper;
 import com.blo.sales.utils.Utils;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = {"http://localhost:4200", "http://localhost:4300", "http://localhost:4400"})
 public class SalesFacadeImpl implements ISalesFacade {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(SalesFacadeImpl.class);
