@@ -137,6 +137,7 @@ public class DebtorFacadeImpl implements IDebtorFacade {
 					var saleFound = sales.getSaleById(sale.getId());
 					LOGGER.info("Sale found");
 					saleFound.setClose_sale(time);
+					saleFound.set_on_cashbox(true);
 					var saleUpdated = sales.updateSale(sale.getId(), saleFound);
 					LOGGER.info(String.format("sale updated %s", String.valueOf(saleUpdated)));
 				}

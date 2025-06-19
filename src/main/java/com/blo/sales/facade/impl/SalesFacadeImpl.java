@@ -119,6 +119,7 @@ public class SalesFacadeImpl implements ISalesFacade {
 				saleIn.setTotal(BigDecimal.ZERO);
 			}
 			
+			saleIn.set_on_cashbox(true);
 			var saleSaved = business.addSale(saleIn);
 			cashboxAddingCash(sale.getTotal(), sale.getClose_sale());
 			LOGGER.info(String.format("sale registered %s", String.valueOf(saleSaved)));

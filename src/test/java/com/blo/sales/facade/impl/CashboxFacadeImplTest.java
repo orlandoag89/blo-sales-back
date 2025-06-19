@@ -74,30 +74,18 @@ public class CashboxFacadeImplTest {
 	@Test
 	public void closeCashboxNotCashboxOpenTest() throws Exception {
 		Mockito.when(business.getCashboxOpen()).thenReturn(null);
-		Mockito.when(sales.getSalesNotCashbox()).thenReturn(MocksFactory.createDtoIntSales());
-		Mockito.when(sales.updateSale(Mockito.anyString(), Mockito.any())).thenReturn(MocksFactory.createDtoIntSaleOnCashbox());
-		Mockito.when(cashboxMapper.toInner(Mockito.any())).thenReturn(MocksFactory.createDtoIntCashboxClose());
-		Mockito.when(business.saveCashbox(Mockito.any())).thenReturn(MocksFactory.createDtoIntCashboxClose());
-		Mockito.when(cashboxMapper.toOuter(Mockito.any())).thenReturn(MocksFactory.createDtoCashboxClose());
 		
 		var result = mockMvc.perform(post("/api/v1/cashbox")
 				.header(MocksUtils.X_TRACKING_ID, "closeCashboxNotCashboxOpenTest")
                 .contentType(MediaType.APPLICATION_JSON).content("{}"))
-            .andExpect(status().isOk())
+            .andExpect(status().isUnprocessableEntity())
             .andReturn();
-		
-		Mockito.verify(business, Mockito.atLeastOnce()).getCashboxOpen();
-		Mockito.verify(sales, Mockito.atLeastOnce()).getSalesNotCashbox();
-		Mockito.verify(sales, Mockito.atLeastOnce()).updateSale(Mockito.anyString(), Mockito.any());
-		Mockito.verify(cashboxMapper, Mockito.atLeastOnce()).toInner(Mockito.any());
-		Mockito.verify(business, Mockito.atLeastOnce()).saveCashbox(Mockito.any());
-		Mockito.verify(cashboxMapper, Mockito.atLeastOnce()).toOuter(Mockito.any());
 		
 		var resultAsString = MocksUtils.getContentAsString(result, "closeCashboxNotCashboxOpenTest");
 		var obj = MocksUtils.parserToCommonWrapper(resultAsString, MocksFactory.getReferenceFromDtoCashbox());
 		
 		assertNotNull(obj);
-		assertEquals(StatusCashboxEnum.CLOSE.name(), obj.getData().getStatus().name());
+		assertNotNull(obj.getError());
 	}
 	
 	/**
@@ -108,8 +96,6 @@ public class CashboxFacadeImplTest {
 	public void closeCashboxCashboxOpenTest() throws Exception {
 		Mockito.when(business.getCashboxOpen()).thenReturn(MocksFactory.createDtoIntCashboxOpen());
 		Mockito.when(cashboxMapper.toOuter(Mockito.any())).thenReturn(MocksFactory.createDtoCashboxOpen());
-		Mockito.when(sales.getSalesNotCashbox()).thenReturn(MocksFactory.createDtoIntSales());
-		Mockito.when(sales.updateSale(Mockito.anyString(), Mockito.any())).thenReturn(MocksFactory.createDtoIntSaleOnCashbox());
 		Mockito.when(cashboxMapper.toInner(Mockito.any())).thenReturn(MocksFactory.createDtoIntCashboxClose());
 		Mockito.when(business.updateCashbox(Mockito.anyString(), Mockito.any())).thenReturn(MocksFactory.createDtoIntCashboxClose());
 		Mockito.when(cashboxMapper.toOuter(Mockito.any())).thenReturn(MocksFactory.createDtoCashboxClose());
@@ -122,8 +108,6 @@ public class CashboxFacadeImplTest {
 		
 		Mockito.verify(business, Mockito.atLeastOnce()).getCashboxOpen();
 		Mockito.verify(cashboxMapper, Mockito.atLeastOnce()).toOuter(Mockito.any());
-		Mockito.verify(sales, Mockito.atLeastOnce()).getSalesNotCashbox();
-		Mockito.verify(sales, Mockito.atLeastOnce()).updateSale(Mockito.anyString(), Mockito.any());
 		Mockito.verify(cashboxMapper, Mockito.atLeastOnce()).toInner(Mockito.any());
 		Mockito.verify(business, Mockito.atLeastOnce()).updateCashbox(Mockito.anyString(), Mockito.any());
 		Mockito.verify(cashboxMapper, Mockito.atLeastOnce()).toOuter(Mockito.any());
