@@ -74,4 +74,26 @@ public class CashboxBusinessImplTest {
 		assertNotNull(out.getBoxes());
 		assertFalse(out.getBoxes().isEmpty());
 	}
+	
+	@Test
+	public void addingCashNoCashboxTest() throws BloSalesBusinessException {
+		Mockito.when(dao.getCashboxOpen()).thenReturn(null);
+		Mockito.when(dao.addCashbox(Mockito.any())).thenReturn(MocksFactory.createDtoIntCashboxOpen());
+		
+		serv.addingCash(MocksFactory.createBigDecimal50(), MocksFactory.createNow());
+		
+		Mockito.verify(dao, Mockito.atLeastOnce()).getCashboxOpen();
+		Mockito.verify(dao, Mockito.atLeastOnce()).addCashbox(Mockito.any());
+	}
+	
+	@Test
+	public void addingCashCashbox() throws BloSalesBusinessException {
+		Mockito.when(dao.getCashboxOpen()).thenReturn(MocksFactory.createDtoIntCashboxOpen());
+		Mockito.when(dao.updateCashbox(Mockito.anyString(), Mockito.any())).thenReturn(MocksFactory.createDtoIntCashboxOpen());
+		
+		serv.addingCash(MocksFactory.createBigDecimal50(), MocksFactory.createNow());
+		
+		Mockito.verify(dao, Mockito.atLeastOnce()).getCashboxOpen();
+		Mockito.verify(dao, Mockito.atLeastOnce()).updateCashbox(Mockito.anyString(), Mockito.any());
+	}
 }

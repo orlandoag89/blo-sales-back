@@ -1,5 +1,7 @@
 package com.blo.sales.business.impl;
 
+import java.math.BigDecimal;
+
 import org.owasp.encoder.Encode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,6 +47,27 @@ public class CashboxBusinessImpl implements ICashboxBusiness {
 	public DtoIntCashboxes getAllCashboxes() {
 		LOGGER.info("getting all cashboxes");
 		return dao.getAllCashboxes();
+	}
+
+	@Override
+	public void addingCash(BigDecimal cash, long time) throws BloSalesBusinessException {
+		LOGGER.info(String.format("creando una caja con $%s en fecha %s", cash, time));
+		var openCashbox = getCashboxOpen();
+		LOGGER.info(String.format("caja abierta %s", String.valueOf(openCashbox)));
+		if (openCashbox == null) {
+			LOGGER.info("no hay caja ahora");
+			var cashbox = new DtoIntCashbox();
+			cashbox.setDate(time);
+			cashbox.setMoney(cash);
+			cashbox.setStatus(StatusCashboxIntEnum.OPEN);
+			openCashbox = saveCashbox(cashbox);
+			LOGGER.info(String.format("Cashbox creada %s", String.valueOf(openCashbox)));
+		} else {
+			var newAmount = openCashbox.getMoney().add(cash);
+			openCashbox.setMoney(newAmount);
+			LOGGER.info(String.format("cashbox nuevos datos %s", String.valueOf(openCashbox)));
+			updateCashbox(openCashbox.getId(), openCashbox);
+		}
 	}
 
 }

@@ -15,8 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.blo.sales.business.ICashboxBusiness;
 import com.blo.sales.business.IDebtorsBusiness;
 import com.blo.sales.business.ISalesBusiness;
-import com.blo.sales.business.dto.DtoIntCashbox;
-import com.blo.sales.business.enums.StatusCashboxIntEnum;
 import com.blo.sales.exceptions.BloSalesBusinessException;
 import com.blo.sales.facade.IDebtorFacade;
 import com.blo.sales.facade.dto.DtoDebtor;
@@ -24,7 +22,6 @@ import com.blo.sales.facade.dto.DtoDebtors;
 import com.blo.sales.facade.dto.DtoPartialPyment;
 import com.blo.sales.facade.dto.commons.DtoCommonWrapper;
 import com.blo.sales.facade.dto.commons.DtoError;
-import com.blo.sales.facade.enums.StatusCashboxEnum;
 import com.blo.sales.facade.mapper.DtoDebtorMapper;
 import com.blo.sales.facade.mapper.DtoDebtorsMapper;
 import com.blo.sales.facade.mapper.DtoPartialPymentMapper;
@@ -106,29 +103,7 @@ public class DebtorFacadeImpl implements IDebtorFacade {
 			LOGGER.info(String.format("adding payment %s to %s", Encode.forJava(String.valueOf(partialPyment)), id));
 			var partialPymentMapped = partialPymentMapper.toInner(partialPyment);
 			var saved = business.addPay(id, partialPymentMapped, time);
-			LOGGER.info(String.format("datos de deudor actualizados %s", String.valueOf(saved)));
-			
-			var currentCashbox = cashboxes.getCashboxOpen();
-			// valida si hay un nuevo cashbox
-			if (currentCashbox == null) {
-				// abre una caja
-				LOGGER.info("saving a new cashbox");
-				var dataCashbox = new DtoIntCashbox();
-				dataCashbox.setDate(time);
-				dataCashbox.setMoney(partialPymentMapped.getPartial_pyment());
-				dataCashbox.setStatus(StatusCashboxIntEnum.valueOf(StatusCashboxEnum.OPEN.name()));
-				currentCashbox = cashboxes.saveCashbox(dataCashbox);
-				LOGGER.info(String.format("cashbox saved %s", String.valueOf(currentCashbox)));
-			} 
-			else {
-				// agrega dinero a la caja actual
-				LOGGER.info("cashbox exists");
-				var money = currentCashbox.getMoney().add(partialPymentMapped.getPartial_pyment());
-				currentCashbox.setMoney(money);
-				cashboxes.updateCashbox(currentCashbox.getId(), currentCashbox);
-				LOGGER.info(String.format("cashbox updated %s", String.valueOf(currentCashbox)));
-			}
-			
+			LOGGER.info(String.format("datos de deudor actualizados %s", String.valueOf(saved)));			
 			// si la cuenta actual es menor o igual a cero entonces se va a eliminar el deudor y cerrar sus ventas
 			if (saved.getTotal().compareTo(BigDecimal.ZERO) <= 0) {
 				// cerrar las ventas
@@ -145,9 +120,14 @@ public class DebtorFacadeImpl implements IDebtorFacade {
 				business.deleteDebtorById(id);
 				LOGGER.info(String.format("%s was deleted, account was payed", id));
 				output.setData(new DtoDebtor());
+				// guarda el dinero en una caja
+				var money = partialPyment.getPartial_pyment().add(saved.getTotal());
+				//saveMoneyOnCashbox(time, money);
+				cashboxes.addingCash(money, time);
 				return new ResponseEntity<>(output, HttpStatus.OK);
 			}
-			
+			//saveMoneyOnCashbox(time, partialPymentMapped.getPartial_pyment());
+			cashboxes.addingCash(partialPyment.getPartial_pyment(), time);
 			var out = debtorMapper.toOuter(saved);
 			LOGGER.info(String.format("partial payment was added to %s", id));
 			output.setData(out);
@@ -159,5 +139,5 @@ public class DebtorFacadeImpl implements IDebtorFacade {
 			return new ResponseEntity<>(output, e.getExceptHttpStatus());
 		}
 	}
-
+	
 }

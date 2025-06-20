@@ -503,6 +503,10 @@ public final class MocksFactory {
 		return out;
 	}
 
+	public static BigDecimal createBigDecimal50() {
+		return BIG_DECIMAL_50;
+	}
+	
 	public static DtoSaleProduct createDtoSaleProduct() {
 		var out = new DtoSaleProduct();
 		var product = createDtoProduct();
@@ -570,6 +574,10 @@ public final class MocksFactory {
 		out.setProducts(products);
 		out.setTotal(BIG_DECIMAL_50);
 		return out;
+	}
+	
+	public static long createNow() {
+		return NOW;
 	}
 
 	public static DtoSales createDtoSales() {
