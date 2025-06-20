@@ -115,7 +115,6 @@ public class SalesFacadeImpl implements ISalesFacade {
 			
 			saleIn.set_on_cashbox(true);
 			var saleSaved = business.addSale(saleIn);
-			//cashboxAddingCash(sale.getTotal(), sale.getClose_sale());
 			cashboxBusiness.addingCash(sale.getTotal(), sale.getOpen_date());
 			LOGGER.info(String.format("sale registered %s", String.valueOf(saleSaved)));
 			out.setSale(saleMapper.toOuter(saleSaved));
@@ -241,7 +240,6 @@ public class SalesFacadeImpl implements ISalesFacade {
 				var out = debtorMapper.toOuter(debtorSaved);
 				LOGGER.info(String.format("Debtor saved %s", String.valueOf(out)));
 				if (partialPyment.compareTo(BigDecimal.ZERO) > 0) {
-					//cashboxAddingCash(partialPyment, time);
 					cashboxBusiness.addingCash(partialPyment, time);
 				}
 				output.setDebtor(out);
@@ -273,7 +271,6 @@ public class SalesFacadeImpl implements ISalesFacade {
 				debtorInDb.getPartial_pyments().add(itemPartialPyment);
 				LOGGER.info(String.format("partial payment from debtor %s", String.valueOf(debtorInDb.getPartial_pyments())));
 				// abrir o actualizar una caja de dinero
-				//cashboxAddingCash(partialPyment, time);
 				cashboxBusiness.addingCash(partialPyment, time);
 			}
 			

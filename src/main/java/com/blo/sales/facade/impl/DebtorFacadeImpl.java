@@ -122,11 +122,9 @@ public class DebtorFacadeImpl implements IDebtorFacade {
 				output.setData(new DtoDebtor());
 				// guarda el dinero en una caja
 				var money = partialPyment.getPartial_pyment().add(saved.getTotal());
-				//saveMoneyOnCashbox(time, money);
 				cashboxes.addingCash(money, time);
 				return new ResponseEntity<>(output, HttpStatus.OK);
 			}
-			//saveMoneyOnCashbox(time, partialPymentMapped.getPartial_pyment());
 			cashboxes.addingCash(partialPyment.getPartial_pyment(), time);
 			var out = debtorMapper.toOuter(saved);
 			LOGGER.info(String.format("partial payment was added to %s", id));
