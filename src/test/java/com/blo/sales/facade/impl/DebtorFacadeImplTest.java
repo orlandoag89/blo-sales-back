@@ -110,8 +110,7 @@ public class DebtorFacadeImplTest {
 		
 		Mockito.when(partialPymentMapper.toInner(Mockito.any())).thenReturn(MocksFactory.createDtoIntPartialPyment());
 		Mockito.when(business.addPay(Mockito.anyString(), Mockito.any(), Mockito.anyLong())).thenReturn(existsDebtor);
-		Mockito.when(cashboxes.getCashboxOpen()).thenReturn(null);
-		Mockito.when(cashboxes.saveCashbox(Mockito.any())).thenReturn(MocksFactory.createDtoIntCashboxOpen());
+		Mockito.doNothing().when(cashboxes).addingCash(Mockito.any(), Mockito.anyLong());
 		Mockito.when(sales.getSaleById(Mockito.anyString())).thenReturn(MocksFactory.createDtoIntSaleNoCashbox());
 		Mockito.when(sales.updateSale(Mockito.anyString(), Mockito.any())).thenReturn(MocksFactory.createDtoIntSaleOnCashbox());
 		Mockito.doNothing().when(business).deleteDebtorById(Mockito.anyString());
@@ -125,8 +124,6 @@ public class DebtorFacadeImplTest {
 		
 		Mockito.verify(partialPymentMapper, Mockito.atLeastOnce()).toInner(Mockito.any());
 		Mockito.verify(business, Mockito.atLeastOnce()).addPay(Mockito.anyString(), Mockito.any(), Mockito.anyLong());
-		Mockito.verify(cashboxes, Mockito.atLeastOnce()).getCashboxOpen();
-		Mockito.verify(cashboxes, Mockito.atLeastOnce()).saveCashbox(Mockito.any());
 		Mockito.verify(sales, Mockito.atLeastOnce()).getSaleById(Mockito.anyString());
 		Mockito.verify(sales, Mockito.atLeastOnce()).updateSale(Mockito.anyString(), Mockito.any());
 		
@@ -148,8 +145,7 @@ public class DebtorFacadeImplTest {
 		
 		Mockito.when(partialPymentMapper.toInner(Mockito.any())).thenReturn(MocksFactory.createDtoIntPartialPyment());
 		Mockito.when(business.addPay(Mockito.anyString(), Mockito.any(), Mockito.anyLong())).thenReturn(existsDebtor);
-		Mockito.when(cashboxes.getCashboxOpen()).thenReturn(MocksFactory.createDtoIntCashboxOpen());
-		Mockito.when(cashboxes.updateCashbox(Mockito.anyString(), Mockito.any())).thenReturn(MocksFactory.createDtoIntCashboxClose());
+		Mockito.doNothing().when(cashboxes).addingCash(Mockito.any(), Mockito.anyLong());
 		Mockito.when(sales.getSaleById(Mockito.anyString())).thenReturn(MocksFactory.createDtoIntSaleNoCashbox());
 		Mockito.when(sales.updateSale(Mockito.anyString(), Mockito.any())).thenReturn(MocksFactory.createDtoIntSaleOnCashbox());
 		Mockito.doNothing().when(business).deleteDebtorById(Mockito.anyString());
@@ -163,8 +159,6 @@ public class DebtorFacadeImplTest {
 		
 		Mockito.verify(partialPymentMapper, Mockito.atLeastOnce()).toInner(Mockito.any());
 		Mockito.verify(business, Mockito.atLeastOnce()).addPay(Mockito.anyString(), Mockito.any(), Mockito.anyLong());
-		Mockito.verify(cashboxes, Mockito.atLeastOnce()).getCashboxOpen();
-		Mockito.verify(cashboxes, Mockito.atLeastOnce()).updateCashbox(Mockito.anyString(), Mockito.any());
 		Mockito.verify(sales, Mockito.atLeastOnce()).getSaleById(Mockito.anyString());
 		Mockito.verify(sales, Mockito.atLeastOnce()).updateSale(Mockito.anyString(), Mockito.any());
 		
@@ -186,8 +180,7 @@ public class DebtorFacadeImplTest {
 		
 		Mockito.when(partialPymentMapper.toInner(Mockito.any())).thenReturn(MocksFactory.createDtoIntPartialPyment());
 		Mockito.when(business.addPay(Mockito.anyString(), Mockito.any(), Mockito.anyLong())).thenReturn(existsDebtor);
-		Mockito.when(cashboxes.getCashboxOpen()).thenReturn(null);
-		Mockito.when(cashboxes.saveCashbox(Mockito.any())).thenReturn(MocksFactory.createDtoIntCashboxOpen());
+		Mockito.doNothing().when(cashboxes).addingCash(Mockito.any(), Mockito.anyLong());
 		Mockito.when(debtorMapper.toOuter(Mockito.any())).thenReturn(MocksFactory.createExistsDtoDebtor());
 		
 		var result = mockMvc.perform(put("/api/v1/debtors/1a2b3c4d/payments?time=" + MocksFactory.getNowDate())

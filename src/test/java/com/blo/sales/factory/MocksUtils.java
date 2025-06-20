@@ -18,6 +18,7 @@ public final class MocksUtils {
 	public static final BigDecimal BIG_DECIMAL_00 = new BigDecimal("0");
 	public static final BigDecimal BIG_DECIMAL_10 = new BigDecimal("10");
 	public static final BigDecimal BIG_DECIMAL_100 = new BigDecimal("100");
+	public static final BigDecimal BIG_DECIMAL_150 = new BigDecimal("150");
 	public static final BigDecimal BIG_DECIMAL_3 = new BigDecimal("3");
 	public static final BigDecimal BIG_DECIMAL_30 = new BigDecimal("30");
 	public static final BigDecimal BIG_DECIMAL_70 = new BigDecimal("70");

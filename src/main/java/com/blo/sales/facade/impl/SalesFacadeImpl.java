@@ -24,7 +24,6 @@ import com.blo.sales.business.dto.DtoIntPartialPyment;
 import com.blo.sales.business.dto.DtoIntSales;
 import com.blo.sales.exceptions.BloSalesBusinessException;
 import com.blo.sales.facade.ISalesFacade;
-import com.blo.sales.facade.dto.DtoCashbox;
 import com.blo.sales.facade.dto.DtoProduct;
 import com.blo.sales.facade.dto.DtoSale;
 import com.blo.sales.facade.dto.DtoSaleProduct;
@@ -32,9 +31,7 @@ import com.blo.sales.facade.dto.DtoSales;
 import com.blo.sales.facade.dto.DtoWrapperSale;
 import com.blo.sales.facade.dto.commons.DtoCommonWrapper;
 import com.blo.sales.facade.dto.commons.DtoError;
-import com.blo.sales.facade.enums.StatusCashboxEnum;
 import com.blo.sales.facade.enums.StatusSaleEnum;
-import com.blo.sales.facade.mapper.DtoCashboxMapper;
 import com.blo.sales.facade.mapper.DtoDebtorMapper;
 import com.blo.sales.facade.mapper.DtoProductMapper;
 import com.blo.sales.facade.mapper.DtoSaleMapper;
@@ -70,9 +67,6 @@ public class SalesFacadeImpl implements ISalesFacade {
 	
 	@Autowired
 	private DtoDebtorMapper debtorMapper;
-	
-	@Autowired
-	private DtoCashboxMapper cashboxMapper;
 	
 	@Value("${exceptions.messages.product-insufficient}")
 	private String productInsufficientMessage;
@@ -121,7 +115,7 @@ public class SalesFacadeImpl implements ISalesFacade {
 			
 			saleIn.set_on_cashbox(true);
 			var saleSaved = business.addSale(saleIn);
-			cashboxAddingCash(sale.getTotal(), sale.getClose_sale());
+			cashboxBusiness.addingCash(sale.getTotal(), sale.getOpen_date());
 			LOGGER.info(String.format("sale registered %s", String.valueOf(saleSaved)));
 			out.setSale(saleMapper.toOuter(saleSaved));
 			out.setProductsWithAlerts(productsAlert);
@@ -246,7 +240,7 @@ public class SalesFacadeImpl implements ISalesFacade {
 				var out = debtorMapper.toOuter(debtorSaved);
 				LOGGER.info(String.format("Debtor saved %s", String.valueOf(out)));
 				if (partialPyment.compareTo(BigDecimal.ZERO) > 0) {
-					cashboxAddingCash(partialPyment, time);
+					cashboxBusiness.addingCash(partialPyment, time);
 				}
 				output.setDebtor(out);
 				wrapperResponse.setData(output);
@@ -277,7 +271,7 @@ public class SalesFacadeImpl implements ISalesFacade {
 				debtorInDb.getPartial_pyments().add(itemPartialPyment);
 				LOGGER.info(String.format("partial payment from debtor %s", String.valueOf(debtorInDb.getPartial_pyments())));
 				// abrir o actualizar una caja de dinero
-				cashboxAddingCash(partialPyment, time);
+				cashboxBusiness.addingCash(partialPyment, time);
 			}
 			
 			var debtorUpdated = debtorBusiness.updateDebtor(debtorInDb.getId(), debtorInDb);
@@ -292,24 +286,6 @@ public class SalesFacadeImpl implements ISalesFacade {
 			wrapperResponse.setError(error);
 			return new ResponseEntity<>(wrapperResponse, e.getExceptHttpStatus());
 		}
-	}
-	
-	private void cashboxAddingCash(BigDecimal cash, long time) throws BloSalesBusinessException {
-		var openCashbox = cashboxBusiness.getCashboxOpen();
-		LOGGER.info(String.format("caja abierta %s", String.valueOf(openCashbox)));
-		if (openCashbox == null) {
-			var cashbox = new DtoCashbox();
-			cashbox.setDate(time);
-			cashbox.setMoney(cash);
-			cashbox.setStatus(StatusCashboxEnum.OPEN);
-			var innerCashbox = cashboxMapper.toInner(cashbox);
-			openCashbox = cashboxBusiness.saveCashbox(innerCashbox);
-		} else {
-			var newCash = openCashbox.getMoney().add(cash);
-			openCashbox.setMoney(newCash);
-			cashboxBusiness.updateCashbox(openCashbox.getId(), openCashbox);
-		}
-		LOGGER.info(String.format("nformacion de cashbox %s", openCashbox));
 	}
 	
 	private List<DtoProduct> getProductsAlertsAndUpdate(List<DtoSaleProduct> products) throws BloSalesBusinessException {
