@@ -115,7 +115,7 @@ public class SalesFacadeImpl implements ISalesFacade {
 			
 			saleIn.set_on_cashbox(true);
 			var saleSaved = business.addSale(saleIn);
-			cashboxBusiness.addingCash(sale.getTotal(), sale.getOpen_date());
+			cashboxBusiness.addingCash(saleIn.getTotal(), sale.getOpen_date());
 			LOGGER.info(String.format("sale registered %s", String.valueOf(saleSaved)));
 			out.setSale(saleMapper.toOuter(saleSaved));
 			out.setProductsWithAlerts(productsAlert);
