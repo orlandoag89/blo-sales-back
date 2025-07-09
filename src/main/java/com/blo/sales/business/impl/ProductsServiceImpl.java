@@ -33,7 +33,7 @@ public class ProductsServiceImpl implements IProductsBusiness {
 	public DtoIntProducts getProducts() throws BloSalesBusinessException {
 		LOGGER.info("Get products");
 		var output = dao.getProducts();
-		output.getProducts().add(getAnotherProductServices());
+		output.getProducts().add(0, getAnotherProductServices());
 		LOGGER.info("Productos y otros productos");
 		return output;
 	}

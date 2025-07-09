@@ -34,6 +34,7 @@ import com.blo.sales.dao.docs.Sales;
 import com.blo.sales.dao.docs.Usuario;
 import com.blo.sales.dao.enums.DocRolesEnum;
 import com.blo.sales.dao.enums.DocStatusCashboxEnum;
+import com.blo.sales.dao.enums.SpecialProductsEnum;
 import com.blo.sales.facade.dto.DtoCashbox;
 import com.blo.sales.facade.dto.DtoCashboxes;
 import com.blo.sales.facade.dto.DtoDebtor;
@@ -89,6 +90,12 @@ public final class MocksFactory {
 		return out;
 	}
 	
+	public static DtoIntProduct createDtoIntSpecialProduct() {
+		var out = createDtoIntProduct();
+		out.setName(SpecialProductsEnum.ANOTHER_PRODUCT_SERVICE.name());
+		return out;
+	}
+	
 	public static Product createProduct() {
 		var out = new Product();
 		out.setId(ANY_ID);
@@ -97,6 +104,12 @@ public final class MocksFactory {
 		out.setName(ANY_STRING);
 		out.setQuantity(BIG_DECIMAL_5);
 		out.setTotal_price(BIG_DECIMAL_50);
+		return out;
+	}
+	
+	public static Product createProductSpecial() {
+		var out = createProduct();
+		out.setName(SpecialProductsEnum.ANOTHER_PRODUCT_SERVICE.name());
 		return out;
 	}
 
