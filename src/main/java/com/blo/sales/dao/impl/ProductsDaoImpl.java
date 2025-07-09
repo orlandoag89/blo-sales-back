@@ -1,5 +1,6 @@
 package com.blo.sales.dao.impl;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,7 +14,9 @@ import org.springframework.stereotype.Service;
 import com.blo.sales.business.dto.DtoIntProduct;
 import com.blo.sales.business.dto.DtoIntProducts;
 import com.blo.sales.dao.IProductsDao;
+import com.blo.sales.dao.docs.Product;
 import com.blo.sales.dao.docs.Products;
+import com.blo.sales.dao.enums.SpecialProductsEnum;
 import com.blo.sales.dao.mapper.ProductMapper;
 import com.blo.sales.dao.mapper.ProductsMapper;
 import com.blo.sales.dao.repository.ProductsRepository;
@@ -102,6 +105,25 @@ public class ProductsDaoImpl implements IProductsDao {
 		LOGGER.info(String.format("product updated: %s", String.valueOf(out)));
 		return out;
 		
+	}
+
+	@Override
+	public DtoIntProduct getAnotherProductServices() throws BloSalesBusinessException {
+		LOGGER.info("buscando otros productos/servicios");
+		var anotherProduct = repository.findProductByName(SpecialProductsEnum.ANOTHER_PRODUCT_SERVICE.name());
+		if (!anotherProduct.isPresent()) {
+			LOGGER.info("productos/servicios especiales no esta registrado");
+			var product = new Product();
+			product.setName(SpecialProductsEnum.ANOTHER_PRODUCT_SERVICE.name());
+			product.setQuantity(new BigDecimal("10000000"));
+			product.setTotal_price(BigDecimal.ZERO);
+			var saved = repository.save(product);
+			LOGGER.info(String.format("producto guardado %s", String.valueOf(saved)));
+			return productMapper.toOuter(saved);
+		}
+		var productFound = anotherProduct.get();
+		LOGGER.info(String.format("producto encontrado %s", String.valueOf(productFound)));
+		return productMapper.toOuter(productFound);
 	}
 
 }

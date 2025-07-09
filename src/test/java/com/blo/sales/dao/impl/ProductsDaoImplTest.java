@@ -132,4 +132,32 @@ public class ProductsDaoImplTest {
 		
 		assertThrows(BloSalesBusinessException.class, () -> impl.updateProduct(MocksFactory.getId(), MocksFactory.createDtoIntProduct()));
 	}
+	
+	@Test
+	public void getAnotherProductServicesExistsAnother() throws BloSalesBusinessException {
+		Mockito.when(repository.findProductByName(Mockito.anyString())).thenReturn(MocksFactory.createOptionalProduct());
+		Mockito.when(productMapper.toOuter(Mockito.any())).thenReturn(MocksFactory.createDtoIntSpecialProduct());
+		
+		var out = impl.getAnotherProductServices();
+		
+		Mockito.verify(repository, Mockito.atLeastOnce()).findProductByName(Mockito.anyString());
+		Mockito.verify(productMapper, Mockito.atLeastOnce()).toOuter(Mockito.any());
+		
+		assertNotNull(out);
+	}
+	
+	@Test
+	public void getAnotherProductServicesNotExistsAnother() throws BloSalesBusinessException {
+		Mockito.when(repository.findProductByName(Mockito.anyString())).thenReturn(Optional.empty());
+		Mockito.when(repository.save(Mockito.any())).thenReturn(MocksFactory.createProductSpecial());
+		Mockito.when(productMapper.toOuter(Mockito.any())).thenReturn(MocksFactory.createDtoIntSpecialProduct());
+		
+		var out = impl.getAnotherProductServices();
+		
+		Mockito.verify(repository, Mockito.atLeastOnce()).findProductByName(Mockito.anyString());
+		Mockito.verify(repository, Mockito.atLeastOnce()).save(Mockito.any());
+		Mockito.verify(productMapper, Mockito.atLeastOnce()).toOuter(Mockito.any());
+		
+		assertNotNull(out);
+	}
 }
