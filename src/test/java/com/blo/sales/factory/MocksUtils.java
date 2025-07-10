@@ -22,6 +22,7 @@ public final class MocksUtils {
 	public static final BigDecimal BIG_DECIMAL_3 = new BigDecimal("3");
 	public static final BigDecimal BIG_DECIMAL_30 = new BigDecimal("30");
 	public static final BigDecimal BIG_DECIMAL_70 = new BigDecimal("70");
+	public static final BigDecimal BIG_DECIMAL_0_470 = new BigDecimal("0.470");
 	
 	private static ObjectMapper objectMapper = new ObjectMapper();
 	
