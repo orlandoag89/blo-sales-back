@@ -2,6 +2,9 @@ package com.blo.sales.utils;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
@@ -19,6 +22,19 @@ public final class Utils {
 	private static final String UNDEFINED = "undefined";
 	
 	private Utils() { }
+	
+	/**
+	 * Metodo que fuciona 2 listas sin elementos repetidos
+	 * @param lst1
+	 * @param lst2
+	 * @return
+	 */
+	public static List<String> mergeStringList(List<String> lst1, List<String> lst2) {
+		Set<String> listMerged = new HashSet<>();
+		listMerged.addAll(lst1);
+		listMerged.addAll(lst1);
+		return listMerged.stream().toList();
+	}
 	
 	/**
 	 * metodo para recuperar el tiempo en mili segundos

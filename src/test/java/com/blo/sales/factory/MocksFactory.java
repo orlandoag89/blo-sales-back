@@ -2,6 +2,7 @@ package com.blo.sales.factory;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,6 +29,7 @@ import com.blo.sales.dao.docs.Debtors;
 import com.blo.sales.dao.docs.PartialPyment;
 import com.blo.sales.dao.docs.Product;
 import com.blo.sales.dao.docs.Products;
+import com.blo.sales.dao.docs.Provider;
 import com.blo.sales.dao.docs.Sale;
 import com.blo.sales.dao.docs.SaleProduct;
 import com.blo.sales.dao.docs.Sales;
@@ -58,6 +60,7 @@ public final class MocksFactory {
 
 	private static final String TOKEN = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0Iiwicm9sZSI6IkNPTU1PTiIsImlhdCI6MTc0Njc2MTQzMiwiZXhwIjoxNzQ2ODI2MjMyfQ.GFHwBEDt0nemtEeXisQIDy4rw5xd5sY28KDUkDmYDkE";
 	private static final String ANY_STRING = "any_string";
+	private static final String ANY_PHONE_NUMBER = "8821314546";
 	private static final String ANY_NAME = "Pepe";
 	private static final String ANY_ID = "1a2b3c4d5e";
 	private static final BigDecimal BIG_DECIMAL_1 = BigDecimal.ONE;
@@ -65,8 +68,19 @@ public final class MocksFactory {
 	private static final BigDecimal BIG_DECIMAL_50 = new BigDecimal("50");
 	private static final BigDecimal BIG_DECIMAL_0_350 = new BigDecimal("0.350");
 	private static final long NOW = Utils.getTimeNow();
+	private static final List<String> DAYS = Arrays.asList("lunes", "martes", "miercoles","jueves", "viernes", "sabado","domingo");
+	private static final List<String> PRODUCTS = Arrays.asList("Jarritos", "Leche Sabrole");
 
 	private MocksFactory() {
+	}
+	
+	public static Provider createProvider() {
+		var out = new Provider();
+		out.setName(ANY_NAME);
+		out.setPhoneNumber(ANY_PHONE_NUMBER);
+		out.setDays_visit(DAYS);
+		out.setProducts_offered(PRODUCTS);
+		return out;
 	}
 
 	public static DtoProduct createDtoProduct() {
