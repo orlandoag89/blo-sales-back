@@ -76,6 +76,7 @@ public final class MocksFactory {
 		out.setName(ANY_STRING);
 		out.setQuantity(BIG_DECIMAL_5);
 		out.setTotal_price(BIG_DECIMAL_50);
+		out.setCost_of_sale(BIG_DECIMAL_50.subtract(BIG_DECIMAL_5));
 		return out;
 	}
 
@@ -87,6 +88,7 @@ public final class MocksFactory {
 		out.setName(ANY_STRING);
 		out.setQuantity(BIG_DECIMAL_5);
 		out.setTotal_price(BIG_DECIMAL_50);
+		out.setCost_of_sale(BIG_DECIMAL_50.subtract(BIG_DECIMAL_5));
 		return out;
 	}
 	
@@ -104,6 +106,7 @@ public final class MocksFactory {
 		out.setName(ANY_STRING);
 		out.setQuantity(BIG_DECIMAL_5);
 		out.setTotal_price(BIG_DECIMAL_50);
+		out.setCost_of_sale(BIG_DECIMAL_50.subtract(BIG_DECIMAL_5));;
 		return out;
 	}
 	

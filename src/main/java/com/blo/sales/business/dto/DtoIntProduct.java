@@ -15,6 +15,8 @@ public @Data class DtoIntProduct implements Serializable {
 
     private BigDecimal total_price;
 
+    private BigDecimal cost_of_sale;
+    
     private BigDecimal quantity;
 
     private String desc;

@@ -17,6 +17,8 @@ public @Data class Product implements Serializable {
 	private String name;
 	
 	private BigDecimal total_price;
+	
+	private BigDecimal cost_of_sale;
 
 	private BigDecimal quantity;
 
