@@ -19,6 +19,9 @@ public @Data class DtoProduct implements Serializable {
 
 	@NotNull(message = "El precio del producto es necesario")
 	private BigDecimal total_price; // precio del producto
+	
+	@NotNull(message = "El costo de venta es obligatorio")
+	private BigDecimal cost_of_sale; //costo de lo que me cuesta el producto
 
 	@NotNull(message = "La cantidad del producto en existencia es necesaria")
 	@Pattern(regexp = "^[0-9]+")

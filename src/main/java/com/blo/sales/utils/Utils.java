@@ -1,5 +1,6 @@
 package com.blo.sales.utils;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 
 import org.apache.commons.lang3.StringUtils;
@@ -10,6 +11,10 @@ import com.blo.sales.exceptions.BloSalesBusinessException;
 public final class Utils {
 	
 	public static final String EMPTY_STRING = "";
+	
+	public static final BigDecimal LIMIT_FROM_PRODUCTS_NOT_KG = new BigDecimal(2);
+	
+	public static final BigDecimal LIMIT_FROM_PRODUCTS_KG = new BigDecimal("0.200");
 	
 	private static final String UNDEFINED = "undefined";
 	
