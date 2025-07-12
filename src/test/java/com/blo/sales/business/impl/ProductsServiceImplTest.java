@@ -1,5 +1,6 @@
 package com.blo.sales.business.impl;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -9,6 +10,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import com.blo.sales.dao.IProductsDao;
 import com.blo.sales.exceptions.BloSalesBusinessException;
@@ -37,7 +39,9 @@ public class ProductsServiceImplTest {
 	
 	@Test
 	public void getProductsTest() throws BloSalesBusinessException {
+		ReflectionTestUtils.setField(impl, "productsMessagesSpecial", "Productos de papeleria, chicharrones");
 		Mockito.when(dao.getProducts()).thenReturn(MocksFactory.createDtoIntProducts());
+		Mockito.when(dao.getAnotherProductServices()).thenReturn(MocksFactory.createDtoIntProduct());
 		
 		var out = impl.getProducts();
 		
@@ -45,6 +49,7 @@ public class ProductsServiceImplTest {
 		
 		assertNotNull(out);
 		assertFalse(out.getProducts().isEmpty());
+		assertEquals("Productos de papeleria, chicharrones", out.getProducts().get(0).getName());
 	}
 	
 	@Test

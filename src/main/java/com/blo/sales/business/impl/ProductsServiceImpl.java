@@ -3,6 +3,7 @@ package com.blo.sales.business.impl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.blo.sales.business.IProductsBusiness;
@@ -18,6 +19,9 @@ public class ProductsServiceImpl implements IProductsBusiness {
 	
 	@Autowired
 	private IProductsDao dao;
+	
+	@Value("${products.messages.special}")
+	private String productsMessagesSpecial;
 
     @Override
     public DtoIntProducts addProducts(DtoIntProducts products) throws BloSalesBusinessException {
@@ -28,7 +32,10 @@ public class ProductsServiceImpl implements IProductsBusiness {
 	@Override
 	public DtoIntProducts getProducts() throws BloSalesBusinessException {
 		LOGGER.info("Get products");
-		return dao.getProducts();
+		var output = dao.getProducts();
+		output.getProducts().add(0, getAnotherProductServices());
+		LOGGER.info("Productos y otros productos");
+		return output;
 	}
 
 	@Override
@@ -41,5 +48,12 @@ public class ProductsServiceImpl implements IProductsBusiness {
 	public DtoIntProduct updateProduct(String productId, DtoIntProduct data) throws BloSalesBusinessException {
 		LOGGER.info(String.format("Updating product by id: %s", String.valueOf(data)));
 		return dao.updateProduct(productId, data);
+	}
+
+	private DtoIntProduct getAnotherProductServices() throws BloSalesBusinessException {
+		LOGGER.info("recuperando productos especiales y servicios");
+		var anotherProduct = dao.getAnotherProductServices();
+		anotherProduct.setName(productsMessagesSpecial);
+		return anotherProduct;
 	}
 }

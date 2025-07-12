@@ -13,5 +13,7 @@ public interface IProductsDao {
 	DtoIntProduct getProduct(String productId) throws BloSalesBusinessException;
 	
 	DtoIntProduct updateProduct(String productId, DtoIntProduct data) throws BloSalesBusinessException;
+	
+	DtoIntProduct getAnotherProductServices() throws BloSalesBusinessException;
 
 }
