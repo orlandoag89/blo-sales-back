@@ -302,7 +302,13 @@ public class SalesFacadeImpl implements ISalesFacade {
 				throw new BloSalesBusinessException(productInsufficientMessage, productInsufficientCode, HttpStatus.UNPROCESSABLE_ENTITY);
 			}
 			
-			if (newQuantity.compareTo(new BigDecimal("2")) <= 0) {
+			var productsLimitCompare = Utils.LIMIT_FROM_PRODUCTS_NOT_KG;
+			if (product.isIts_kg()) {
+				LOGGER.info("producto por kilos / gramos");
+				productsLimitCompare = Utils.LIMIT_FROM_PRODUCTS_KG;
+			}
+			
+			if (newQuantity.compareTo(productsLimitCompare) <= 0) {
 				var productOut = productMapper.toOuter(productFound);
 				productOut.setQuantity(newQuantity);
 				productsWithAlert.add(productOut);

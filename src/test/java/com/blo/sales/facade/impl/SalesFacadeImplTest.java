@@ -273,6 +273,51 @@ public class SalesFacadeImplTest {
 	}
 	
 	/**
+	 * Test para validar las alertas de productos cuando los productos son kilos
+	 * @throws Exception
+	 */
+	@Test
+	public void registerSaleWithAlertsProductsOnKgTest() throws Exception {
+		var saleSaved = MocksFactory.createDtoIntSaleNoCashbox();
+		var sale = MocksFactory.createDtoNewSaleNoCashbox();
+		sale.getProducts().set(0, MocksFactory.createDtoSaleProductKg());
+		
+		var productFound = MocksFactory.createDtoIntProduct();
+		productFound.setQuantity(MocksUtils.BIG_DECIMAL_0_470);
+		
+		Mockito.when(saleMapper.toInner(Mockito.any())).thenReturn(saleSaved);
+		Mockito.when(business.addSale(Mockito.any())).thenReturn(saleSaved);
+		Mockito.when(saleMapper.toOuter(Mockito.any())).thenReturn(MocksFactory.createDtoSaleNoCashbox());
+		Mockito.when(productMapper.toOuter(Mockito.any())).thenReturn(MocksFactory.createDtoProduct());
+		Mockito.when(productsBusiness.getProduct(Mockito.anyString())).thenReturn(productFound);
+		Mockito.when(productsBusiness.updateProduct(Mockito.anyString(), Mockito.any())).thenReturn(MocksFactory.createDtoIntProduct());
+		
+		var saleAsString = objectMapper.writeValueAsString(sale);
+		
+		 var result = mockMvc.perform(post("/api/v1/sales")
+				 	.header(MocksUtils.X_TRACKING_ID, "registerSaleWithAlertsProductsOnKgTest")
+	                .contentType(MediaType.APPLICATION_JSON)
+	                .content(saleAsString))
+	            .andExpect(status().isCreated())
+	            .andReturn();
+		 
+		Mockito.verify(saleMapper, Mockito.atLeastOnce()).toInner(Mockito.any());
+		Mockito.verify(business, Mockito.atLeastOnce()).addSale(Mockito.any());
+		Mockito.verify(saleMapper, Mockito.atLeastOnce()).toOuter(Mockito.any());
+		Mockito.verify(productMapper, Mockito.atLeastOnce()).toOuter(Mockito.any());
+		Mockito.verify(productsBusiness, Mockito.atLeastOnce()).getProduct(Mockito.anyString());
+		Mockito.verify(productsBusiness, Mockito.atLeastOnce()).updateProduct(Mockito.anyString(), Mockito.any());
+		 
+		 var product = MocksUtils.getContentAsString(result, "registerSaleWithAlertsProductsTest");
+		 var obj = MocksUtils.parserToCommonWrapper(product,  MocksFactory.getReferenceFromWrapperSale());
+		 
+		 assertNotNull(product);
+		 assertNotNull(obj);
+		 assertNotNull(obj.getData());
+		 assertFalse(obj.getData().getProductsWithAlerts().isEmpty());
+	}
+	
+	/**
 	 * Recupera todas las ventas
 	 * @throws Exception
 	 */

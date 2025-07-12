@@ -63,6 +63,7 @@ public final class MocksFactory {
 	private static final BigDecimal BIG_DECIMAL_1 = BigDecimal.ONE;
 	private static final BigDecimal BIG_DECIMAL_5 = new BigDecimal("5");
 	private static final BigDecimal BIG_DECIMAL_50 = new BigDecimal("50");
+	private static final BigDecimal BIG_DECIMAL_0_350 = new BigDecimal("0.350");
 	private static final long NOW = Utils.getTimeNow();
 
 	private MocksFactory() {
@@ -533,6 +534,13 @@ public final class MocksFactory {
 		out.setQuantity(product.getQuantity());
 		out.setTotal_price(product.getTotal_price());
 		out.setQuantity_on_sale(BIG_DECIMAL_1);
+		return out;
+	}
+	
+	public static DtoSaleProduct createDtoSaleProductKg() {
+		var out = createDtoSaleProduct();
+		out.setIts_kg(true);
+		out.setQuantity_on_sale(BIG_DECIMAL_0_350);
 		return out;
 	}
 
