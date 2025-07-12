@@ -97,6 +97,7 @@ public class ProductsDaoImpl implements IProductsDao {
 		productFound.setName(data.getName());
 		productFound.setQuantity(data.getQuantity());
 		productFound.setTotal_price(data.getTotal_price());
+		productFound.setCost_of_sale(data.getCost_of_sale());
 		
 		var product = productMapper.toInner(productFound);
 		
