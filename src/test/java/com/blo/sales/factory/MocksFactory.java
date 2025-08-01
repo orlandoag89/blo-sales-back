@@ -1066,4 +1066,12 @@ public final class MocksFactory {
 	public static TypeReference<DtoCommonWrapper<DtoUser>> getReferenceFromDtoUser() {
 		return new TypeReference<DtoCommonWrapper<DtoUser>>() { };
 	}
+	
+	public static TypeReference<DtoCommonWrapper<DtoCredit>> getReferenceFromDtoCredit() {
+		return new TypeReference<DtoCommonWrapper<DtoCredit>>() { };
+	}
+	
+	public static TypeReference<DtoCommonWrapper<DtoCredits>> getReferenceFromDtoCredits() {
+		return new TypeReference<DtoCommonWrapper<DtoCredits>>() { };
+	}
 }
