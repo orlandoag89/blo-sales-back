@@ -43,6 +43,8 @@ import com.blo.sales.dao.enums.DocStatusCashboxEnum;
 import com.blo.sales.dao.enums.SpecialProductsEnum;
 import com.blo.sales.facade.dto.DtoCashbox;
 import com.blo.sales.facade.dto.DtoCashboxes;
+import com.blo.sales.facade.dto.DtoCredit;
+import com.blo.sales.facade.dto.DtoCredits;
 import com.blo.sales.facade.dto.DtoDebtor;
 import com.blo.sales.facade.dto.DtoDebtors;
 import com.blo.sales.facade.dto.DtoPartialPyment;
@@ -55,6 +57,7 @@ import com.blo.sales.facade.dto.DtoUser;
 import com.blo.sales.facade.dto.DtoUserToken;
 import com.blo.sales.facade.dto.DtoWrapperSale;
 import com.blo.sales.facade.dto.commons.DtoCommonWrapper;
+import com.blo.sales.facade.enums.CommonStatusEnum;
 import com.blo.sales.facade.enums.RolesEnum;
 import com.blo.sales.facade.enums.StatusCashboxEnum;
 import com.blo.sales.utils.Utils;
@@ -905,6 +908,32 @@ public final class MocksFactory {
 	public static DtoIntCredit createDtoInCreditSavedClose() {
 		var out = createDtoIntCreditSaved();
 		out.setStatus_credit(CommonStatusIntEnum.CLOSE);
+		return out;
+	}
+	
+	public static DtoCredit createNewDtoCredit() {
+		var out = new DtoCredit();
+		out.setCurrent_amount(BIG_DECIMAL_0);
+		out.setLast_update_date(INITIAL_LONG);
+		out.setLender_name(ANY_NAME);
+		out.setOpen_date(NOW);
+		out.setPartial_payment(new ArrayList<>());
+		out.setStatus_credit(CommonStatusEnum.OPEN);
+		out.setTotal_amount(BIG_DECIMAL_500);
+		return out;
+	}
+	
+	public static DtoCredit createDtoCreditSaved() {
+		var out = createNewDtoCredit();
+		out.setId(ANY_ID);
+		return out;
+	}
+	
+	public static DtoCredits createDtoCredits() {
+		var out = new DtoCredits();
+		List<DtoCredit> credits = new ArrayList<>();
+		credits.add(createDtoCreditSaved());
+		out.setCredits(credits);
 		return out;
 	}
 	
