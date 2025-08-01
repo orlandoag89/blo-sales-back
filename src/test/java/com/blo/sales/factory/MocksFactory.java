@@ -533,6 +533,10 @@ public final class MocksFactory {
 		return BIG_DECIMAL_50;
 	}
 	
+	public static BigDecimal createBigDecimal500() {
+		return BIG_DECIMAL_500;
+	}
+	
 	public static DtoSaleProduct createDtoSaleProduct() {
 		var out = new DtoSaleProduct();
 		var product = createDtoProduct();
@@ -867,6 +871,24 @@ public final class MocksFactory {
 		return out;
 	}
 	
+	public static Credit createCreditSavedClose() {
+		var out = createCreditSaved();
+		out.setStatus_credit(DocCommonStatusEnum.CLOSE);
+		return out;
+	}
+	
+	public static Credit createNewCredit() {
+		var out = new Credit();
+		out.setCurrent_amount(BIG_DECIMAL_0);
+		out.setLast_update_date(INITIAL_LONG);
+		out.setLender_name(ANY_NAME);
+		out.setOpen_date(NOW);
+		out.setPartial_payment(new ArrayList<>());
+		out.setStatus_credit(DocCommonStatusEnum.OPEN);
+		out.setTotal_amount(BIG_DECIMAL_500);
+		return out;
+	}
+	
 	public static DtoIntCredit createDtoIntCreditSaved() {
 		var out = new DtoIntCredit();
 		out.setCurrent_amount(BIG_DECIMAL_0);
@@ -880,11 +902,27 @@ public final class MocksFactory {
 		return out;
 	}
 	
+	public static DtoIntCredit createDtoInCreditSavedClose() {
+		var out = createDtoIntCreditSaved();
+		out.setStatus_credit(CommonStatusIntEnum.CLOSE);
+		return out;
+	}
+	
+	public static DtoIntCredit createNewDtoIntCredit() {
+		var out = new DtoIntCredit();
+		out.setCurrent_amount(BIG_DECIMAL_0);
+		out.setLast_update_date(INITIAL_LONG);
+		out.setLender_name(ANY_NAME);
+		out.setOpen_date(NOW);
+		out.setPartial_payment(new ArrayList<>());
+		out.setStatus_credit(CommonStatusIntEnum.OPEN);
+		out.setTotal_amount(BIG_DECIMAL_500);
+		return out;
+	}
+	
 	public static Credits createCredits() {
 		var credits = new Credits();
-		List<Credit> creditsL = new ArrayList<>();
-		creditsL.add(createCreditSaved());
-		credits.setCredits(creditsL);
+		credits.setCredits(createCreditList());
 		return credits;
 	}
 	
@@ -894,6 +932,26 @@ public final class MocksFactory {
 		credits.add(createDtoIntCreditSaved());
 		out.setCredits(credits);
 		return out;
+	}
+	
+	public static List<Credit> createCreditList() {
+		List<Credit> out = new ArrayList<>();
+		out.add(createCreditSaved());
+		return out;
+	}
+	
+	public static Optional<Credit> createOptionalCredit() {
+		return Optional.of(createCreditSaved());
+	}
+	
+	public static Optional<Credit> createOptionalCreditCurrentAmountBy50() {
+		var e = createCreditSaved();
+		e.setCurrent_amount(BIG_DECIMAL_50);
+		return Optional.of(e);
+	}
+	
+	public static Optional<Credit> createOptionaCloselCredit() {
+		return Optional.of(createCreditSavedClose());
 	}
 	
 	public static Optional<Usuario> createOptionalUsuario() {
@@ -930,6 +988,10 @@ public final class MocksFactory {
 	
 	public static String getAnyString() {
 		return ANY_STRING;
+	}
+	
+	public static BigDecimal getBigDecimal5() {
+		return BIG_DECIMAL_5;
 	}
 	
 	public static TypeReference<DtoCommonWrapper<DtoWrapperSale>> getReferenceFromWrapperSale() {

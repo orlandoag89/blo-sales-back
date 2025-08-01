@@ -125,7 +125,7 @@ public class CreditsDaoImpl implements ICreditsDao {
 		}
 		creditFound.setTotal_amount(amount);
 		// suma para actualizar el monto total
-		var newCurrentAmount = amount.subtract(creditFound.getCurrent_amount());
+		var newCurrentAmount = creditFound.getCurrent_amount().subtract(amount);
 		LOGGER.info(String.format("amount %s - current_amount %s = %s", String.valueOf(amount), String.valueOf(creditFound.getCurrent_amount()), String.valueOf(newCurrentAmount)));
 		tryPayCredit(creditFound, newCurrentAmount);
 		var toSave = creditMapper.toInner(creditFound);
