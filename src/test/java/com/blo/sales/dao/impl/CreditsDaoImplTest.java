@@ -168,7 +168,7 @@ public class CreditsDaoImplTest {
 		Mockito.verify(repository, Mockito.atLeastOnce()).save(Mockito.any());
 		Mockito.verify(creditMapper, Mockito.atLeastOnce()).toOuter(Mockito.any());
 		
-		assertEquals("45", out.getCurrent_amount());
+		assertEquals("45", out.getCurrent_amount().toString());
 	}
 	/**
 	 * caso de prueba cuando se intenta actualizar el monto restante de la deuda 500 a solo 50. Se cierra el credito en automático
