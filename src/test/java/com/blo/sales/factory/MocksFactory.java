@@ -7,6 +7,8 @@ import java.util.Optional;
 
 import com.blo.sales.business.dto.DtoIntCashbox;
 import com.blo.sales.business.dto.DtoIntCashboxes;
+import com.blo.sales.business.dto.DtoIntCredit;
+import com.blo.sales.business.dto.DtoIntCredits;
 import com.blo.sales.business.dto.DtoIntDebtor;
 import com.blo.sales.business.dto.DtoIntDebtors;
 import com.blo.sales.business.dto.DtoIntPartialPyment;
@@ -17,12 +19,15 @@ import com.blo.sales.business.dto.DtoIntSaleProduct;
 import com.blo.sales.business.dto.DtoIntSales;
 import com.blo.sales.business.dto.DtoIntUser;
 import com.blo.sales.business.dto.DtoIntUserToken;
+import com.blo.sales.business.enums.CommonStatusIntEnum;
 import com.blo.sales.business.enums.RolesIntEnum;
 import com.blo.sales.business.enums.StatusCashboxIntEnum;
 import com.blo.sales.dao.docs.Cashbox;
 import com.blo.sales.dao.docs.Cashboxes;
 import com.blo.sales.dao.docs.Config;
 import com.blo.sales.dao.docs.Contrasenia;
+import com.blo.sales.dao.docs.Credit;
+import com.blo.sales.dao.docs.Credits;
 import com.blo.sales.dao.docs.Debtor;
 import com.blo.sales.dao.docs.Debtors;
 import com.blo.sales.dao.docs.PartialPyment;
@@ -32,11 +37,14 @@ import com.blo.sales.dao.docs.Sale;
 import com.blo.sales.dao.docs.SaleProduct;
 import com.blo.sales.dao.docs.Sales;
 import com.blo.sales.dao.docs.Usuario;
+import com.blo.sales.dao.enums.DocCommonStatusEnum;
 import com.blo.sales.dao.enums.DocRolesEnum;
 import com.blo.sales.dao.enums.DocStatusCashboxEnum;
 import com.blo.sales.dao.enums.SpecialProductsEnum;
 import com.blo.sales.facade.dto.DtoCashbox;
 import com.blo.sales.facade.dto.DtoCashboxes;
+import com.blo.sales.facade.dto.DtoCredit;
+import com.blo.sales.facade.dto.DtoCredits;
 import com.blo.sales.facade.dto.DtoDebtor;
 import com.blo.sales.facade.dto.DtoDebtors;
 import com.blo.sales.facade.dto.DtoPartialPyment;
@@ -49,6 +57,7 @@ import com.blo.sales.facade.dto.DtoUser;
 import com.blo.sales.facade.dto.DtoUserToken;
 import com.blo.sales.facade.dto.DtoWrapperSale;
 import com.blo.sales.facade.dto.commons.DtoCommonWrapper;
+import com.blo.sales.facade.enums.CommonStatusEnum;
 import com.blo.sales.facade.enums.RolesEnum;
 import com.blo.sales.facade.enums.StatusCashboxEnum;
 import com.blo.sales.utils.Utils;
@@ -60,10 +69,13 @@ public final class MocksFactory {
 	private static final String ANY_STRING = "any_string";
 	private static final String ANY_NAME = "Pepe";
 	private static final String ANY_ID = "1a2b3c4d5e";
+	private static final BigDecimal BIG_DECIMAL_0 = BigDecimal.ZERO;
 	private static final BigDecimal BIG_DECIMAL_1 = BigDecimal.ONE;
 	private static final BigDecimal BIG_DECIMAL_5 = new BigDecimal("5");
 	private static final BigDecimal BIG_DECIMAL_50 = new BigDecimal("50");
+	private static final BigDecimal BIG_DECIMAL_500 = new BigDecimal("500");
 	private static final BigDecimal BIG_DECIMAL_0_350 = new BigDecimal("0.350");
+	private static final long INITIAL_LONG = 0L;
 	private static final long NOW = Utils.getTimeNow();
 
 	private MocksFactory() {
@@ -524,6 +536,10 @@ public final class MocksFactory {
 		return BIG_DECIMAL_50;
 	}
 	
+	public static BigDecimal createBigDecimal500() {
+		return BIG_DECIMAL_500;
+	}
+	
 	public static DtoSaleProduct createDtoSaleProduct() {
 		var out = new DtoSaleProduct();
 		var product = createDtoProduct();
@@ -845,6 +861,128 @@ public final class MocksFactory {
 		return out;
 	}
 	
+	public static Credit createCreditSaved() {
+		var out = new Credit();
+		out.setCurrent_amount(BIG_DECIMAL_0);
+		out.setId(ANY_ID);
+		out.setLast_update_date(INITIAL_LONG);
+		out.setLender_name(ANY_NAME);
+		out.setOpen_date(NOW);
+		out.setPartial_payment(new ArrayList<>());
+		out.setStatus_credit(DocCommonStatusEnum.OPEN);
+		out.setTotal_amount(BIG_DECIMAL_500);
+		return out;
+	}
+	
+	public static Credit createCreditSavedClose() {
+		var out = createCreditSaved();
+		out.setStatus_credit(DocCommonStatusEnum.CLOSE);
+		return out;
+	}
+	
+	public static Credit createNewCredit() {
+		var out = new Credit();
+		out.setCurrent_amount(BIG_DECIMAL_0);
+		out.setLast_update_date(INITIAL_LONG);
+		out.setLender_name(ANY_NAME);
+		out.setOpen_date(NOW);
+		out.setPartial_payment(new ArrayList<>());
+		out.setStatus_credit(DocCommonStatusEnum.OPEN);
+		out.setTotal_amount(BIG_DECIMAL_500);
+		return out;
+	}
+	
+	public static DtoIntCredit createDtoIntCreditSaved() {
+		var out = new DtoIntCredit();
+		out.setCurrent_amount(BIG_DECIMAL_0);
+		out.setId(ANY_ID);
+		out.setLast_update_date(INITIAL_LONG);
+		out.setLender_name(ANY_NAME);
+		out.setOpen_date(NOW);
+		out.setPartial_payment(new ArrayList<>());
+		out.setStatus_credit(CommonStatusIntEnum.OPEN);
+		out.setTotal_amount(BIG_DECIMAL_500);
+		return out;
+	}
+	
+	public static DtoIntCredit createDtoInCreditSavedClose() {
+		var out = createDtoIntCreditSaved();
+		out.setStatus_credit(CommonStatusIntEnum.CLOSE);
+		return out;
+	}
+	
+	public static DtoCredit createNewDtoCredit() {
+		var out = new DtoCredit();
+		out.setCurrent_amount(BIG_DECIMAL_0);
+		out.setLast_update_date(INITIAL_LONG);
+		out.setLender_name(ANY_NAME);
+		out.setOpen_date(NOW);
+		out.setPartial_payment(new ArrayList<>());
+		out.setStatus_credit(CommonStatusEnum.OPEN);
+		out.setTotal_amount(BIG_DECIMAL_500);
+		return out;
+	}
+	
+	public static DtoCredit createDtoCreditSaved() {
+		var out = createNewDtoCredit();
+		out.setId(ANY_ID);
+		return out;
+	}
+	
+	public static DtoCredits createDtoCredits() {
+		var out = new DtoCredits();
+		List<DtoCredit> credits = new ArrayList<>();
+		credits.add(createDtoCreditSaved());
+		out.setCredits(credits);
+		return out;
+	}
+	
+	public static DtoIntCredit createNewDtoIntCredit() {
+		var out = new DtoIntCredit();
+		out.setCurrent_amount(BIG_DECIMAL_0);
+		out.setLast_update_date(INITIAL_LONG);
+		out.setLender_name(ANY_NAME);
+		out.setOpen_date(NOW);
+		out.setPartial_payment(new ArrayList<>());
+		out.setStatus_credit(CommonStatusIntEnum.OPEN);
+		out.setTotal_amount(BIG_DECIMAL_500);
+		return out;
+	}
+	
+	public static Credits createCredits() {
+		var credits = new Credits();
+		credits.setCredits(createCreditList());
+		return credits;
+	}
+	
+	public static DtoIntCredits createDtoIntCredits() {
+		var out = new DtoIntCredits();
+		List<DtoIntCredit> credits = new ArrayList<>();
+		credits.add(createDtoIntCreditSaved());
+		out.setCredits(credits);
+		return out;
+	}
+	
+	public static List<Credit> createCreditList() {
+		List<Credit> out = new ArrayList<>();
+		out.add(createCreditSaved());
+		return out;
+	}
+	
+	public static Optional<Credit> createOptionalCredit() {
+		return Optional.of(createCreditSaved());
+	}
+	
+	public static Optional<Credit> createOptionalCreditCurrentAmountBy50() {
+		var e = createCreditSaved();
+		e.setCurrent_amount(BIG_DECIMAL_50);
+		return Optional.of(e);
+	}
+	
+	public static Optional<Credit> createOptionaCloselCredit() {
+		return Optional.of(createCreditSavedClose());
+	}
+	
 	public static Optional<Usuario> createOptionalUsuario() {
 		return Optional.of(createCommonUsuarioWithoutOpenPasswordOpen());
 	}
@@ -879,6 +1017,10 @@ public final class MocksFactory {
 	
 	public static String getAnyString() {
 		return ANY_STRING;
+	}
+	
+	public static BigDecimal getBigDecimal5() {
+		return BIG_DECIMAL_5;
 	}
 	
 	public static TypeReference<DtoCommonWrapper<DtoWrapperSale>> getReferenceFromWrapperSale() {
@@ -923,5 +1065,13 @@ public final class MocksFactory {
 	
 	public static TypeReference<DtoCommonWrapper<DtoUser>> getReferenceFromDtoUser() {
 		return new TypeReference<DtoCommonWrapper<DtoUser>>() { };
+	}
+	
+	public static TypeReference<DtoCommonWrapper<DtoCredit>> getReferenceFromDtoCredit() {
+		return new TypeReference<DtoCommonWrapper<DtoCredit>>() { };
+	}
+	
+	public static TypeReference<DtoCommonWrapper<DtoCredits>> getReferenceFromDtoCredits() {
+		return new TypeReference<DtoCommonWrapper<DtoCredits>>() { };
 	}
 }
