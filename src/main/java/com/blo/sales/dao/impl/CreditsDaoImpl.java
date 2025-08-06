@@ -88,6 +88,7 @@ public class CreditsDaoImpl implements ICreditsDao {
 		tryPayCredit(creditFound, restCredit);
 		creditFound.setCurrent_amount(restCredit);
 		creditFound.getPartial_payment().add(0, partialPayment);
+		creditFound.setLast_update_date(partialPayment.getDate());
 		var toSave = creditMapper.toInner(creditFound);
 		var creditSaved = repository.save(toSave);
 		LOGGER.info(String.format("credito actualizado %s", String.valueOf(creditSaved)));
