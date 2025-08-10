@@ -1,5 +1,6 @@
 package com.blo.sales.dao;
 
+import com.blo.sales.business.dto.DtoIntProductsOnSalesCounter;
 import com.blo.sales.business.dto.DtoIntSale;
 import com.blo.sales.business.dto.DtoIntSales;
 import com.blo.sales.exceptions.BloSalesBusinessException;
@@ -20,4 +21,5 @@ public interface ISalesDao {
 	
 	DtoIntSales getSalesNotCashbox() throws BloSalesBusinessException;
 
+	DtoIntProductsOnSalesCounter getBestSellingProducts() throws BloSalesBusinessException;
 }

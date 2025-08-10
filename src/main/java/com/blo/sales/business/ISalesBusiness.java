@@ -1,12 +1,11 @@
 package com.blo.sales.business;
 
+import com.blo.sales.business.dto.DtoIntProductsOnSalesCounter;
 import com.blo.sales.business.dto.DtoIntSale;
 import com.blo.sales.business.dto.DtoIntSales;
 import com.blo.sales.exceptions.BloSalesBusinessException;
 
 public interface ISalesBusiness {
-	
-	//DtoIntWrapperSale saveSaleAndDebtor(DtoIntSale sale, DtoIntDebtor debtor, BigDecimal partialPyment) throws BloSalesBusinessException;
 	
 	DtoIntSale addSale(DtoIntSale sale) throws BloSalesBusinessException;
 	
@@ -21,5 +20,7 @@ public interface ISalesBusiness {
 	DtoIntSale updateSale(String id, DtoIntSale sale) throws BloSalesBusinessException;
 	
 	DtoIntSales getSalesNotCashbox() throws BloSalesBusinessException;
+	
+	DtoIntProductsOnSalesCounter getBestSellingProducts() throws BloSalesBusinessException;
 
 }

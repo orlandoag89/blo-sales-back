@@ -1,5 +1,8 @@
 package com.blo.sales.dao.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.owasp.encoder.Encode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,10 +11,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import com.blo.sales.business.dto.DtoIntProductOnSaleCounter;
+import com.blo.sales.business.dto.DtoIntProductsOnSalesCounter;
 import com.blo.sales.business.dto.DtoIntSale;
 import com.blo.sales.business.dto.DtoIntSales;
 import com.blo.sales.dao.ISalesDao;
 import com.blo.sales.dao.docs.Sales;
+import com.blo.sales.dao.mapper.ProductOnSaleCounterMapper;
 import com.blo.sales.dao.mapper.SaleMapper;
 import com.blo.sales.dao.mapper.SalesMapper;
 import com.blo.sales.dao.repository.SalesRepository;
@@ -30,6 +36,9 @@ public class SalesDaoImpl implements ISalesDao {
 	
 	@Autowired
 	private SaleMapper saleMapper;
+	
+	@Autowired
+	private ProductOnSaleCounterMapper productOnSaleCounterMapper;
 
 	@Value("${exceptions.codes.sale-not-found}")
 	private String saleNotFoundCode;
@@ -120,6 +129,17 @@ public class SalesDaoImpl implements ISalesDao {
 		
 		LOGGER.info(String.format("sales is not cashbox %s", String.valueOf(salesOut)));
 		return salesOut;
+	}
+
+	@Override
+	public DtoIntProductsOnSalesCounter getBestSellingProducts() throws BloSalesBusinessException {
+		var out = new DtoIntProductsOnSalesCounter();
+		LOGGER.info("recuperando informacion de productos en ventas");
+		List<DtoIntProductOnSaleCounter> productsOnSales = new ArrayList<>();
+		repository.countSalesByProduct().forEach(p -> productsOnSales.add(productOnSaleCounterMapper.toOuter(p)));
+		LOGGER.info(String.format("productos por venta %s", String.valueOf(productsOnSales)));
+		out.setProductsOnSales(productsOnSales);
+		return out;
 	}
 	
 }
