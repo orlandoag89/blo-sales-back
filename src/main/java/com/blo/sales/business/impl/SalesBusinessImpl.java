@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.blo.sales.business.ISalesBusiness;
+import com.blo.sales.business.dto.DtoIntProductsOnSalesCounter;
 import com.blo.sales.business.dto.DtoIntSale;
 import com.blo.sales.business.dto.DtoIntSales;
 import com.blo.sales.dao.ISalesDao;
@@ -60,6 +61,12 @@ public class SalesBusinessImpl implements ISalesBusiness {
 	public DtoIntSales getSalesNotCashbox() throws BloSalesBusinessException {
 		LOGGER.info("retrieving sales no cashbox");
 		return dao.getSalesNotCashbox();
+	}
+
+	@Override
+	public DtoIntProductsOnSalesCounter getBestSellingProducts() throws BloSalesBusinessException {
+		LOGGER.info("recuperando informacion de ventas");
+		return dao.getBestSellingProducts();
 	}
 
 }
