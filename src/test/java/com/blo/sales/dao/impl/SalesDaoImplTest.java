@@ -143,11 +143,22 @@ public class SalesDaoImplTest {
 	}
 	
 	@Test
-	public void getBestSellingProductsTest() throws BloSalesBusinessException {
+	public void getBestSellingProductsByAllTest() throws BloSalesBusinessException {
 		Mockito.when(repository.countSalesByProduct()).thenReturn(MocksFactory.createProductsOnSaleCounter());
 		Mockito.when(productOnSaleCounterMapper.toOuter(Mockito.any())).thenReturn(MocksFactory.createDtoIntProductOnSaleCounter());
 		
-		var out = impl.getBestSellingProducts();
+		var out = impl.getBestSellingProducts(0,0,0,0);
+		
+		assertNotNull(out.getProductsOnSales());
+		assertFalse(out.getProductsOnSales().isEmpty());
+	}
+	
+	@Test
+	public void getBestSellingProductsByPeriodTest() throws BloSalesBusinessException {
+		Mockito.when(repository.countSalesByProduct(Mockito.anyList())).thenReturn(MocksFactory.createProductsOnSaleCounter());
+		Mockito.when(productOnSaleCounterMapper.toOuter(Mockito.any())).thenReturn(MocksFactory.createDtoIntProductOnSaleCounter());
+		
+		var out = impl.getBestSellingProducts(1, 2025, 2, 2025);
 		
 		assertNotNull(out.getProductsOnSales());
 		assertFalse(out.getProductsOnSales().isEmpty());

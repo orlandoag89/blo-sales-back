@@ -21,6 +21,6 @@ public interface ISalesBusiness {
 	
 	DtoIntSales getSalesNotCashbox() throws BloSalesBusinessException;
 	
-	DtoIntProductsOnSalesCounter getBestSellingProducts() throws BloSalesBusinessException;
+	DtoIntProductsOnSalesCounter getBestSellingProducts(int initMonth, int initYear, int endMonth, int endYear) throws BloSalesBusinessException;
 
 }

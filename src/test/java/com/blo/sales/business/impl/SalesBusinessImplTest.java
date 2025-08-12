@@ -106,9 +106,9 @@ public class SalesBusinessImplTest {
 	
 	@Test
 	public void getBestSellingProducts() throws BloSalesBusinessException {
-		Mockito.when(dao.getBestSellingProducts()).thenReturn(MocksFactory.createDtoIntProductsOnSalesCounter());
+		Mockito.when(dao.getBestSellingProducts(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyInt(), Mockito.anyInt())).thenReturn(MocksFactory.createDtoIntProductsOnSalesCounter());
 		
-		var out = impl.getBestSellingProducts();
+		var out = impl.getBestSellingProducts(0,0,0,0);
 		
 		assertNotNull(out);
 		assertFalse(out.getProductsOnSales().isEmpty());

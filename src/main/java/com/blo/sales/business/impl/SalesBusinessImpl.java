@@ -64,9 +64,9 @@ public class SalesBusinessImpl implements ISalesBusiness {
 	}
 
 	@Override
-	public DtoIntProductsOnSalesCounter getBestSellingProducts() throws BloSalesBusinessException {
+	public DtoIntProductsOnSalesCounter getBestSellingProducts(int initMonth, int initYear, int endMonth, int endYear) throws BloSalesBusinessException {
 		LOGGER.info("recuperando informacion de ventas");
-		return dao.getBestSellingProducts();
+		return dao.getBestSellingProducts(initMonth, initYear, endMonth, endYear);
 	}
 
 }
