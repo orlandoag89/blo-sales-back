@@ -33,4 +33,20 @@ public interface SalesRepository extends MongoRepository<Sale, String> {
         "{ $sort: { total_sold: -1 } }"
     })
 	List<ProductsOnSaleCounter> countSalesByProduct();
+	
+	@Aggregation(pipeline = {
+		    "{ $match: { $and: [ " +
+		        "?#{ [0] != null ? { 'open_date': { $gte: ?0 } } : { } }, " +
+		        "?#{ [1] != null ? { 'open_date': { $lte: ?1 } } : { } } " +
+		    "] } }",
+		    "{ $unwind: '$products' }",
+		    "{ $group: { " +
+		        "_id: '$products.name', " +
+		        "total_sold: { $sum: { $toDouble: '$products.quantity_on_sale' } }, " +
+		        "total_revenue: { $sum: { $toDouble: '$products.total_price' } }, " +
+		        "time_sold: { $sum: 1 } " +
+		    "} }",
+		    "{ $sort: { total_sold: -1 } }"
+		})
+		List<ProductsOnSaleCounter> countSalesByProductByPeriod(long start, long end);
 }

@@ -63,7 +63,7 @@ public class CreditsFacadeImpl implements ICreditsFacade {
 		var toBody = new DtoCommonWrapper<DtoCredits>();
 		LOGGER.info("recuperando todos los creditos");
 		var out = business.getAllCredits();
-		LOGGER.info(String.format("creditos [%s]", String.valueOf(out)));
+		LOGGER.info(String.format("creditos [%s]", String.valueOf(out.getCredits().size())));
 		var data = creditsMapper.toOuter(out);
 		toBody.setData(data);
 		return new ResponseEntity<>(toBody, HttpStatus.OK);

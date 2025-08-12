@@ -35,7 +35,7 @@ public class ReportsFacadeImpl implements IReportsFacade {
 		try {
 			var salesProducts = salesBusiness.getBestSellingProducts();
 			var data = productsOnSalesCounterMapper.toOuter(salesProducts);
-			LOGGER.info(String.format("productos en ventas %s", String.valueOf(data)));
+			LOGGER.info(String.format("productos en ventas %s", String.valueOf(data.getProductsOnSales().size())));
 			body.setData(data);
 			return new ResponseEntity<>(body, HttpStatus.OK);
 		} catch (BloSalesBusinessException e) {

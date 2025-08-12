@@ -56,7 +56,7 @@ public class CreditsDaoImpl implements ICreditsDao {
 		List<Credit> allCredits = repository.findAll();
 		var credits = new Credits();
 		credits.setCredits(allCredits);
-		LOGGER.info(String.format("recuperando todos los creditos disponibles %s", String.valueOf(credits)));
+		LOGGER.info(String.format("recuperando todos los creditos disponibles %s", String.valueOf(allCredits.size())));
 		return creditsMapper.toOuter(credits);
 	}
 

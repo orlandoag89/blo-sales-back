@@ -71,6 +71,7 @@ public class CreditsFacadeImplTest {
 	
 	@Test
 	public void getCreditsTest() throws Exception {
+		Mockito.when(business.getAllCredits()).thenReturn(MocksFactory.createDtoIntCredits());
 		Mockito.when(creditsMapper.toOuter(Mockito.any())).thenReturn(MocksFactory.createDtoCredits());
 
 		var result = mockMvc.perform(get("/api/v1/credits")

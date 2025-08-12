@@ -60,7 +60,7 @@ public class SalesDaoImpl implements ISalesDao {
 	@Override
 	public DtoIntSales getSales() throws BloSalesBusinessException {
 		var sales = repository.findAll();
-		LOGGER.info(String.format("Sales found %s", String.valueOf(sales)));
+		LOGGER.info(String.format("Sales found %s", String.valueOf(sales.size())));
 		var salesWrapper = new Sales();
 		salesWrapper.setSales(sales);
 		return salesMapper.toOuter(salesWrapper);
