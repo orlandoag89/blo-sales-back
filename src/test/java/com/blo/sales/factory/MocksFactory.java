@@ -13,7 +13,9 @@ import com.blo.sales.business.dto.DtoIntDebtor;
 import com.blo.sales.business.dto.DtoIntDebtors;
 import com.blo.sales.business.dto.DtoIntPartialPyment;
 import com.blo.sales.business.dto.DtoIntProduct;
+import com.blo.sales.business.dto.DtoIntProductOnSaleCounter;
 import com.blo.sales.business.dto.DtoIntProducts;
+import com.blo.sales.business.dto.DtoIntProductsOnSalesCounter;
 import com.blo.sales.business.dto.DtoIntSale;
 import com.blo.sales.business.dto.DtoIntSaleProduct;
 import com.blo.sales.business.dto.DtoIntSales;
@@ -33,6 +35,7 @@ import com.blo.sales.dao.docs.Debtors;
 import com.blo.sales.dao.docs.PartialPyment;
 import com.blo.sales.dao.docs.Product;
 import com.blo.sales.dao.docs.Products;
+import com.blo.sales.dao.docs.ProductsOnSaleCounter;
 import com.blo.sales.dao.docs.Sale;
 import com.blo.sales.dao.docs.SaleProduct;
 import com.blo.sales.dao.docs.Sales;
@@ -49,7 +52,9 @@ import com.blo.sales.facade.dto.DtoDebtor;
 import com.blo.sales.facade.dto.DtoDebtors;
 import com.blo.sales.facade.dto.DtoPartialPyment;
 import com.blo.sales.facade.dto.DtoProduct;
+import com.blo.sales.facade.dto.DtoProductOnSaleCounter;
 import com.blo.sales.facade.dto.DtoProducts;
+import com.blo.sales.facade.dto.DtoProductsOnSalesCounter;
 import com.blo.sales.facade.dto.DtoSale;
 import com.blo.sales.facade.dto.DtoSaleProduct;
 import com.blo.sales.facade.dto.DtoSales;
@@ -969,6 +974,22 @@ public final class MocksFactory {
 		return out;
 	}
 	
+	public static ProductsOnSaleCounter createProductsOnSaleCounterItem() {
+		var out = new ProductsOnSaleCounter();
+		out.setName(ANY_NAME);
+		out.setTime_sold(3);
+		out.setTotal_revenue(BIG_DECIMAL_5);
+		out.setTotal_sold(BIG_DECIMAL_50);
+		return out;
+	}
+	
+	public static List<ProductsOnSaleCounter> createProductsOnSaleCounter() {
+		List<ProductsOnSaleCounter> lst = new ArrayList<>();
+		lst.add(createProductsOnSaleCounterItem());
+		return lst;
+		
+	}
+	
 	public static Optional<Credit> createOptionalCredit() {
 		return Optional.of(createCreditSaved());
 	}
@@ -977,6 +998,40 @@ public final class MocksFactory {
 		var e = createCreditSaved();
 		e.setCurrent_amount(BIG_DECIMAL_50);
 		return Optional.of(e);
+	}
+	
+	public static DtoIntProductOnSaleCounter createDtoIntProductOnSaleCounter() {
+		var out = new DtoIntProductOnSaleCounter();
+		out.setName(ANY_NAME);
+		out.setTime_sold(3);
+		out.setTotal_revenue(BIG_DECIMAL_5);
+		out.setTotal_sold(BIG_DECIMAL_50);
+		return out;
+	}
+	
+	public static DtoIntProductsOnSalesCounter createDtoIntProductsOnSalesCounter() {
+		var out = new DtoIntProductsOnSalesCounter();
+		List<DtoIntProductOnSaleCounter> lst = new ArrayList<>();
+		lst.add(createDtoIntProductOnSaleCounter());
+		out.setProductsOnSales(lst);
+		return out;
+	}
+	
+	public static DtoProductOnSaleCounter createDtoProductOnSaleCounter() {
+		var out = new DtoProductOnSaleCounter();
+		out.setName(ANY_NAME);
+		out.setTime_sold(3);
+		out.setTotal_revenue(BIG_DECIMAL_5);
+		out.setTotal_sold(BIG_DECIMAL_50);
+		return out;
+	}
+	
+	public static DtoProductsOnSalesCounter createDtoProductsOnSalesCounter() {
+		var out = new DtoProductsOnSalesCounter();
+		List<DtoProductOnSaleCounter> lst = new ArrayList<>();
+		lst.add(createDtoProductOnSaleCounter());
+		out.setProductsOnSales(lst);
+		return out;
 	}
 	
 	public static Optional<Credit> createOptionaCloselCredit() {
@@ -1073,5 +1128,9 @@ public final class MocksFactory {
 	
 	public static TypeReference<DtoCommonWrapper<DtoCredits>> getReferenceFromDtoCredits() {
 		return new TypeReference<DtoCommonWrapper<DtoCredits>>() { };
+	}
+	
+	public static TypeReference<DtoCommonWrapper<DtoProductsOnSalesCounter>> getReferenceFromDtoProductsOnSalesCounter() {
+		return new TypeReference<DtoCommonWrapper<DtoProductsOnSalesCounter>>() { };
 	}
 }

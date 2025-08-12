@@ -13,6 +13,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.blo.sales.dao.mapper.ProductOnSaleCounterMapper;
 import com.blo.sales.dao.mapper.SaleMapper;
 import com.blo.sales.dao.mapper.SalesMapper;
 import com.blo.sales.dao.repository.SalesRepository;
@@ -30,6 +31,9 @@ public class SalesDaoImplTest {
 	
 	@Mock
 	private SaleMapper saleMapper;
+	
+	@Mock
+	private ProductOnSaleCounterMapper productOnSaleCounterMapper;
 	
 	@InjectMocks
 	private SalesDaoImpl impl;
@@ -136,5 +140,16 @@ public class SalesDaoImplTest {
 		
 		assertNotNull(out);
 		assertFalse(out.getSales().isEmpty());
+	}
+	
+	@Test
+	public void getBestSellingProductsTest() throws BloSalesBusinessException {
+		Mockito.when(repository.countSalesByProduct()).thenReturn(MocksFactory.createProductsOnSaleCounter());
+		Mockito.when(productOnSaleCounterMapper.toOuter(Mockito.any())).thenReturn(MocksFactory.createDtoIntProductOnSaleCounter());
+		
+		var out = impl.getBestSellingProducts();
+		
+		assertNotNull(out.getProductsOnSales());
+		assertFalse(out.getProductsOnSales().isEmpty());
 	}
 }
