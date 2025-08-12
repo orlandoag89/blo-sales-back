@@ -1,6 +1,7 @@
 package com.blo.sales.facade.impl;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -202,11 +203,12 @@ public class SalesFacadeImpl implements ISalesFacade {
 			var totalFromProducts = saleData.getSale().getProducts().stream().
 				map(p -> p.getQuantity_on_sale().multiply(p.getTotal_price())).
 				reduce(BigDecimal.ZERO, BigDecimal::add);
-			LOGGER.info(String.format("total from products %s", totalFromProducts));
-			var totalSubPartial = totalFromProducts.subtract(partialPyment);
+			var round = totalFromProducts.setScale(2, RoundingMode.HALF_UP);
+			LOGGER.info(String.format("total from products %s", round));
+			var totalSubPartial = round.subtract(partialPyment);
 			LOGGER.info(String.format("diff total - partial pyment = %s", totalSubPartial));
 			// si la diferencia entre la cuenta total y pago parcial no es igual al pago parcial envia un error
-			if (totalSubPartial.compareTo(saleData.getDebtor().getTotal()) != 0 && totalFromProducts.compareTo(saleData.getSale().getTotal()) != 0) {
+			if (totalSubPartial.compareTo(saleData.getDebtor().getTotal()) != 0 && round.compareTo(saleData.getSale().getTotal()) != 0) {
 				LOGGER.error("ambos totales no son la diferencia entre total menos pago parcial");
 				throw new BloSalesBusinessException(exceptionsMessagesTotalNotValid, exceptionsCodesTotalNotValid, HttpStatus.BAD_REQUEST);
 			}
