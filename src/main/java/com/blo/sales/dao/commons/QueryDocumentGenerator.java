@@ -52,5 +52,39 @@ public final class QueryDocumentGenerator {
 
 	    return conditions;
 	}
+	
+	/**
+	 * Filtro por fecha y anio
+	 * @param inicioMes
+	 * @param inicioAnio
+	 * @param finMes
+	 * @param finAnio
+	 * @return
+	 */
+	public static Document buildMatchCondition(
+	        Integer inicioMes, Integer inicioAnio,
+	        Integer finMes, Integer finAnio) {
 
+	    if (inicioMes != null && inicioAnio != null && finMes != null && finAnio != null) {
+	        long startEpoch = LocalDate.of(inicioAnio, inicioMes, 1)
+	                .atStartOfDay().toInstant(ZoneOffset.UTC).toEpochMilli();
+	        long endEpoch = LocalDate.of(finAnio, finMes, 1)
+	                .plusMonths(1).minusDays(1)
+	                .atTime(23, 59, 59).toInstant(ZoneOffset.UTC).toEpochMilli();
+
+	        return new Document("open_date", new Document("$gte", startEpoch).append("$lte", endEpoch));
+	    }
+	    else if (finMes != null && finAnio != null) {
+	        long endEpoch = LocalDate.of(finAnio, finMes, 1)
+	                .plusMonths(1).minusDays(1)
+	                .atTime(23, 59, 59).toInstant(ZoneOffset.UTC).toEpochMilli();
+
+	        return new Document("open_date", new Document("$lte", endEpoch));
+	    }
+	    else {
+	        return new Document(); // Sin filtros
+	    }
+	}
+
+	
 }

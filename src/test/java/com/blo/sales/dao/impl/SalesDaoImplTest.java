@@ -144,7 +144,7 @@ public class SalesDaoImplTest {
 	
 	@Test
 	public void getBestSellingProductsByAllTest() throws BloSalesBusinessException {
-		Mockito.when(repository.countSalesByProduct()).thenReturn(MocksFactory.createProductsOnSaleCounter());
+		Mockito.when(repository.countSalesByProduct(Mockito.anyList())).thenReturn(MocksFactory.createProductsOnSaleCounter());
 		Mockito.when(productOnSaleCounterMapper.toOuter(Mockito.any())).thenReturn(MocksFactory.createDtoIntProductOnSaleCounter());
 		
 		var out = impl.getBestSellingProducts(0,0,0,0);

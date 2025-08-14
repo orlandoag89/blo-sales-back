@@ -3,6 +3,7 @@ package com.blo.sales.business;
 import com.blo.sales.business.dto.DtoIntProductsOnSalesCounter;
 import com.blo.sales.business.dto.DtoIntSale;
 import com.blo.sales.business.dto.DtoIntSales;
+import com.blo.sales.business.dto.DtoIntSalesDetailReport;
 import com.blo.sales.exceptions.BloSalesBusinessException;
 
 public interface ISalesBusiness {
@@ -23,4 +24,5 @@ public interface ISalesBusiness {
 	
 	DtoIntProductsOnSalesCounter getBestSellingProducts(int initMonth, int initYear, int endMonth, int endYear) throws BloSalesBusinessException;
 
+	DtoIntSalesDetailReport getSalesByDate(int initMonth, int initYear, int endMonth, int endYear);
 }

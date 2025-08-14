@@ -15,11 +15,14 @@ import org.springframework.stereotype.Service;
 import com.blo.sales.business.dto.DtoIntProductOnSaleCounter;
 import com.blo.sales.business.dto.DtoIntProductsOnSalesCounter;
 import com.blo.sales.business.dto.DtoIntSale;
+import com.blo.sales.business.dto.DtoIntSaleDetailReport;
 import com.blo.sales.business.dto.DtoIntSales;
+import com.blo.sales.business.dto.DtoIntSalesDetailReport;
 import com.blo.sales.dao.ISalesDao;
 import com.blo.sales.dao.commons.QueryDocumentGenerator;
 import com.blo.sales.dao.docs.Sales;
 import com.blo.sales.dao.mapper.ProductOnSaleCounterMapper;
+import com.blo.sales.dao.mapper.SaleDetailReportMapper;
 import com.blo.sales.dao.mapper.SaleMapper;
 import com.blo.sales.dao.mapper.SalesMapper;
 import com.blo.sales.dao.repository.SalesRepository;
@@ -41,6 +44,9 @@ public class SalesDaoImpl implements ISalesDao {
 	
 	@Autowired
 	private ProductOnSaleCounterMapper productOnSaleCounterMapper;
+	
+	@Autowired
+	private SaleDetailReportMapper saleDetailReportMapper;
 
 	@Value("${exceptions.codes.sale-not-found}")
 	private String saleNotFoundCode;
@@ -138,16 +144,37 @@ public class SalesDaoImpl implements ISalesDao {
 		var out = new DtoIntProductsOnSalesCounter();
 		LOGGER.info("recuperando informacion de productos en ventas");
 		List<DtoIntProductOnSaleCounter> productsOnSales = new ArrayList<>();
-		var sumDatesInfo = initMonth + initYear + endMonth + endYear;
-		if (sumDatesInfo == 0) {
-			repository.countSalesByProduct().forEach(p -> productsOnSales.add(productOnSaleCounterMapper.toOuter(p)));
-			LOGGER.info(String.format("productos por venta %s", String.valueOf(productsOnSales.size())));
+		List<Document> match = null;
+		if (isAllPeriods(initMonth, initYear, endMonth, endYear)) {
+			match = QueryDocumentGenerator.buildMatchConditions(null, null, null, null);
 		} else {
-			List<Document> match = QueryDocumentGenerator.buildMatchConditions(initMonth, initYear, endMonth, endYear);
-			repository.countSalesByProduct(match).forEach(p -> productsOnSales.add(productOnSaleCounterMapper.toOuter(p)));
-			LOGGER.info(String.format("productos por venta %s por periodo", String.valueOf(productsOnSales.size())));
+			match = QueryDocumentGenerator.buildMatchConditions(initMonth, initYear, endMonth, endYear);
 		}
+		repository.countSalesByProduct(match).forEach(p -> productsOnSales.add(productOnSaleCounterMapper.toOuter(p)));
+		LOGGER.info(String.format("productos por venta %s por periodo", String.valueOf(productsOnSales.size())));
 		out.setProductsOnSales(productsOnSales);
 		return out;
+	}
+
+	@Override
+	public DtoIntSalesDetailReport getSalesByDate(int initMonth, int initYear, int endMonth, int endYear) {
+		LOGGER.info("recuperando reporte de ventas");
+		List<DtoIntSaleDetailReport> sales = new ArrayList<>();
+		var out = new DtoIntSalesDetailReport();
+		Document query = null;
+		if (isAllPeriods(initMonth, initYear, endMonth, endYear)) {
+			query = QueryDocumentGenerator.buildMatchCondition(null, null, null, null);
+		} else {
+			query = QueryDocumentGenerator.buildMatchCondition(initMonth, initYear, endMonth, endYear);
+		}
+		repository.retrieveSalesByDate(query).forEach(s -> sales.add(saleDetailReportMapper.toOuter(s)));
+		LOGGER.info(String.format("detalles ventas del periodo %s", String.valueOf(sales.size())));
+		out.setSales(sales);
+		return out;
+	}
+	
+	private boolean isAllPeriods(int initMonth, int initYear, int endMonth, int endYear) {
+		var sumDatesInfo = initMonth + initYear + endMonth + endYear;
+		return sumDatesInfo == 0;
 	}
 }
