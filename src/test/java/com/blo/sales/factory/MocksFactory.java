@@ -17,8 +17,10 @@ import com.blo.sales.business.dto.DtoIntProductOnSaleCounter;
 import com.blo.sales.business.dto.DtoIntProducts;
 import com.blo.sales.business.dto.DtoIntProductsOnSalesCounter;
 import com.blo.sales.business.dto.DtoIntSale;
+import com.blo.sales.business.dto.DtoIntSaleDetailReport;
 import com.blo.sales.business.dto.DtoIntSaleProduct;
 import com.blo.sales.business.dto.DtoIntSales;
+import com.blo.sales.business.dto.DtoIntSalesDetailReport;
 import com.blo.sales.business.dto.DtoIntUser;
 import com.blo.sales.business.dto.DtoIntUserToken;
 import com.blo.sales.business.enums.CommonStatusIntEnum;
@@ -37,6 +39,7 @@ import com.blo.sales.dao.docs.Product;
 import com.blo.sales.dao.docs.Products;
 import com.blo.sales.dao.docs.ProductsOnSaleCounter;
 import com.blo.sales.dao.docs.Sale;
+import com.blo.sales.dao.docs.SaleDetailReport;
 import com.blo.sales.dao.docs.SaleProduct;
 import com.blo.sales.dao.docs.Sales;
 import com.blo.sales.dao.docs.Usuario;
@@ -56,8 +59,10 @@ import com.blo.sales.facade.dto.DtoProductOnSaleCounter;
 import com.blo.sales.facade.dto.DtoProducts;
 import com.blo.sales.facade.dto.DtoProductsOnSalesCounter;
 import com.blo.sales.facade.dto.DtoSale;
+import com.blo.sales.facade.dto.DtoSaleDetailReport;
 import com.blo.sales.facade.dto.DtoSaleProduct;
 import com.blo.sales.facade.dto.DtoSales;
+import com.blo.sales.facade.dto.DtoSalesDetailReport;
 import com.blo.sales.facade.dto.DtoUser;
 import com.blo.sales.facade.dto.DtoUserToken;
 import com.blo.sales.facade.dto.DtoWrapperSale;
@@ -109,13 +114,13 @@ public final class MocksFactory {
 		out.setCost_of_sale(BIG_DECIMAL_50.subtract(BIG_DECIMAL_5));
 		return out;
 	}
-	
+
 	public static DtoIntProduct createDtoIntSpecialProduct() {
 		var out = createDtoIntProduct();
 		out.setName(SpecialProductsEnum.ANOTHER_PRODUCT_SERVICE.name());
 		return out;
 	}
-	
+
 	public static Product createProduct() {
 		var out = new Product();
 		out.setId(ANY_ID);
@@ -124,10 +129,11 @@ public final class MocksFactory {
 		out.setName(ANY_STRING);
 		out.setQuantity(BIG_DECIMAL_5);
 		out.setTotal_price(BIG_DECIMAL_50);
-		out.setCost_of_sale(BIG_DECIMAL_50.subtract(BIG_DECIMAL_5));;
+		out.setCost_of_sale(BIG_DECIMAL_50.subtract(BIG_DECIMAL_5));
+		;
 		return out;
 	}
-	
+
 	public static Product createProductSpecial() {
 		var out = createProduct();
 		out.setName(SpecialProductsEnum.ANOTHER_PRODUCT_SERVICE.name());
@@ -162,7 +168,7 @@ public final class MocksFactory {
 		out.setProducts(products);
 		return out;
 	}
-	
+
 	public static Products createProducts() {
 		var out = new Products();
 		List<Product> products = new ArrayList<>();
@@ -170,7 +176,7 @@ public final class MocksFactory {
 		out.setProducts(products);
 		return out;
 	}
-	
+
 	public static DtoProducts createDtoProductsSaved() {
 		var out = new DtoProducts();
 		List<DtoProduct> products = new ArrayList<>();
@@ -179,7 +185,7 @@ public final class MocksFactory {
 		out.setProducts(products);
 		return out;
 	}
-	
+
 	public static DtoIntProducts createDtoIntProductsSaved() {
 		var out = new DtoIntProducts();
 		List<DtoIntProduct> products = new ArrayList<>();
@@ -225,7 +231,7 @@ public final class MocksFactory {
 		out.setStatus(StatusCashboxIntEnum.OPEN);
 		return out;
 	}
-	
+
 	public static DtoIntCashbox createDtoIntNewCashbox() {
 		var out = new DtoIntCashbox();
 		out.setDate(NOW);
@@ -233,7 +239,7 @@ public final class MocksFactory {
 		out.setStatus(StatusCashboxIntEnum.OPEN);
 		return out;
 	}
-	
+
 	public static DtoIntCashbox createDtoIntCashboxClose() {
 		var out = createDtoIntCashboxOpen();
 		out.setStatus(StatusCashboxIntEnum.CLOSE);
@@ -280,7 +286,7 @@ public final class MocksFactory {
 		out.setTotal(BIG_DECIMAL_50);
 		return out;
 	}
-	
+
 	public static DtoIntDebtor createNewDtoIntDebtor() {
 		var out = new DtoIntDebtor();
 		out.setName(ANY_NAME);
@@ -291,7 +297,7 @@ public final class MocksFactory {
 		out.setTotal(BIG_DECIMAL_50);
 		return out;
 	}
-	
+
 	public static DtoWrapperSale createDtoWrapperSaleWithNewDebtor() {
 		var out = new DtoWrapperSale();
 		out.setDebtor(createNewDtoDebtor());
@@ -317,7 +323,7 @@ public final class MocksFactory {
 		out.setTotal(BIG_DECIMAL_50);
 		return out;
 	}
-	
+
 	public static DtoIntDebtor createExistsDtoIntDebtor() {
 		var out = new DtoIntDebtor();
 		out.setId(ANY_ID);
@@ -336,7 +342,7 @@ public final class MocksFactory {
 		out.setTotal(BIG_DECIMAL_50);
 		return out;
 	}
-	
+
 	public static Debtor createExistsDebtor() {
 		var out = new Debtor();
 		out.setId(ANY_ID);
@@ -355,7 +361,7 @@ public final class MocksFactory {
 		out.setTotal(BIG_DECIMAL_50);
 		return out;
 	}
-	
+
 	public static Debtor createNewDebtor() {
 		var out = new Debtor();
 		out.setName(ANY_NAME);
@@ -373,14 +379,14 @@ public final class MocksFactory {
 		out.setTotal(BIG_DECIMAL_50);
 		return out;
 	}
-	
+
 	public static Debtors createDebtors() {
 		var out = new Debtors();
-		
+
 		List<Debtor> debtors = new ArrayList<>();
 		debtors.add(createExistsDebtor());
 		out.setDebtors(debtors);
-		
+
 		return out;
 	}
 
@@ -390,14 +396,14 @@ public final class MocksFactory {
 		out.setPartial_pyment(BIG_DECIMAL_5);
 		return out;
 	}
-	
+
 	public static DtoIntPartialPyment createDtoIntPartialPyment() {
 		var out = new DtoIntPartialPyment();
 		out.setDate(NOW);
 		out.setPartial_pyment(BIG_DECIMAL_5);
 		return out;
 	}
-	
+
 	public static PartialPyment createPartialPyment() {
 		var out = new PartialPyment();
 		out.setDate(NOW);
@@ -419,7 +425,7 @@ public final class MocksFactory {
 		out.setProducts(products);
 		return out;
 	}
-	
+
 	public static DtoSale createDtoSaleNoCashbox() {
 		var out = new DtoSale();
 		out.set_on_cashbox(false);
@@ -434,7 +440,7 @@ public final class MocksFactory {
 		out.setTotal(BIG_DECIMAL_50);
 		return out;
 	}
-	
+
 	public static DtoSale createDtoSaleNoCashboxAndOpen() {
 		var out = new DtoSale();
 		out.set_on_cashbox(false);
@@ -448,7 +454,7 @@ public final class MocksFactory {
 		out.setTotal(BIG_DECIMAL_50);
 		return out;
 	}
-	
+
 	public static DtoIntSale createDtoIntSaleNoCashboxAndOpen() {
 		var out = new DtoIntSale();
 		out.set_on_cashbox(false);
@@ -462,7 +468,7 @@ public final class MocksFactory {
 		out.setTotal(BIG_DECIMAL_50);
 		return out;
 	}
-	
+
 	public static DtoSale createDtoNewSaleNoCashbox() {
 		var out = new DtoSale();
 		out.set_on_cashbox(false);
@@ -476,7 +482,7 @@ public final class MocksFactory {
 		out.setTotal(BIG_DECIMAL_50);
 		return out;
 	}
-	
+
 	public static DtoIntSale createDtoIntSaleNoCashbox() {
 		var out = new DtoIntSale();
 		out.set_on_cashbox(false);
@@ -491,7 +497,7 @@ public final class MocksFactory {
 		out.setTotal(BIG_DECIMAL_50);
 		return out;
 	}
-	
+
 	public static DtoIntSale createSavedDtoIntSaleNoCashbox() {
 		var out = new DtoIntSale();
 		out.set_on_cashbox(false);
@@ -522,7 +528,7 @@ public final class MocksFactory {
 		out.setTotal(BIG_DECIMAL_50);
 		return out;
 	}
-	
+
 	public static DtoIntSale createNewDtoIntSaleOnCashbox() {
 		var out = new DtoIntSale();
 		out.set_on_cashbox(true);
@@ -540,11 +546,11 @@ public final class MocksFactory {
 	public static BigDecimal createBigDecimal50() {
 		return BIG_DECIMAL_50;
 	}
-	
+
 	public static BigDecimal createBigDecimal500() {
 		return BIG_DECIMAL_500;
 	}
-	
+
 	public static DtoSaleProduct createDtoSaleProduct() {
 		var out = new DtoSaleProduct();
 		var product = createDtoProduct();
@@ -557,7 +563,7 @@ public final class MocksFactory {
 		out.setQuantity_on_sale(BIG_DECIMAL_1);
 		return out;
 	}
-	
+
 	public static DtoSaleProduct createDtoSaleProductKg() {
 		var out = createDtoSaleProduct();
 		out.setIts_kg(true);
@@ -577,7 +583,7 @@ public final class MocksFactory {
 		out.setQuantity_on_sale(BIG_DECIMAL_1);
 		return out;
 	}
-	
+
 	public static SaleProduct createSaleProduct() {
 		var out = new SaleProduct();
 		var product = createProduct();
@@ -590,37 +596,37 @@ public final class MocksFactory {
 		out.setQuantity_on_sale(BIG_DECIMAL_1);
 		return out;
 	}
-	
+
 	public static Sale createSaleNoCashbox() {
 		var out = new Sale();
 		out.set_on_cashbox(false);
 		out.setClose_sale(NOW);
 		out.setId(ANY_ID);
 		out.setOpen_date(NOW);
-		
+
 		List<SaleProduct> products = new ArrayList<>();
 		products.add(createSaleProduct());
-		
+
 		out.setProducts(products);
 		out.setTotal(BIG_DECIMAL_50);
 		return out;
 	}
-	
+
 	public static Sale createSaleOnCashbox() {
 		var out = new Sale();
 		out.set_on_cashbox(true);
 		out.setClose_sale(NOW);
 		out.setId(ANY_ID);
 		out.setOpen_date(NOW);
-		
+
 		List<SaleProduct> products = new ArrayList<>();
 		products.add(createSaleProduct());
-		
+
 		out.setProducts(products);
 		out.setTotal(BIG_DECIMAL_50);
 		return out;
 	}
-	
+
 	public static long createNow() {
 		return NOW;
 	}
@@ -635,7 +641,7 @@ public final class MocksFactory {
 
 		return out;
 	}
-	
+
 	public static DtoIntSales createDtoIntSales() {
 		var out = new DtoIntSales();
 
@@ -646,7 +652,7 @@ public final class MocksFactory {
 
 		return out;
 	}
-	
+
 	public static Sales createSales() {
 		var out = new Sales();
 
@@ -657,43 +663,43 @@ public final class MocksFactory {
 
 		return out;
 	}
-	
+
 	public static DtoIntSales createOpenDtoIntSales() {
 		var out = new DtoIntSales();
 
 		List<DtoIntSale> sales = new ArrayList<>();
-		
+
 		var item1 = createDtoIntSaleNoCashbox();
 		item1.setClose_sale(0L);
 		sales.add(item1);
-		
+
 		var item2 = createDtoIntSaleNoCashbox();
 		item2.setClose_sale(0L);
 		sales.add(item2);
-		
+
 		out.setSales(sales);
 
 		return out;
 	}
-	
+
 	public static DtoSales createOpenDtoSales() {
 		var out = new DtoSales();
 
 		List<DtoSale> sales = new ArrayList<>();
-		
+
 		var item1 = createDtoSaleNoCashbox();
 		item1.setClose_sale(0L);
 		sales.add(item1);
-		
+
 		var item2 = createDtoSaleNoCashbox();
 		item2.setClose_sale(0L);
 		sales.add(item2);
-		
+
 		out.setSales(sales);
 
 		return out;
 	}
-	
+
 	public static DtoIntSales createDtoIntSalesListEmpty() {
 		var out = new DtoIntSales();
 
@@ -701,7 +707,7 @@ public final class MocksFactory {
 
 		return out;
 	}
-	
+
 	public static DtoIntSales createDtoIntSalesListNull() {
 		var out = new DtoIntSales();
 
@@ -712,20 +718,20 @@ public final class MocksFactory {
 
 	public static DtoSales createDtoSalesListEmpty() {
 		var out = new DtoSales();
-		
+
 		out.setSales(new ArrayList<>());
 
 		return out;
 	}
-	
+
 	public static DtoSales createDtoSalesListNull() {
 		var out = new DtoSales();
-		
+
 		out.setSales(null);
 
 		return out;
 	}
-	
+
 	public static DtoDebtors createDtoDebtors() {
 		var out = new DtoDebtors();
 		List<DtoDebtor> debtors = new ArrayList<>();
@@ -733,7 +739,7 @@ public final class MocksFactory {
 		out.setDebtors(debtors);
 		return out;
 	}
-	
+
 	public static DtoIntDebtors createDtoIntDebtors() {
 		var out = new DtoIntDebtors();
 		List<DtoIntDebtor> debtors = new ArrayList<>();
@@ -741,7 +747,7 @@ public final class MocksFactory {
 		out.setDebtors(debtors);
 		return out;
 	}
-	
+
 	public static Cashbox createCloseCashbox() {
 		var out = new Cashbox();
 		out.setDate(NOW);
@@ -750,7 +756,7 @@ public final class MocksFactory {
 		out.setStatus(DocStatusCashboxEnum.CLOSE);
 		return out;
 	}
-	
+
 	public static Cashbox createOpenCashbox() {
 		var out = new Cashbox();
 		out.setDate(NOW);
@@ -759,34 +765,34 @@ public final class MocksFactory {
 		out.setStatus(DocStatusCashboxEnum.OPEN);
 		return out;
 	}
-	
+
 	public static Cashboxes createCashboxes() {
 		var out = new Cashboxes();
-		
+
 		out.setBoxes(createCashboxesList());
-		
+
 		return out;
 	}
-	
+
 	public static List<Cashbox> createCashboxesList() {
 		List<Cashbox> boxes = new ArrayList<>();
-		
+
 		boxes.add(createOpenCashbox());
 		boxes.add(createCloseCashbox());
 		boxes.add(createCloseCashbox());
 		return boxes;
 	}
-	
+
 	public static DtoIntUserToken createDtoIntUserToken() {
 		return new DtoIntUserToken(TOKEN);
 	}
-	
+
 	public static DtoUserToken createDtoUserToken() {
 		var out = new DtoUserToken();
 		out.setToken(TOKEN);
 		return out;
 	}
-	
+
 	public static DtoIntUser createDtoIntCommonUser() {
 		var out = new DtoIntUser();
 		out.setId(ANY_ID);
@@ -796,7 +802,7 @@ public final class MocksFactory {
 		out.setUsername(ANY_STRING);
 		return out;
 	}
-	
+
 	public static DtoUser createDtoCommonUser() {
 		var out = new DtoUser();
 		out.setId(ANY_ID);
@@ -807,49 +813,49 @@ public final class MocksFactory {
 		out.setPassword_confirm(ANY_STRING);
 		return out;
 	}
-	
+
 	public static DtoIntUser createDtoIntRootUser() {
 		var user = createDtoIntCommonUser();
 		user.setUsername("root");
 		user.setRole(RolesIntEnum.ROOT);
 		return user;
 	}
-	
+
 	public static DtoUser createDtoRootUser() {
 		var user = createDtoCommonUser();
 		user.setUsername("root");
 		user.setRole(RolesEnum.ROOT);
 		return user;
 	}
-	
+
 	public static Usuario createCommonUsuarioWithOpenPasswordOpen() {
 		var out = new Usuario();
 		out.setId(ANY_ID);
 		out.setRol(DocRolesEnum.COMMON);
 		out.setUsername(ANY_STRING);
-		
+
 		List<Contrasenia> passwords = new ArrayList<>();
 		passwords.add(createContrasenia());
 		var itemAux = createContrasenia();
 		itemAux.setProcess_reset(true);
 		passwords.add(itemAux);
-		
+
 		out.setPassword(passwords);
 		return out;
 	}
-	
+
 	public static Usuario createCommonUsuarioWithoutOpenPasswordOpen() {
 		var out = createCommonUsuarioWithOpenPasswordOpen();
 		out.getPassword().get(1).setProcess_reset(false);
 		return out;
 	}
-	
+
 	public static Usuario createNewCommonUsuarioWithoutOpenPasswordOpen() {
 		var out = createCommonUsuarioWithoutOpenPasswordOpen();
 		out.setId(null);
 		return out;
 	}
-	
+
 	public static Contrasenia createContrasenia() {
 		var out = new Contrasenia();
 		out.setCreated_date(NOW);
@@ -857,7 +863,7 @@ public final class MocksFactory {
 		out.setProcess_reset(false);
 		return out;
 	}
-	
+
 	public static List<Config> createConfig() {
 		List<Config> out = new ArrayList<Config>();
 		var config = new Config();
@@ -865,7 +871,7 @@ public final class MocksFactory {
 		out.add(config);
 		return out;
 	}
-	
+
 	public static Credit createCreditSaved() {
 		var out = new Credit();
 		out.setCurrent_amount(BIG_DECIMAL_0);
@@ -878,13 +884,13 @@ public final class MocksFactory {
 		out.setTotal_amount(BIG_DECIMAL_500);
 		return out;
 	}
-	
+
 	public static Credit createCreditSavedClose() {
 		var out = createCreditSaved();
 		out.setStatus_credit(DocCommonStatusEnum.CLOSE);
 		return out;
 	}
-	
+
 	public static Credit createNewCredit() {
 		var out = new Credit();
 		out.setCurrent_amount(BIG_DECIMAL_0);
@@ -896,7 +902,7 @@ public final class MocksFactory {
 		out.setTotal_amount(BIG_DECIMAL_500);
 		return out;
 	}
-	
+
 	public static DtoIntCredit createDtoIntCreditSaved() {
 		var out = new DtoIntCredit();
 		out.setCurrent_amount(BIG_DECIMAL_0);
@@ -909,13 +915,13 @@ public final class MocksFactory {
 		out.setTotal_amount(BIG_DECIMAL_500);
 		return out;
 	}
-	
+
 	public static DtoIntCredit createDtoInCreditSavedClose() {
 		var out = createDtoIntCreditSaved();
 		out.setStatus_credit(CommonStatusIntEnum.CLOSE);
 		return out;
 	}
-	
+
 	public static DtoCredit createNewDtoCredit() {
 		var out = new DtoCredit();
 		out.setCurrent_amount(BIG_DECIMAL_0);
@@ -927,13 +933,13 @@ public final class MocksFactory {
 		out.setTotal_amount(BIG_DECIMAL_500);
 		return out;
 	}
-	
+
 	public static DtoCredit createDtoCreditSaved() {
 		var out = createNewDtoCredit();
 		out.setId(ANY_ID);
 		return out;
 	}
-	
+
 	public static DtoCredits createDtoCredits() {
 		var out = new DtoCredits();
 		List<DtoCredit> credits = new ArrayList<>();
@@ -941,7 +947,7 @@ public final class MocksFactory {
 		out.setCredits(credits);
 		return out;
 	}
-	
+
 	public static DtoIntCredit createNewDtoIntCredit() {
 		var out = new DtoIntCredit();
 		out.setCurrent_amount(BIG_DECIMAL_0);
@@ -953,13 +959,13 @@ public final class MocksFactory {
 		out.setTotal_amount(BIG_DECIMAL_500);
 		return out;
 	}
-	
+
 	public static Credits createCredits() {
 		var credits = new Credits();
 		credits.setCredits(createCreditList());
 		return credits;
 	}
-	
+
 	public static DtoIntCredits createDtoIntCredits() {
 		var out = new DtoIntCredits();
 		List<DtoIntCredit> credits = new ArrayList<>();
@@ -967,13 +973,13 @@ public final class MocksFactory {
 		out.setCredits(credits);
 		return out;
 	}
-	
+
 	public static List<Credit> createCreditList() {
 		List<Credit> out = new ArrayList<>();
 		out.add(createCreditSaved());
 		return out;
 	}
-	
+
 	public static ProductsOnSaleCounter createProductsOnSaleCounterItem() {
 		var out = new ProductsOnSaleCounter();
 		out.setName(ANY_NAME);
@@ -982,24 +988,24 @@ public final class MocksFactory {
 		out.setTotal_sold(BIG_DECIMAL_50);
 		return out;
 	}
-	
+
 	public static List<ProductsOnSaleCounter> createProductsOnSaleCounter() {
 		List<ProductsOnSaleCounter> lst = new ArrayList<>();
 		lst.add(createProductsOnSaleCounterItem());
 		return lst;
-		
+
 	}
-	
+
 	public static Optional<Credit> createOptionalCredit() {
 		return Optional.of(createCreditSaved());
 	}
-	
+
 	public static Optional<Credit> createOptionalCreditCurrentAmountBy50() {
 		var e = createCreditSaved();
 		e.setCurrent_amount(BIG_DECIMAL_50);
 		return Optional.of(e);
 	}
-	
+
 	public static DtoIntProductOnSaleCounter createDtoIntProductOnSaleCounter() {
 		var out = new DtoIntProductOnSaleCounter();
 		out.setName(ANY_NAME);
@@ -1008,7 +1014,7 @@ public final class MocksFactory {
 		out.setTotal_sold(BIG_DECIMAL_50);
 		return out;
 	}
-	
+
 	public static DtoIntProductsOnSalesCounter createDtoIntProductsOnSalesCounter() {
 		var out = new DtoIntProductsOnSalesCounter();
 		List<DtoIntProductOnSaleCounter> lst = new ArrayList<>();
@@ -1016,7 +1022,7 @@ public final class MocksFactory {
 		out.setProductsOnSales(lst);
 		return out;
 	}
-	
+
 	public static DtoProductOnSaleCounter createDtoProductOnSaleCounter() {
 		var out = new DtoProductOnSaleCounter();
 		out.setName(ANY_NAME);
@@ -1025,7 +1031,7 @@ public final class MocksFactory {
 		out.setTotal_sold(BIG_DECIMAL_50);
 		return out;
 	}
-	
+
 	public static DtoProductsOnSalesCounter createDtoProductsOnSalesCounter() {
 		var out = new DtoProductsOnSalesCounter();
 		List<DtoProductOnSaleCounter> lst = new ArrayList<>();
@@ -1033,104 +1039,169 @@ public final class MocksFactory {
 		out.setProductsOnSales(lst);
 		return out;
 	}
+
+	public static SaleDetailReport createSaleDetailReport() {
+		var out = new SaleDetailReport();
+		out.setMonth(1);
+		out.setTotalVentas(BIG_DECIMAL_500);
+		out.setYear(2025);
+		return out;
+	}
+
+	public static List<SaleDetailReport> createSalesDetailReport() {
+		List<SaleDetailReport> reports = new ArrayList<>();
+		reports.add(createSaleDetailReport());
+		return reports;
+	}
+
+	public static DtoIntSaleDetailReport createDtoIntSaleDetailReport() {
+		var out = new DtoIntSaleDetailReport();
+		out.setMonth(1);
+		out.setTotalVentas(BIG_DECIMAL_500);
+		out.setYear(2025);
+		return out;
+	}
+
+	public static DtoIntSalesDetailReport createDtoIntSalesDetailReport() {
+		var out = new DtoIntSalesDetailReport();
+		List<DtoIntSaleDetailReport> lst = new ArrayList<>();
+		lst.add(createDtoIntSaleDetailReport());
+		out.setSales(lst);
+		return out;
+	}
 	
+	public static DtoSaleDetailReport createDtoSaleDetailReport() {
+		var out = new DtoSaleDetailReport();
+		out.setMonth(1);
+		out.setTotalVentas(BIG_DECIMAL_500);
+		out.setYear(2025);
+		return out;
+	}
+
+	public static DtoSalesDetailReport createDtoSalesDetailReport() {
+		var out = new DtoSalesDetailReport();
+		List<DtoSaleDetailReport> lst = new ArrayList<>();
+		lst.add(createDtoSaleDetailReport());
+		out.setSales(lst);
+		return out;
+	}
+
 	public static Optional<Credit> createOptionaCloselCredit() {
 		return Optional.of(createCreditSavedClose());
 	}
-	
+
 	public static Optional<Usuario> createOptionalUsuario() {
 		return Optional.of(createCommonUsuarioWithoutOpenPasswordOpen());
 	}
-	
+
 	public static Optional<Usuario> createOptionalUsuarioOpenProcess() {
 		return Optional.of(createCommonUsuarioWithOpenPasswordOpen());
 	}
-	
+
 	public static Optional<Cashbox> createOptionalCashbox() {
 		return Optional.of(createOpenCashbox());
 	}
-	
+
 	public static Optional<Debtor> createOptionaDebtor() {
 		return Optional.of(createExistsDebtor());
 	}
-	
+
 	public static Optional<Sale> createOptionalSale() {
 		return Optional.of(createSaleNoCashbox());
 	}
-	
+
 	public static Optional<Product> createOptionalProduct() {
 		return Optional.of(createProduct());
 	}
-	
+
 	public static long getNowDate() {
 		return NOW;
 	}
-	
+
 	public static String getId() {
 		return ANY_ID;
 	}
-	
+
 	public static String getAnyString() {
 		return ANY_STRING;
 	}
-	
+
 	public static BigDecimal getBigDecimal5() {
 		return BIG_DECIMAL_5;
 	}
-	
+
 	public static TypeReference<DtoCommonWrapper<DtoWrapperSale>> getReferenceFromWrapperSale() {
-		return new TypeReference<DtoCommonWrapper<DtoWrapperSale>>() { };
+		return new TypeReference<DtoCommonWrapper<DtoWrapperSale>>() {
+		};
 	}
-	
+
 	public static TypeReference<DtoCommonWrapper<DtoSales>> getReferenceFromDtoSales() {
-		return new TypeReference<DtoCommonWrapper<DtoSales>>() { };
+		return new TypeReference<DtoCommonWrapper<DtoSales>>() {
+		};
 	}
-	
+
 	public static TypeReference<DtoCommonWrapper<DtoSale>> getReferenceFromDtoSale() {
-		return new TypeReference<DtoCommonWrapper<DtoSale>>() { };
+		return new TypeReference<DtoCommonWrapper<DtoSale>>() {
+		};
 	}
-	
+
 	public static TypeReference<DtoCommonWrapper<DtoProducts>> getReferenceFromDtoProducts() {
-		return new TypeReference<DtoCommonWrapper<DtoProducts>>() { };
+		return new TypeReference<DtoCommonWrapper<DtoProducts>>() {
+		};
 	}
-	
+
 	public static TypeReference<DtoCommonWrapper<DtoProduct>> getReferenceFromDtoProduct() {
-		return new TypeReference<DtoCommonWrapper<DtoProduct>>() { };
+		return new TypeReference<DtoCommonWrapper<DtoProduct>>() {
+		};
 	}
-	
+
 	public static TypeReference<DtoCommonWrapper<DtoDebtor>> getReferenceFromDtoDebtor() {
-		return new TypeReference<DtoCommonWrapper<DtoDebtor>>() { };
+		return new TypeReference<DtoCommonWrapper<DtoDebtor>>() {
+		};
 	}
-	
+
 	public static TypeReference<DtoCommonWrapper<DtoDebtors>> getReferenceFromDtoDebtors() {
-		return new TypeReference<DtoCommonWrapper<DtoDebtors>>() { };
+		return new TypeReference<DtoCommonWrapper<DtoDebtors>>() {
+		};
 	}
-	
+
 	public static TypeReference<DtoCommonWrapper<DtoCashbox>> getReferenceFromDtoCashbox() {
-		return new TypeReference<DtoCommonWrapper<DtoCashbox>>() { };
+		return new TypeReference<DtoCommonWrapper<DtoCashbox>>() {
+		};
 	}
-	
+
 	public static TypeReference<DtoCommonWrapper<DtoCashboxes>> getReferenceFromDtoCashboxes() {
-		return new TypeReference<DtoCommonWrapper<DtoCashboxes>>() { };
+		return new TypeReference<DtoCommonWrapper<DtoCashboxes>>() {
+		};
 	}
-	
+
 	public static TypeReference<DtoCommonWrapper<DtoUserToken>> getReferenceFromDtoUserToken() {
-		return new TypeReference<DtoCommonWrapper<DtoUserToken>>() { };
+		return new TypeReference<DtoCommonWrapper<DtoUserToken>>() {
+		};
 	}
-	
+
 	public static TypeReference<DtoCommonWrapper<DtoUser>> getReferenceFromDtoUser() {
-		return new TypeReference<DtoCommonWrapper<DtoUser>>() { };
+		return new TypeReference<DtoCommonWrapper<DtoUser>>() {
+		};
 	}
-	
+
 	public static TypeReference<DtoCommonWrapper<DtoCredit>> getReferenceFromDtoCredit() {
-		return new TypeReference<DtoCommonWrapper<DtoCredit>>() { };
+		return new TypeReference<DtoCommonWrapper<DtoCredit>>() {
+		};
 	}
-	
+
 	public static TypeReference<DtoCommonWrapper<DtoCredits>> getReferenceFromDtoCredits() {
-		return new TypeReference<DtoCommonWrapper<DtoCredits>>() { };
+		return new TypeReference<DtoCommonWrapper<DtoCredits>>() {
+		};
+	}
+
+	public static TypeReference<DtoCommonWrapper<DtoProductsOnSalesCounter>> getReferenceFromDtoProductsOnSalesCounter() {
+		return new TypeReference<DtoCommonWrapper<DtoProductsOnSalesCounter>>() {
+		};
 	}
 	
-	public static TypeReference<DtoCommonWrapper<DtoProductsOnSalesCounter>> getReferenceFromDtoProductsOnSalesCounter() {
-		return new TypeReference<DtoCommonWrapper<DtoProductsOnSalesCounter>>() { };
+	public static TypeReference<DtoCommonWrapper<DtoSalesDetailReport>> getReferenceFromDtoSalesDetailReport() {
+		return new TypeReference<DtoCommonWrapper<DtoSalesDetailReport>>() {
+		};
 	}
 }

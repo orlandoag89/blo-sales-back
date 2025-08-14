@@ -116,7 +116,7 @@ public class ReportsFacadeImpl implements IReportsFacade {
 	}
 	
 	private void validatorDatesPeriod(int initialMonth, int initYear, int endMonth, int endYear) throws BloSalesBusinessException {
-		if (initYear < 2025) {
+		if (initYear < 2025 || endYear < 2025) {
 			LOGGER.error("Fecha inicio no puede ser menor a 2025");
 			throw new BloSalesBusinessException(exceptionsMessgesReportPeriodYearNotValid, exceptionsCodesReportPeriodYearNotValid, HttpStatus.BAD_REQUEST);
 		}

@@ -162,4 +162,132 @@ public class ReportsFacadeImplTest {
 		assertNotNull(objtProducts);
 		assertNotNull(objtProducts.getError());
 	}
+	
+	@Test
+	public void retrieveSalesByDateAllSalesTest() throws Exception {
+		Mockito.when(salesBusiness.getSalesByDate(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyInt(), Mockito.anyInt())).thenReturn(MocksFactory.createDtoIntSalesDetailReport());
+		Mockito.when(productsOnSalesCounterMapper.toOuter(Mockito.any())).thenReturn(MocksFactory.createDtoProductsOnSalesCounter());
+		
+		var result = mockMvc.perform(get("/api/v1/reports/sales?reportType=ALL&initialMonth=0&initYear=0&endMonth=0&endYear=0")
+	    		.header(MocksUtils.X_TRACKING_ID, "retrieveSalesByDateAllSalesTest")
+	            .contentType(MediaType.APPLICATION_JSON))
+	            .andExpect(status().isOk())
+	            .andReturn();
+		
+		var productsOnSales = MocksUtils.getContentAsString(result, "retrieveSalesByDateAllSalesTest");
+		var objtProducts = MocksUtils.parserToCommonWrapper(productsOnSales,  MocksFactory.getReferenceFromDtoSalesDetailReport());
+		
+		assertNotNull(objtProducts);
+		assertFalse(objtProducts.getData().getSales().isEmpty());
+		assertNull(objtProducts.getError());
+	}
+	
+	@Test
+	public void retrieveSalesByDatePeriodSalesTest() throws Exception {
+		Mockito.when(salesBusiness.getSalesByDate(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyInt(), Mockito.anyInt())).thenReturn(MocksFactory.createDtoIntSalesDetailReport());
+		Mockito.when(productsOnSalesCounterMapper.toOuter(Mockito.any())).thenReturn(MocksFactory.createDtoProductsOnSalesCounter());
+		
+		var result = mockMvc.perform(get("/api/v1/reports/sales?reportType=BY_PERIOD&initialMonth=3&initYear=2025&endMonth=4&endYear=2025")
+	    		.header(MocksUtils.X_TRACKING_ID, "retrieveSalesByDatePeriodSalesTest")
+	            .contentType(MediaType.APPLICATION_JSON))
+	            .andExpect(status().isOk())
+	            .andReturn();
+		
+		var productsOnSales = MocksUtils.getContentAsString(result, "retrieveSalesByDatePeriodSalesTest");
+		var objtProducts = MocksUtils.parserToCommonWrapper(productsOnSales,  MocksFactory.getReferenceFromDtoSalesDetailReport());
+		
+		assertNotNull(objtProducts);
+		assertFalse(objtProducts.getData().getSales().isEmpty());
+		assertNull(objtProducts.getError());
+	}
+	
+	@Test
+	public void retrieveSalesByDatePeriodErrorInitYearTest() throws Exception {
+		Mockito.when(salesBusiness.getSalesByDate(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyInt(), Mockito.anyInt())).thenReturn(MocksFactory.createDtoIntSalesDetailReport());
+		Mockito.when(productsOnSalesCounterMapper.toOuter(Mockito.any())).thenReturn(MocksFactory.createDtoProductsOnSalesCounter());
+		
+		var result = mockMvc.perform(get("/api/v1/reports/sales?reportType=BY_PERIOD&initialMonth=3&initYear=2024&endMonth=4&endYear=2025")
+	    		.header(MocksUtils.X_TRACKING_ID, "retrieveSalesByDatePeriodErrorInitYearTest")
+	            .contentType(MediaType.APPLICATION_JSON))
+	            .andExpect(status().isBadRequest())
+	            .andReturn();
+		
+		var productsOnSales = MocksUtils.getContentAsString(result, "retrieveSalesByDatePeriodErrorInitYearTest");
+		var objtProducts = MocksUtils.parserToCommonWrapper(productsOnSales,  MocksFactory.getReferenceFromDtoSalesDetailReport());
+		
+		assertNotNull(objtProducts);
+		assertNotNull(objtProducts.getError());
+	}
+	
+	@Test
+	public void retrieveSalesByDatePeriodErrorEndYearTest() throws Exception {
+		Mockito.when(salesBusiness.getSalesByDate(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyInt(), Mockito.anyInt())).thenReturn(MocksFactory.createDtoIntSalesDetailReport());
+		Mockito.when(productsOnSalesCounterMapper.toOuter(Mockito.any())).thenReturn(MocksFactory.createDtoProductsOnSalesCounter());
+		
+		var result = mockMvc.perform(get("/api/v1/reports/sales?reportType=BY_PERIOD&initialMonth=3&initYear=2025&endMonth=4&endYear=2024")
+	    		.header(MocksUtils.X_TRACKING_ID, "retrieveSalesByDatePeriodErrorEndYearTest")
+	            .contentType(MediaType.APPLICATION_JSON))
+	            .andExpect(status().isBadRequest())
+	            .andReturn();
+		
+		var productsOnSales = MocksUtils.getContentAsString(result, "retrieveSalesByDatePeriodErrorEndYearTest");
+		var objtProducts = MocksUtils.parserToCommonWrapper(productsOnSales,  MocksFactory.getReferenceFromDtoSalesDetailReport());
+		
+		assertNotNull(objtProducts);
+		assertNotNull(objtProducts.getError());
+	}
+	
+	@Test
+	public void retrieveSalesByDatePeriodErrorInitMonthTest() throws Exception {
+		Mockito.when(salesBusiness.getSalesByDate(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyInt(), Mockito.anyInt())).thenReturn(MocksFactory.createDtoIntSalesDetailReport());
+		Mockito.when(productsOnSalesCounterMapper.toOuter(Mockito.any())).thenReturn(MocksFactory.createDtoProductsOnSalesCounter());
+		
+		var result = mockMvc.perform(get("/api/v1/reports/sales?reportType=BY_PERIOD&initialMonth=0&initYear=2025&endMonth=1&endYear=2024")
+	    		.header(MocksUtils.X_TRACKING_ID, "retrieveSalesByDatePeriodErrorInitMonthTest")
+	            .contentType(MediaType.APPLICATION_JSON))
+	            .andExpect(status().isBadRequest())
+	            .andReturn();
+		
+		var productsOnSales = MocksUtils.getContentAsString(result, "retrieveSalesByDatePeriodErrorInitMonthTest");
+		var objtProducts = MocksUtils.parserToCommonWrapper(productsOnSales,  MocksFactory.getReferenceFromDtoSalesDetailReport());
+		
+		assertNotNull(objtProducts);
+		assertNotNull(objtProducts.getError());
+	}
+	
+	@Test
+	public void retrieveSalesByDatePeriodErrorEndMonthTest() throws Exception {
+		Mockito.when(salesBusiness.getSalesByDate(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyInt(), Mockito.anyInt())).thenReturn(MocksFactory.createDtoIntSalesDetailReport());
+		Mockito.when(productsOnSalesCounterMapper.toOuter(Mockito.any())).thenReturn(MocksFactory.createDtoProductsOnSalesCounter());
+		
+		var result = mockMvc.perform(get("/api/v1/reports/sales?reportType=BY_PERIOD&initialMonth=3&initYear=2025&endMonth=13&endYear=2025")
+	    		.header(MocksUtils.X_TRACKING_ID, "retrieveSalesByDatePeriodErrorEndMonthTest")
+	            .contentType(MediaType.APPLICATION_JSON))
+	            .andExpect(status().isBadRequest())
+	            .andReturn();
+		
+		var productsOnSales = MocksUtils.getContentAsString(result, "retrieveSalesByDatePeriodErrorEndMonthTest");
+		var objtProducts = MocksUtils.parserToCommonWrapper(productsOnSales,  MocksFactory.getReferenceFromDtoSalesDetailReport());
+		
+		assertNotNull(objtProducts);
+		assertNotNull(objtProducts.getError());
+	}
+	
+	@Test
+	public void retrieveSalesByDatePeriodErrorYearsTest() throws Exception {
+		Mockito.when(salesBusiness.getSalesByDate(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyInt(), Mockito.anyInt())).thenReturn(MocksFactory.createDtoIntSalesDetailReport());
+		Mockito.when(productsOnSalesCounterMapper.toOuter(Mockito.any())).thenReturn(MocksFactory.createDtoProductsOnSalesCounter());
+		
+		var result = mockMvc.perform(get("/api/v1/reports/sales?reportType=BY_PERIOD&initialMonth=3&initYear=2026&endMonth=13&endYear=2025")
+	    		.header(MocksUtils.X_TRACKING_ID, "retrieveSalesByDatePeriodErrorEndMonthTest")
+	            .contentType(MediaType.APPLICATION_JSON))
+	            .andExpect(status().isBadRequest())
+	            .andReturn();
+		
+		var productsOnSales = MocksUtils.getContentAsString(result, "retrieveSalesByDatePeriodErrorEndMonthTest");
+		var objtProducts = MocksUtils.parserToCommonWrapper(productsOnSales,  MocksFactory.getReferenceFromDtoSalesDetailReport());
+		
+		assertNotNull(objtProducts);
+		assertNotNull(objtProducts.getError());
+	}
 }

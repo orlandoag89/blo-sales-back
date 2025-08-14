@@ -14,6 +14,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.blo.sales.dao.mapper.ProductOnSaleCounterMapper;
+import com.blo.sales.dao.mapper.SaleDetailReportMapper;
 import com.blo.sales.dao.mapper.SaleMapper;
 import com.blo.sales.dao.mapper.SalesMapper;
 import com.blo.sales.dao.repository.SalesRepository;
@@ -34,6 +35,9 @@ public class SalesDaoImplTest {
 	
 	@Mock
 	private ProductOnSaleCounterMapper productOnSaleCounterMapper;
+	
+	@Mock
+	private SaleDetailReportMapper saleDetailReportMapper;
 	
 	@InjectMocks
 	private SalesDaoImpl impl;
@@ -162,5 +166,27 @@ public class SalesDaoImplTest {
 		
 		assertNotNull(out.getProductsOnSales());
 		assertFalse(out.getProductsOnSales().isEmpty());
+	}
+	
+	@Test
+	public void getSalesByDateAllSalesTest() {
+		Mockito.when(repository.retrieveSalesByDate(Mockito.any())).thenReturn(MocksFactory.createSalesDetailReport());
+		Mockito.when(saleDetailReportMapper.toOuter(Mockito.any())).thenReturn(MocksFactory.createDtoIntSaleDetailReport());
+		
+		var out = impl.getSalesByDate(0, 0, 0, 0);
+		
+		assertNotNull(out);
+		assertFalse(out.getSales().isEmpty());
+	}
+	
+	@Test
+	public void getSalesByDateSalesByPeriodTest() {
+		Mockito.when(repository.retrieveSalesByDate(Mockito.any())).thenReturn(MocksFactory.createSalesDetailReport());
+		Mockito.when(saleDetailReportMapper.toOuter(Mockito.any())).thenReturn(MocksFactory.createDtoIntSaleDetailReport());
+		
+		var out = impl.getSalesByDate(1, 2025, 2, 2025);
+		
+		assertNotNull(out);
+		assertFalse(out.getSales().isEmpty());
 	}
 }
