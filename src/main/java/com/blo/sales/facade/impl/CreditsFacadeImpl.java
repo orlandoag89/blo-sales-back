@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.blo.sales.business.ICreditsBusiness;
+import com.blo.sales.business.dto.DtoIntCredits;
 import com.blo.sales.exceptions.BloSalesBusinessException;
 import com.blo.sales.facade.ICreditsFacade;
 import com.blo.sales.facade.dto.DtoCredit;
@@ -17,6 +18,7 @@ import com.blo.sales.facade.dto.DtoCredits;
 import com.blo.sales.facade.dto.DtoPartialPyment;
 import com.blo.sales.facade.dto.commons.DtoCommonWrapper;
 import com.blo.sales.facade.dto.commons.DtoError;
+import com.blo.sales.facade.enums.CommonStatusEnum;
 import com.blo.sales.facade.mapper.DtoCreditMapper;
 import com.blo.sales.facade.mapper.DtoCreditsMapper;
 import com.blo.sales.facade.mapper.DtoPartialPymentMapper;
@@ -59,11 +61,16 @@ public class CreditsFacadeImpl implements ICreditsFacade {
 	}
 
 	@Override
-	public ResponseEntity<DtoCommonWrapper<DtoCredits>> getAllCredits() {
+	public ResponseEntity<DtoCommonWrapper<DtoCredits>> getCreditsByStatus(CommonStatusEnum status) {
 		var toBody = new DtoCommonWrapper<DtoCredits>();
-		LOGGER.info("recuperando todos los creditos");
-		var out = business.getAllCredits();
-		LOGGER.info(String.format("creditos [%s]", String.valueOf(out.getCredits().size())));
+		LOGGER.info(String.format("creditos por [%s]", Encode.forJava(String.valueOf(status))));
+		var out = new DtoIntCredits();
+		if (status.compareTo(CommonStatusEnum.ALL) != 0) {
+			out = business.getCreditsByStatus(status.name());
+		} else {
+			out = business.getAllCredits();
+		}
+		LOGGER.info(String.format("creditos encontrados", String.valueOf(out.getCredits().size())));
 		var data = creditsMapper.toOuter(out);
 		toBody.setData(data);
 		return new ResponseEntity<>(toBody, HttpStatus.OK);

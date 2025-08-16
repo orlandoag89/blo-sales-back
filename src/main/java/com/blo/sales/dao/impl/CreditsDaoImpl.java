@@ -134,6 +134,16 @@ public class CreditsDaoImpl implements ICreditsDao {
 		LOGGER.info(String.format("monto de credito actualizado %s", String.valueOf(creditSaved)));
 		return creditMapper.toOuter(creditSaved);
 	}
+	
+	@Override
+	public DtoIntCredits getCreditsByStatus(String status) {
+		LOGGER.info(String.format("recuperando %s creditos", Encode.forJava(status)));
+		List<Credit> credits = repository.retrieveCreditsBy(status);
+		var out = new Credits();
+		out.setCredits(credits);
+		LOGGER.info(String.format("creditos totales: %s", String.valueOf(out.getCredits().size())));
+		return creditsMapper.toOuter(out);
+	}
 
 	private void tryPayCredit(DtoIntCredit credit, BigDecimal amout) {
 		if (amout.compareTo(BigDecimal.ZERO) <= 0) {
@@ -152,4 +162,5 @@ public class CreditsDaoImpl implements ICreditsDao {
 		LOGGER.info(String.format("credito encontrado %s", String.valueOf(creditFound)));
 		return creditMapper.toOuter(creditFound.get());
 	}
+
 }

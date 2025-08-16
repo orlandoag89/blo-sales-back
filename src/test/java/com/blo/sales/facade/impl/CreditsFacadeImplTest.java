@@ -74,13 +74,53 @@ public class CreditsFacadeImplTest {
 		Mockito.when(business.getAllCredits()).thenReturn(MocksFactory.createDtoIntCredits());
 		Mockito.when(creditsMapper.toOuter(Mockito.any())).thenReturn(MocksFactory.createDtoCredits());
 
-		var result = mockMvc.perform(get("/api/v1/credits")
+		var result = mockMvc.perform(get("/api/v1/credits?status=ALL")
 				.header(MocksUtils.X_TRACKING_ID, "getCreditsTest")
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andReturn();
 		
 		var resultAsString = MocksUtils.getContentAsString(result, "getCreditsTest");
+		var obj = MocksUtils.parserToCommonWrapper(resultAsString, MocksFactory.getReferenceFromDtoCredits());
+		
+		assertNotNull(obj);
+		assertNotNull(obj);
+		assertNotNull(obj.getData());
+		assertFalse(obj.getData().getCredits().isEmpty());
+	}
+	
+	@Test
+	public void getCreditsByOpenStatusTest() throws Exception {
+		Mockito.when(business.getCreditsByStatus(Mockito.anyString())).thenReturn(MocksFactory.createDtoIntCredits());
+		Mockito.when(creditsMapper.toOuter(Mockito.any())).thenReturn(MocksFactory.createDtoCredits());
+
+		var result = mockMvc.perform(get("/api/v1/credits?status=OPEN")
+				.header(MocksUtils.X_TRACKING_ID, "getCreditsTest")
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andReturn();
+		
+		var resultAsString = MocksUtils.getContentAsString(result, "getCreditsByTest");
+		var obj = MocksUtils.parserToCommonWrapper(resultAsString, MocksFactory.getReferenceFromDtoCredits());
+		
+		assertNotNull(obj);
+		assertNotNull(obj);
+		assertNotNull(obj.getData());
+		assertFalse(obj.getData().getCredits().isEmpty());
+	}
+	
+	@Test
+	public void getCreditsByCloseStatusTest() throws Exception {
+		Mockito.when(business.getCreditsByStatus(Mockito.anyString())).thenReturn(MocksFactory.createDtoIntCredits());
+		Mockito.when(creditsMapper.toOuter(Mockito.any())).thenReturn(MocksFactory.createDtoCredits());
+
+		var result = mockMvc.perform(get("/api/v1/credits?status=CLOSE")
+				.header(MocksUtils.X_TRACKING_ID, "getCreditsTest")
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andReturn();
+		
+		var resultAsString = MocksUtils.getContentAsString(result, "getCreditsByTest");
 		var obj = MocksUtils.parserToCommonWrapper(resultAsString, MocksFactory.getReferenceFromDtoCredits());
 		
 		assertNotNull(obj);

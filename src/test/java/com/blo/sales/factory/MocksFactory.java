@@ -79,6 +79,7 @@ public final class MocksFactory {
 	private static final String ANY_STRING = "any_string";
 	private static final String ANY_NAME = "Pepe";
 	private static final String ANY_ID = "1a2b3c4d5e";
+	private static final String OPEN = "OPEN";
 	private static final BigDecimal BIG_DECIMAL_0 = BigDecimal.ZERO;
 	private static final BigDecimal BIG_DECIMAL_1 = BigDecimal.ONE;
 	private static final BigDecimal BIG_DECIMAL_5 = new BigDecimal("5");
@@ -88,8 +89,7 @@ public final class MocksFactory {
 	private static final long INITIAL_LONG = 0L;
 	private static final long NOW = Utils.getTimeNow();
 
-	private MocksFactory() {
-	}
+	private MocksFactory() { }
 
 	public static DtoProduct createDtoProduct() {
 		var out = new DtoProduct();
@@ -1128,6 +1128,10 @@ public final class MocksFactory {
 
 	public static BigDecimal getBigDecimal5() {
 		return BIG_DECIMAL_5;
+	}
+	
+	public static String getOpenStatus() {
+		return OPEN;
 	}
 
 	public static TypeReference<DtoCommonWrapper<DtoWrapperSale>> getReferenceFromWrapperSale() {

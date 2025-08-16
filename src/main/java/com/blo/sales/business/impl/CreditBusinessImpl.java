@@ -54,4 +54,10 @@ public class CreditBusinessImpl implements ICreditsBusiness {
 		return dao.updateAmount(idCredit, amount);
 	}
 
+	@Override
+	public DtoIntCredits getCreditsByStatus(String status) {
+		LOGGER.info(String.format("recuperando creditos [%s]", Encode.forJava(status)));
+		return dao.getCreditsByStatus(status);
+	}
+
 }

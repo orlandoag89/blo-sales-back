@@ -37,6 +37,17 @@ public class CreditBusinessImplTest {
 	}
 	
 	@Test
+	public void getCreditsByStatusTest() {
+		Mockito.when(dao.getCreditsByStatus(Mockito.anyString())).thenReturn(MocksFactory.createDtoIntCredits());
+		
+		var out = business.getCreditsByStatus(MocksFactory.getOpenStatus());
+		
+		Mockito.verify(dao, Mockito.atLeastOnce()).getCreditsByStatus(Mockito.anyString());
+		
+		assertFalse(out.getCredits().isEmpty());
+	}
+	
+	@Test
 	public void registerNewCreditTest() throws BloSalesBusinessException {
 		Mockito.when(dao.registerNewCredit(Mockito.any())).thenReturn(MocksFactory.createDtoIntCreditSaved());
 		
