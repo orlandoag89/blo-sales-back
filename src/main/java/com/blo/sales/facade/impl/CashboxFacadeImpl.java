@@ -72,7 +72,7 @@ public class CashboxFacadeImpl implements ICashboxFacade {
 	public ResponseEntity<DtoCommonWrapper<DtoCashboxes>> getAllCashboxes() {
 		var cashboxes = business.getAllCashboxes();
 		var out = cashboxesMapper.toOuter(cashboxes);
-		LOGGER.info(String.format("cashboxes %s", String.valueOf(out)));
+		LOGGER.info(String.format("hay cashboxes %s", String.valueOf(out.getBoxes().size())));
 		var output = new DtoCommonWrapper<DtoCashboxes>();
 		output.setData(out);
 		return new ResponseEntity<>(output, HttpStatus.OK);

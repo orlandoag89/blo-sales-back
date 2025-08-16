@@ -54,7 +54,7 @@ public class CashboxesDaoImpl implements ICashboxesDao {
 		var allCashboxes = repository.findAll();
 		cashboxes.setBoxes(allCashboxes);
 		var out = cashboxesMapper.toOuter(cashboxes);
-		LOGGER.info(String.format("cashboxes found %s", String.valueOf(out)));
+		LOGGER.info(String.format("cashboxes found %s", String.valueOf(out.getBoxes().size())));
 		return out;
 	}
 

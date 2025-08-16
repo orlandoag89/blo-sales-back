@@ -72,7 +72,7 @@ public class ProductsDaoImpl implements IProductsDao {
 		var allProducts = repository.findAll();
 		var wrapperProducts = new Products();
 		wrapperProducts.setProducts(allProducts);
-		LOGGER.info(String.format("Products found: %s", String.valueOf(wrapperProducts)));
+		LOGGER.info(String.format("Products found: %s", String.valueOf(allProducts.size())));
 		return productsMapper.toOuter(wrapperProducts);
 	}
 

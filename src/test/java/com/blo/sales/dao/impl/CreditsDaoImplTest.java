@@ -51,6 +51,20 @@ public class CreditsDaoImplTest {
 		assertNotNull(out);
 		assertFalse(out.getCredits().isEmpty());
 	}
+	
+	@Test
+	public void getCreditsByStatusTest() {
+		Mockito.when(repository.retrieveCreditsBy(Mockito.anyString())).thenReturn(MocksFactory.createCreditList());
+		Mockito.when(creditsMapper.toOuter(Mockito.any())).thenReturn(MocksFactory.createDtoIntCredits());
+		
+		var out = dao.getCreditsByStatus(MocksFactory.getOpenStatus());
+		
+		Mockito.verify(repository, Mockito.atLeastOnce()).retrieveCreditsBy(Mockito.anyString());
+		Mockito.verify(creditsMapper, Mockito.atLeastOnce()).toOuter(Mockito.any());
+		
+		assertNotNull(out);
+		assertFalse(out.getCredits().isEmpty());
+	}
 
 	@Test
 	public void registerNewCreditTest() throws BloSalesBusinessException {
@@ -190,6 +204,5 @@ public class CreditsDaoImplTest {
 		
 		assertEquals(CommonStatusIntEnum.CLOSE, out.getStatus_credit());
 	}
-	
-	
+		
 }

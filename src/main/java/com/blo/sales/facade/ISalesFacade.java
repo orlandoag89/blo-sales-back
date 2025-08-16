@@ -34,4 +34,5 @@ public interface ISalesFacade {
 		@RequestParam BigDecimal partialPyment,
 		@RequestParam long time
 	);
+	
 }

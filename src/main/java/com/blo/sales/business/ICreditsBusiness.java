@@ -9,7 +9,9 @@ import com.blo.sales.exceptions.BloSalesBusinessException;
 
 public interface ICreditsBusiness {
 	
-DtoIntCredits getAllCredits();
+	DtoIntCredits getAllCredits();
+	
+	DtoIntCredits getCreditsByStatus(String status);
 	
 	DtoIntCredit registerNewCredit(DtoIntCredit credit) throws BloSalesBusinessException;
 	

@@ -54,7 +54,7 @@ public class DebtorsDaoImpl implements IDebtorsDao {
 		wrapperDebtors.setDebtors(debtors);
 		
 		var out = debtorsMapper.toOuter(wrapperDebtors);
-		LOGGER.info(String.format("Debtors: %s", String.valueOf(out)));
+		LOGGER.info(String.format("Debtors: %s", String.valueOf(debtors.size())));
 		
 		return out;
 	}
