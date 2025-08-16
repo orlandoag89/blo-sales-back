@@ -154,7 +154,7 @@ public class SalesFacadeImpl implements ISalesFacade {
 				LOGGER.info(String.format("ventas no en caja %s", String.valueOf(sales.getSales().size())));
 			}
 			out = salesMapper.toOuter(sales);
-			LOGGER.info(String.format("sales %s found %s", String.valueOf(out), status));
+			LOGGER.info(String.format("sales %s found %s", String.valueOf(out.getSales().size()), status));
 			output.setData(out);
 			return new ResponseEntity<>(output, HttpStatus.OK);
 		} catch (BloSalesBusinessException e) {
