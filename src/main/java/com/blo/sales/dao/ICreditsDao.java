@@ -11,6 +11,8 @@ public interface ICreditsDao {
 	
 	DtoIntCredits getAllCredits();
 	
+	DtoIntCredits getCreditsByStatus(String status);
+	
 	DtoIntCredit registerNewCredit(DtoIntCredit credit) throws BloSalesBusinessException;
 	
 	DtoIntCredit addPayment(String idCredit, DtoIntPartialPyment partialPayment) throws BloSalesBusinessException;

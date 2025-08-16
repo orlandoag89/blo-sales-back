@@ -81,7 +81,7 @@ public class DebtorFacadeImpl implements IDebtorFacade {
 		var output = new DtoCommonWrapper<DtoDebtors>();
 		try {
 			var debtors = business.getDebtors();
-			LOGGER.info(String.format("Debtors %s", String.valueOf(debtors)));
+			LOGGER.info(String.format("Debtors %s", String.valueOf(debtors.getDebtors().size())));
 			var out = debtorsMapper.toOuter(debtors);
 			output.setData(out);
 			return new ResponseEntity<>(output, HttpStatus.OK);

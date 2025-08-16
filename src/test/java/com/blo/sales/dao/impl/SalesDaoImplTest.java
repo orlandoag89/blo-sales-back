@@ -13,6 +13,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.blo.sales.dao.mapper.ProductOnSaleCounterMapper;
+import com.blo.sales.dao.mapper.SaleDetailReportMapper;
 import com.blo.sales.dao.mapper.SaleMapper;
 import com.blo.sales.dao.mapper.SalesMapper;
 import com.blo.sales.dao.repository.SalesRepository;
@@ -30,6 +32,12 @@ public class SalesDaoImplTest {
 	
 	@Mock
 	private SaleMapper saleMapper;
+	
+	@Mock
+	private ProductOnSaleCounterMapper productOnSaleCounterMapper;
+	
+	@Mock
+	private SaleDetailReportMapper saleDetailReportMapper;
 	
 	@InjectMocks
 	private SalesDaoImpl impl;
@@ -133,6 +141,50 @@ public class SalesDaoImplTest {
 		Mockito.when(salesMapper.toOuter(Mockito.any())).thenReturn(MocksFactory.createDtoIntSales());
 		
 		var out = impl.getSalesNotCashbox();
+		
+		assertNotNull(out);
+		assertFalse(out.getSales().isEmpty());
+	}
+	
+	@Test
+	public void getBestSellingProductsByAllTest() throws BloSalesBusinessException {
+		Mockito.when(repository.countSalesByProduct(Mockito.anyList())).thenReturn(MocksFactory.createProductsOnSaleCounter());
+		Mockito.when(productOnSaleCounterMapper.toOuter(Mockito.any())).thenReturn(MocksFactory.createDtoIntProductOnSaleCounter());
+		
+		var out = impl.getBestSellingProducts(0,0,0,0);
+		
+		assertNotNull(out.getProductsOnSales());
+		assertFalse(out.getProductsOnSales().isEmpty());
+	}
+	
+	@Test
+	public void getBestSellingProductsByPeriodTest() throws BloSalesBusinessException {
+		Mockito.when(repository.countSalesByProduct(Mockito.anyList())).thenReturn(MocksFactory.createProductsOnSaleCounter());
+		Mockito.when(productOnSaleCounterMapper.toOuter(Mockito.any())).thenReturn(MocksFactory.createDtoIntProductOnSaleCounter());
+		
+		var out = impl.getBestSellingProducts(1, 2025, 2, 2025);
+		
+		assertNotNull(out.getProductsOnSales());
+		assertFalse(out.getProductsOnSales().isEmpty());
+	}
+	
+	@Test
+	public void getSalesByDateAllSalesTest() {
+		Mockito.when(repository.retrieveSalesByDate(Mockito.any())).thenReturn(MocksFactory.createSalesDetailReport());
+		Mockito.when(saleDetailReportMapper.toOuter(Mockito.any())).thenReturn(MocksFactory.createDtoIntSaleDetailReport());
+		
+		var out = impl.getSalesByDate(0, 0, 0, 0);
+		
+		assertNotNull(out);
+		assertFalse(out.getSales().isEmpty());
+	}
+	
+	@Test
+	public void getSalesByDateSalesByPeriodTest() {
+		Mockito.when(repository.retrieveSalesByDate(Mockito.any())).thenReturn(MocksFactory.createSalesDetailReport());
+		Mockito.when(saleDetailReportMapper.toOuter(Mockito.any())).thenReturn(MocksFactory.createDtoIntSaleDetailReport());
+		
+		var out = impl.getSalesByDate(1, 2025, 2, 2025);
 		
 		assertNotNull(out);
 		assertFalse(out.getSales().isEmpty());

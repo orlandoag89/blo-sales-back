@@ -139,19 +139,19 @@ public class SalesFacadeImpl implements ISalesFacade {
 			var sales = new DtoIntSales();
 			if (status.name().equals(StatusSaleEnum.ALL.name())) {
 				sales = business.getSales();
-				LOGGER.info(String.format("all sales %s", String.valueOf(sales)));
+				LOGGER.info(String.format("all sales %s", String.valueOf(sales.getSales().size())));
 			}
 			if (status.name().equals(StatusSaleEnum.OPEN.name())) {
 				sales = business.getSalesOpen();
-				LOGGER.info(String.format("open sales %s", String.valueOf(sales)));
+				LOGGER.info(String.format("open sales %s", String.valueOf(sales.getSales().size())));
 			}
 			if (status.name().equals(StatusSaleEnum.CLOSE.name())) {
 				sales = business.getSalesClose();
-				LOGGER.info(String.format("close sales %s", String.valueOf(sales)));
+				LOGGER.info(String.format("close sales %s", String.valueOf(sales.getSales().size())));
 			}
 			if (status.name().equals(StatusSaleEnum.NOT_CASHBOX.name())) {
 				sales = business.getSalesNotCashbox();
-				LOGGER.info(String.format("ventas no en caja %s", String.valueOf(sales)));
+				LOGGER.info(String.format("ventas no en caja %s", String.valueOf(sales.getSales().size())));
 			}
 			out = salesMapper.toOuter(sales);
 			LOGGER.info(String.format("sales %s found %s", String.valueOf(out), status));

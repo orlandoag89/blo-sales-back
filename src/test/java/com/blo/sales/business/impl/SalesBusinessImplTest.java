@@ -103,4 +103,24 @@ public class SalesBusinessImplTest {
 		assertNotNull(out);
 		assertFalse(out.getSales().isEmpty());
 	}
+	
+	@Test
+	public void getBestSellingProducts() throws BloSalesBusinessException {
+		Mockito.when(dao.getBestSellingProducts(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyInt(), Mockito.anyInt())).thenReturn(MocksFactory.createDtoIntProductsOnSalesCounter());
+		
+		var out = impl.getBestSellingProducts(0,0,0,0);
+		
+		assertNotNull(out);
+		assertFalse(out.getProductsOnSales().isEmpty());
+	}
+	
+	@Test
+	public void getSalesByDateTest() {
+		Mockito.when(dao.getSalesByDate(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyInt(), Mockito.anyInt())).thenReturn(MocksFactory.createDtoIntSalesDetailReport());
+		
+		var out = impl.getSalesByDate(0, 0, 0, 0);
+		
+		assertNotNull(out);
+		assertFalse(out.getSales().isEmpty());
+	}
 }
