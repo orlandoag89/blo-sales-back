@@ -10,9 +10,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import com.blo.sales.dao.IProductsDao;
+import com.blo.sales.dao.enums.SpecialProductsEnum;
 import com.blo.sales.exceptions.BloSalesBusinessException;
 import com.blo.sales.factory.MocksFactory;
 
@@ -39,9 +39,10 @@ public class ProductsServiceImplTest {
 	
 	@Test
 	public void getProductsTest() throws BloSalesBusinessException {
-		ReflectionTestUtils.setField(impl, "productsMessagesSpecial", "Productos de papeleria, chicharrones");
+		var anotherProduct = MocksFactory.createDtoIntProduct();
+		anotherProduct.setName(SpecialProductsEnum.ANOTHER_PRODUCT_SERVICE.name());
 		Mockito.when(dao.getProducts()).thenReturn(MocksFactory.createDtoIntProducts());
-		Mockito.when(dao.getAnotherProductServices()).thenReturn(MocksFactory.createDtoIntProduct());
+		Mockito.when(dao.getAnotherProductServices()).thenReturn(anotherProduct);
 		
 		var out = impl.getProducts();
 		
@@ -49,7 +50,7 @@ public class ProductsServiceImplTest {
 		
 		assertNotNull(out);
 		assertFalse(out.getProducts().isEmpty());
-		assertEquals("Productos de papeleria, chicharrones", out.getProducts().get(0).getName());
+		assertEquals("ANOTHER_PRODUCT_SERVICE", out.getProducts().get(0).getName());
 	}
 	
 	@Test
